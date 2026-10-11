@@ -30,7 +30,7 @@ state.encounter=makeId();
 let progressHistory=[],progressOpen=false,progressSelection='',progressType='all',progressStored=true,progressMessage='';
 try{progressHistory=readProgress(localStorage.getItem(PROGRESS_KEY));}catch{progressStored=false;}
 const escapeHTML=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-const RATING_LABELS={balanced:'Just about perfect',aggressive:'Too aggressive',conservative:'Too conservative',refine:'Target needs refining'};
+const RATING_LABELS={balanced:'Strong decision',aggressive:'Too aggressive',conservative:'Too conservative',refine:'Target needs refining'};
 function currentProfile(){return profileKey(state.mode,state.basicHandicap,state.pattern.driverLimit,state.memberBag,state.costs);}
 function recordDecision(){
  if(!Number.isFinite(best.result.expected)){progressMessage='No progress entry: this run has no usable target comparison.';return;}
@@ -127,7 +127,7 @@ function updateLabels(){
  const zoomAllowed=!working&&!result&&!editorDraft&&!progressOpen;
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);
  $('course').setAttribute('viewBox',aimZoom&&zoomAllowed?`${aimZoom.x} ${aimZoom.y} ${aimZoom.width} ${aimZoom.height}`:'0 0 960 580');
- $('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
+ $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
  $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course or the bird’s-eye map. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
@@ -263,7 +263,7 @@ function showResult(){
  let note=!Number.isFinite(b.expected)?'No sampled target avoids an all-OB pattern. Adjust the shot settings; the comparison is not meaningful here.':regret<.05?'A bad single outcome can still follow a good decision.':`The comparison moves the target ${sided(dx)} and ${Math.abs(dy).toFixed(0)} yd ${dy>=0?'deeper':'shorter'}. It saves about ${Number.isFinite(regret)?regret.toFixed(2):'many'} expected strokes.`;
  if(penaltyGain>1)note+=` Water / OB exposure falls by ${penaltyGain.toFixed(1)} percentage points.`;
  if(s.type==='approach'&&Math.hypot(best.aim.x-s.pin.x,best.aim.y-s.pin.y)>8)note+=' The flag and the best target do not have to be the same point.';
- $('coachNote').textContent=lesson.why+' '+lesson.action+' '+note+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
+ $('coachNote').textContent=(lesson.hazardDetail||lesson.why)+'\n\n'+lesson.action+'\n\n'+(lesson.hazardDetail?'':note)+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
  updateLabels();drawCourse();
 }
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));

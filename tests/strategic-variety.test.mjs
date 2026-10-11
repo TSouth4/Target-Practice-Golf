@@ -56,3 +56,14 @@ test('generated par-5 second shots include reachable and unreachable greens whil
  }
  assert.ok(reachable&&unreachable);
 });
+
+test('guarded front, side and back pins make flag aiming measurably worse than a playable alternative',async()=>{
+ for(const [id,seed,axis,direction] of [['water',43,'y',1],['tucked',43,'x',-1],['bowl',5,'y',-1]]){
+  const s=generateScenario(SCENARIOS.find(base=>base.id===id),seed),p=basicPattern(10,s),zs=samples(1200,411),a=s.pin;
+  const r=evaluate(a,patternAtTarget(a,p),s,DEFAULT_COSTS,zs),best=await optimizeTargets(a,p,s,DEFAULT_COSTS,zs);
+  assert.equal(lie(s.pin,s),'green');assert.ok(!s.generation.fallback);
+  assert.ok(r.expected-best.result.expected>.08,`${id}: meaningful flag-target cost`);
+  assert.ok((best.aim[axis]-a[axis])*direction>5,`${id}: safer side of pin`);
+  assert.ok((r.counts.water-best.result.counts.water)/r.n>.08,`${id}: actual water reduction`);
+ }
+});

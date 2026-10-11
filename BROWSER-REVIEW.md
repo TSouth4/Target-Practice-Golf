@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.2.2 automatic environments
+## Update: v12.3 guarded pins and descriptive feedback
+
+All fourteen families passed generated commit/retry browser checks, including the new `approach-v2` layouts. Desktop front-pond and phone side-pond checks confirmed that coaching names the actual hazard, describes the relevant short or lateral miss, shows the measured rate reduction, and retains the expandable lesson. Elevated View is hidden after commitment. The numeric score formula is unchanged; the balanced rating reads Strong decision.
+
+Geometry tests still cover 7,000 layouts. Strategy tests compare flag aiming against alternative targets for front, side and back guarded pins, with actual water-rate reductions and expected-cost improvements. `guarded-feedback.cjs` reproduces the focused feedback browser checks. Validation remains local Chromium; the private hosted site and physical devices have not been tested by this environment.
+
+## Previous update: v12.2.2 automatic environments
 
 Browser checks passed at 1440-, 390-, and 320-pixel widths: the selector is absent, Next shot changes environment, Retry preserves it, and reload retains the new environment without exposing shot outcomes. No browser errors were captured. The existing geometry test confirms that scenery does not alter outcomes, and a new sequence test covers deterministic selection, all three environments, and no immediate repeats. `learning.cjs` includes the browser checks.
 

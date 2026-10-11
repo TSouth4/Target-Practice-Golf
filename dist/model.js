@@ -120,7 +120,7 @@ export const FEEDBACK_RULES={closeStrokes:.05,riskGap:.02,proximityGap:5};
 export function decisionFeedback(aim,p,r,b,s){
  if(!Number.isFinite(b.result.expected))return{kind:'refine',label:'Pattern needs adjustment',reason:'Every sampled target produced only OB outcomes. This run has no usable target comparison.'};
  const regret=Number.isFinite(r.expected)?Math.max(0,r.expected-b.result.expected):Infinity;
- if(regret<=FEEDBACK_RULES.closeStrokes)return{kind:'balanced',label:'Just about perfect',reason:'Within 0.05 expected strokes of the best sampled target in this model.'};
+ if(regret<=FEEDBACK_RULES.closeStrokes)return{kind:'balanced',label:'Strong decision',reason:'Within 0.05 expected strokes of the best sampled target in this model.'};
  if(!Number.isFinite(r.expected))return{kind:'aggressive',label:'Too aggressive',reason:'Every simulated shot finished OB. Change the target or the shot pattern.'};
  const risk=q=>(q.counts.water+q.counts.ob+q.counts.bunker+q.counts.trees)/q.n;
  const extraRisk=risk(r)-risk(b.result);

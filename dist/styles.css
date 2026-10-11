@@ -70,3 +70,5 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
 .course-with-depth #aimDepthWrap output{display:block;font-weight:700}
 .course-with-depth #aimY{writing-mode:vertical-lr;direction:rtl;flex:1;min-height:100px;width:44px;margin:0;touch-action:none}
 @media(max-width:760px){.course-with-depth{gap:4px}.course-with-depth #aimDepthWrap{width:48px;padding:6px 2px}.course-with-depth #aimDepthWrap label{font-size:10px}.course-with-depth #aimY{min-height:80px}}
+
+.coach-note{white-space:pre-line}

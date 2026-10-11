@@ -2,7 +2,7 @@ import {random} from './model.js';
 import {decorateScenario} from './landscape.js';
 import {validateTeeScenario,validPolygon} from './tee-generator.js';
 
-export const APPROACH_GENERATOR_VERSION='approach-v1';
+export const APPROACH_GENERATOR_VERSION='approach-v2';
 function build(base,seed,attempt){
  const rng=random((seed+attempt*104729)>>>0),between=(a,b)=>a+(b-a)*rng(),side=rng()<.5?-1:1;
  const par5=!!base.secondShot,creek=base.id==='creek-par3'||base.id==='par5-carry';
@@ -19,7 +19,11 @@ function build(base,seed,attempt){
   s.labels.push({x:cx,y:cy,text:kind==='water'?'WATER':'SAND'});
  }
  let problem;
- if(creek){
+ if(base.id==='water'){
+  hazard('water','Front pond',x,y-green.ry-12,between(25,40),between(7,9));
+  hazard('bunker','Back-side bunker',x+side*(green.rx+10),y+5,between(5,8),between(9,15));
+  problem='A front pin sits just beyond water. Compare flag proximity with room for shorter finishes; too much depth can leave a longer next putt or miss the back of the green.';
+ }else if(creek){
   const far=y-green.ry-10,near=far-between(12,30),tilt=between(-4,4);
   s.hazards.push({kind:'water',label:par5?'Carry creek':'Front creek',poly:[[bounds[0]+3,near+tilt],[bounds[1]-3,near-tilt],[bounds[1]-3,far-tilt],[bounds[0]+3,far+tilt]],drop:{...drop}});
   s.labels.push({x:center(near),y:(near+far)/2,text:'CREEK'});
@@ -36,12 +40,18 @@ function build(base,seed,attempt){
   hazard('bunker','Greenside bunker',x+side*(green.rx+10),y+between(-8,8),between(5,8),between(10,16));
   problem='Your second shot on a par 5 has a reachable green for some club profiles and a layup for others. Compare the wider short landing area with the tighter green entrance.';
  }else{
-  hazard('water',side<0?'Left pond':'Right pond',x+side*(green.rx+17),y+between(-6,6),between(8,12),green.ry+between(9,19));
+  hazard('water',side<0?'Left pond':'Right pond',x+side*(green.rx+11),y+between(-6,6),between(7,9),green.ry+between(9,19));
   hazard('bunker','Front-side bunker',x-side*green.rx*.7,y-green.ry-12,between(6,12),between(5,8));
   problem='A side pond and front-side sand guard a green whose angle, size and pin position change. Give your dispersion room without leaving an unnecessarily long next shot.';
  }
  const angle=between(0,Math.PI*2),radius=between(.15,.7);
- s.pin={x:x+Math.cos(angle)*green.rx*radius,y:y+Math.sin(angle)*green.ry*radius};s.length=Math.round(Math.hypot(s.pin.x,s.pin.y));
+ s.pin={x:x+Math.cos(angle)*green.rx*radius,y:y+Math.sin(angle)*green.ry*radius};
+ // Tucked flags deliberately tempt players toward a guarded edge; the green remains playable.
+ if(base.id==='tucked')s.pin={x:x+side*green.rx*.84,y:y+green.ry*between(-.2,.2)};
+ if(base.id==='water')s.pin={x:x+green.rx*between(-.15,.15),y:y-green.ry*.84};
+ if(base.id==='bowl')s.pin={x:x+green.rx*between(-.15,.15),y:y+green.ry*(side<0?-.82:.82)};
+ if(base.id==='split')s.pin={x:x+side*green.rx*.85,y:y+green.ry*between(-.15,.15)};
+s.length=Math.round(Math.hypot(s.pin.x,s.pin.y));
  s.tag=`${s.length} yards · ${par5?'par 5 second shot':s.par===3?'par 3':'approach'} · ${creek?'crossing creek':base.id==='bowl'?'sand short / water long':'guarded green'}`;
  s.brief=problem;s.generation={attempt,greenWidth:green.rx*2,greenDepth:green.ry*2,hazardSide:side,creek};
  return s;

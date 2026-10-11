@@ -1,6 +1,16 @@
 # Target Practice
 
-## Current development update: v12.2.2
+## Current development update: v12.3.0
+
+Approaches now include front flags just beyond a pond, flags tucked beside side water, front/back flags between sand and water, and flags near one of two side bunkers. This changes existing families rather than adding more copies to the bank. `approach-v2` changes generated geometry and pin placement; older seeds need their generator version to reproduce the prior layout. Seed zero still retains each authored baseline, and Retry preserves the current layout.
+
+Feedback connects the actual target adjustment with a named hazard, the side of the miss pattern it protects, and measured outcome-rate changes. It distinguishes laying up before a carry from aiming deeper to clear a front hazard. It does not claim that shorter simulated shots were caused by measured mishits.
+
+The numeric grade remains `100 − 60 × extra expected strokes`, rounded and bounded to 0–100. A score near 98 corresponds to about 0.03 extra modeled strokes; an off-center target can deserve a high score when its outcomes are nearly as good. The balanced rating now reads **Strong decision**, replacing **Just about perfect**. Elevated View is hidden during review; Eye level and Landing zoom remain available.
+
+Validation: all 114 regression tests passed. Focused lesson tests and desktop/phone feedback checks were rerun after refining the descriptive wording. All fourteen generated families passed browser commit/retry checks.
+
+## Previous development update: v12.2.2
 
 New scenarios automatically mix East Coast woodland, Pacific Coast, and desert environments. The landscape selector is removed. Consecutive new scenarios use different environments; retries and reloads preserve the current one. Environment affects scenery, not scoring or the shot model. This version includes all v12.2.1 learning and depth improvements. All 112 automated tests and syntax checks passed, plus desktop and phone browser checks for automatic mixing, retry, and reload.
 
@@ -60,6 +70,7 @@ node scripts/browser-review/check.cjs
 node scripts/browser-review/gestures.cjs
 node scripts/browser-review/mobile-and-generated.cjs
 node scripts/browser-review/learning.cjs
+node scripts/browser-review/guarded-feedback.cjs
 ```
 
 These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.
