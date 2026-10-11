@@ -19,7 +19,7 @@ test('seeded hole variations reproduce exact geometry, keep pins safe and includ
   const original=JSON.stringify(base),s=generateScenario(base,seed);assert.deepEqual(s,generateScenario(base,seed));assert.notDeepEqual(s.fairway,base.fairway);assert.ok(s.bounds[0]<s.bounds[1]);assert.equal(lie(s.pin,s),'green');assert.ok(s.aimRange[0]<s.aimY&&s.aimY<s.aimRange[1]);assert.ok(s.length>60);assert.equal(JSON.stringify(base),original);
   if(base.id==='bend'){left||=s.tag.includes('left');right||=s.tag.includes('right');}
  }
- assert.ok(left&&right);assert.equal(SCENARIOS.length,10);
+ assert.ok(left&&right);assert.equal(SCENARIOS.length,14);
 });
 test('scored distributions and comparison obey the same reach and club rules on generated holes',async()=>{
  const zs=samples(600,17);

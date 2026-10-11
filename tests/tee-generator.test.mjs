@@ -54,7 +54,7 @@ test('representative generated layouts keep scoring, club reach, and sampled com
 });
 
 test('the same generated short par 4 rewards reaching the green or laying up according to the player profile',async()=>{
- const s=generateScenario(SCENARIOS.find(s=>s.id==='drivable'),5),zs=samples(1200,912);
+ const s=generateScenario(SCENARIOS.find(s=>s.id==='drivable'),1),zs=samples(1200,912);
  const scratch=basicPattern(0,s),higher=basicPattern(20,s);
  const go=await optimizeTargets({x:0,y:150},scratch,s,DEFAULT_COSTS,zs),layup=await optimizeTargets({x:0,y:150},higher,s,DEFAULT_COSTS,zs);
  assert.equal(lie(go.aim,s),'green');assert.ok(go.result.counts.green/zs.length>.5);

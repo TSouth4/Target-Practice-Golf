@@ -1,6 +1,14 @@
 # Target Practice — first browser review
 
-## Update: mobile improvements and tee generation
+## Update: v12.2 scenario variety and course actions
+
+Chromium checks passed the core flow at 1440-, 390-, and 320-pixel widths, touch gestures and normal-motion commitments, phone slider and orientation checks, and commit/retry for all fourteen generated families. No page errors were captured. Desktop and phone measurements placed the action bar ten pixels below the course; it remained visible while adjusting the aiming control. Sharp doglegs rendered correctly with the expanded aiming range.
+
+All 111 automated tests and JavaScript syntax checks passed. Automated geometry checks cover 3,500 tee and 3,500 approach layouts. A 240-scenario mixed session covered all fourteen families without identical geometry. Strategy tests demonstrate profile-dependent creek carry/layup decisions and meaningful dogleg aiming penalties.
+
+The owner reports that the prior hosted version works after Work corrected its deployment. This v12.2 review uses local Chromium; publishing and physical-phone, Safari, and Firefox checks remain outstanding.
+
+## Previous update: mobile improvements and tee generation
 
 The v12.1.0 development changes passed all 106 automated tests and code checks. The original browser flow was rerun successfully at 1440-, 390-, and 320-pixel widths, with both normal and reduced motion. Additional phone checks confirmed readable terrain-only labels, fixed practice actions during scrolling, 44-pixel slider areas with finger-like touch dragging, and orientation resizing without target loss or page overflow. Each of the four generated tee families was committed and retried in a simulated phone browser, preserving identical geometry and hiding answers again. No page errors were captured.
 

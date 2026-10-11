@@ -1,6 +1,18 @@
 # Target Practice
 
-## Current development update: v12.1.0
+## Current development update: v12.2.0
+
+This update expands practice to 14 families: seven tee situations and seven approaches. New families include sharp doglegs, crossing creeks, a short par 4 with a narrowing entrance, and a creek par 3. Reachable par 4s and par-5 second shots remain part of the mix. Every family now varies its geometry, including fairway shape, landing width, green size and position, hazards, and pin placement. Sharp doglegs support aiming up to 120 yards sideways.
+
+Commit & shoot and the review actions sit immediately below the course on desktop and phone. The action bar stays visible while adjusting lower controls.
+
+Nonzero seeds use `tee-v2` or `approach-v1`; seed zero preserves authored layouts. Retry keeps the exact scenario and shot draws. Both generators validate geometry and safe landing areas, try at most eight candidates, and retain an authored fallback. Seeds from earlier generator versions can produce different layouts in this version.
+
+All 111 automated tests and JavaScript syntax checks passed. Validation covers 7,000 generated layouts and a 240-scenario mixed session with no identical geometry. Strategy checks exercise creek carry versus layup, sharp-dogleg aim, and reachable versus unreachable par-5 greens. These are varied versions of 14 architectures; player feedback is still needed to judge difficulty during longer sessions. The golf model remains illustrative.
+
+The v12.2 changes are prepared in GitHub, but have not been published to the private site from this environment. See `DEPLOYMENT.md` for the complete-file publishing handoff and `BROWSER-REVIEW.md` for browser verification.
+
+## Previous development update: v12.1.0
 
 The original v12.0.0 import remains the baseline on `main`. This update adds:
 
@@ -41,7 +53,7 @@ Private, buildless golf decision trainer. Serve `dist/` as static assets. The ap
 
 ## Practice
 
-Every visit starts with the free handicap profile: straight flight, no big-miss mixture, automatic club selection and distance-dependent dispersion. There is one practice screen. Tee / Approach / Mixed filters replace the named hole chooser. Next shot selects a different authored family, avoids the recent six families when possible, and applies a seeded width, length, pin-position and dogleg-direction variation. Mixed favors the other shot type. There are currently ten underlying families, not unlimited distinct architectures. Retry preserves the exact layout and shot sample.
+Every visit starts with the free handicap profile: straight flight, no big-miss mixture, automatic club selection and distance-dependent dispersion. There is one practice screen. Tee / Approach / Mixed filters replace the named hole chooser. Next shot selects a different authored family, avoids the recent six families when possible, and generates seeded fairway, green, pin, and hazard variations. Mixed favors the other shot type. There are currently fourteen underlying families. Retry preserves the exact layout and shot sample.
 
 Choose direction on the standing-eye POV and depth along that heading on the terrain-only bird’s-eye inset. Double-tap/double-click toggles a terrain-only 2× crop centered on the tapped area; the Zoom in/out button offers a keyboard-accessible alternative centered on the nominal target. The recognized double gesture restores the selection from before its first tap. Single taps retain normal target selection. The SVG screen transform maps picks back through the crop to the same world geometry. Zoom does not inspect dispersion or comparison targets, resets on commitment, retry, new scenario, profile switch or elevation change, and is never persisted across reloads. Keyboard sliders provide the same controls. No dispersion, mean finish or comparison aim is drawn before commitment. Commit & shoot locks controls, simulates 4,000 seeded outcomes, animates 48 evenly spaced examples colored by final lie, then zooms to the orange selected distribution and blue best sampled comparison. Reduced motion skips animation. Feedback labels and model estimates describe the decision, not the quality of one lucky shot. The landing zoom fits both exact 80% core contours, aim markers and mean finishes with tighter margins; rare tails can leave the frame and still count. Review hides locked aim controls and the repeated scenario brief. Tap the rating to expand a lesson grounded in the run’s hazard rates, nominal proximity, expected cost and club comparison. The lesson includes a target adjustment and distinguishes all-OB/no-usable-comparison cases.
 

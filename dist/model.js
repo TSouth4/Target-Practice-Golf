@@ -40,12 +40,12 @@ const PRESETS = {
  20:{tee:[210,28,21,10,58],approach:[155,14,16,10,34]}
 };
 export function preset(handicap,type){const [carry,sdSide,sdLong,bigPct,bigShift]=PRESETS[handicap][type];return {carry,roll:type==='tee'?15:0,sdSide,sdLong,bigPct,bigShift,bigDirection:'both',bigShort:12,start:0,curve:0,bias:0,height:type==='tee'?32:25,rho:0};}
-export function basicPattern(handicap,s,driverLimit=DRIVER_LIMITS[handicap]){const driver=preset(handicap,'tee'),iron=preset(handicap,'approach');const p={...preset(handicap,s.type),autoBag:true,handicap,driverLimit,shotType:s.type,driverSide:driver.sdSide,driverLong:driver.sdLong,ironSide:iron.sdSide,ironLong:iron.sdLong,start:0,curve:0,bias:0,rho:0,bigPct:0,bigShort:0};return patternAtTarget(fitTarget({x:0,y:s.aimY},p),p);}
+export function basicPattern(handicap,s,driverLimit=DRIVER_LIMITS[handicap]){const driver=preset(handicap,'tee'),iron=preset(handicap,'approach');const p={...preset(handicap,s.type),autoBag:true,handicap,driverLimit,shotType:s.type,aimXRange:s.aimXRange||[-60,60],driverSide:driver.sdSide,driverLong:driver.sdLong,ironSide:iron.sdSide,ironLong:iron.sdLong,start:0,curve:0,bias:0,rho:0,bigPct:0,bigShort:0};return patternAtTarget(fitTarget({x:0,y:s.aimY},p),p);}
 // The target sets nominal straight-flight finish distance. Custom curve/bias still moves the finish.
 export function patternAtTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return p.autoBag?clubPattern(distance,p):{...p,carry:Math.max(1,distance-p.roll)};}
-export function fitTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return distance>reachLimit(p)?aimAtDistance(aim,reachLimit(p)):{...aim};}
-export function aimAtDepth(aim,y,range){const depth=clamp(y,...range);return{x:clamp(aim.x/Math.max(1,aim.y)*depth,-60,60),y:depth};}
-export function aimAtDistance(aim,distance){const theta=Math.atan2(aim.x,aim.y),x=clamp(Math.sin(theta)*distance,-60,60);return{x,y:Math.sqrt(Math.max(1,distance*distance-x*x))};}
+export function fitTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return distance>reachLimit(p)?aimAtDistance(aim,reachLimit(p),p.aimXRange):{...aim};}
+export function aimAtDepth(aim,y,range,lateralRange=[-60,60]){const depth=clamp(y,...range);return{x:clamp(aim.x/Math.max(1,aim.y)*depth,...lateralRange),y:depth};}
+export function aimAtDistance(aim,distance,lateralRange=[-60,60]){const theta=Math.atan2(aim.x,aim.y),x=clamp(Math.sin(theta)*distance,...lateralRange);return{x,y:Math.sqrt(Math.max(1,distance*distance-x*x))};}
 export function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
 const polyBounds=new WeakMap();
 export function inPoly(p,poly){let bounds=polyBounds.get(poly);if(!bounds){bounds=[Math.min(...poly.map(v=>v[0])),Math.max(...poly.map(v=>v[0])),Math.min(...poly.map(v=>v[1])),Math.max(...poly.map(v=>v[1]))];polyBounds.set(poly,bounds);}if(p.x<bounds[0]||p.x>bounds[1]||p.y<bounds[2]||p.y>bounds[3])return false;let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){let a=poly[i],b=poly[j];if((a[1]>p.y)!==(b[1]>p.y)&&p.x<(b[0]-a[0])*(p.y-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
@@ -104,15 +104,16 @@ export function optimize(aim,p,s,c,zs){
 }
 export async function optimizeTargets(aim,p,s,c,zs,yieldRow=async()=>{}){
  // Full shared draws at every candidate: broad 6 × 10 yd grid, then local 2 × 2 yd refinement.
+ const lateralRange=s.aimXRange||[-60,60];
  const seen=new Set();let best={aim:{...aim},pattern:patternAtTarget(aim,p),result:null},evaluated=0;
  function consider(candidate){const key=`${candidate.x.toFixed(4)},${candidate.y.toFixed(4)}`;if(seen.has(key))return;seen.add(key);if(Math.hypot(candidate.x,candidate.y)>reachLimit(p)+1e-7)return;const pattern=patternAtTarget(candidate,p);if(pattern.carry<50||pattern.carry>330)return;const result=evaluate(candidate,pattern,s,c,zs);evaluated++;if(!best.result||result.expected<best.result.expected)best={aim:{...candidate},pattern,result};}
  consider(aim);
  const depths=new Set([Math.min(s.aimRange[1],reachLimit(p)),Math.min(s.aimY,reachLimit(p))]);for(let y=s.aimRange[0];y<=Math.min(s.aimRange[1],reachLimit(p));y+=10)depths.add(y);
  if(aim.y>=s.aimRange[0]&&aim.y<=s.aimRange[1])depths.add(aim.y);
- if(s.pin.y>=s.aimRange[0]&&s.pin.y<=s.aimRange[1]){depths.add(s.pin.y);consider({x:clamp(s.pin.x,-60,60),y:s.pin.y});}
- for(const y of depths){for(let x=-60;x<=60;x+=6)consider({x,y});await yieldRow();}
+ if(s.pin.y>=s.aimRange[0]&&s.pin.y<=s.aimRange[1]){depths.add(s.pin.y);consider({x:clamp(s.pin.x,...lateralRange),y:s.pin.y});}
+ for(const y of depths){for(let x=lateralRange[0];x<=lateralRange[1];x+=6)consider({x,y});await yieldRow();}
  const center={...best.aim};
- for(let dy=-10;dy<=10;dy+=2){for(let dx=-6;dx<=6;dx+=2)consider({x:clamp(center.x+dx,-60,60),y:clamp(center.y+dy,...s.aimRange)});await yieldRow();}
+ for(let dy=-10;dy<=10;dy+=2){for(let dx=-6;dx<=6;dx+=2)consider({x:clamp(center.x+dx,...lateralRange),y:clamp(center.y+dy,...s.aimRange)});await yieldRow();}
  return {...best,evaluated};
 }
 export const FEEDBACK_RULES={closeStrokes:.05,riskGap:.02,proximityGap:5};

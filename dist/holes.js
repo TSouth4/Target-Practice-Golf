@@ -26,3 +26,14 @@ export const EXTRA_HOLES=[
   hazards:[{kind:'water',label:'Front carry pond',poly:[[-48,194],[-15,191],[18,195],[49,193],[52,218],[20,221],[-15,219],[-50,216]],drop:{x:0,y:185}},{kind:'bunker',label:'Right greenside bunker',poly:[[28,227],[43,229],[46,247],[34,259],[26,247]]}],labels:[{x:0,y:205,text:'WATER'},{x:36,y:242,text:'SAND'}]}
 
 ];
+
+// Additional authored fallbacks for the expanded strategic generator.
+EXTRA_HOLES.push(
+ {id:'sharp-dogleg',type:'tee',name:'The sharp corner',tag:'Sharp dogleg · inside sand',hole:'11',par:4,length:389,pin:{x:80,y:380},maxY:420,aimY:230,aimRange:[125,320],aimXRange:[-120,120],bounds:[-70,145],green:{x:80,y:380,rx:18,ry:19},
+ brief:'A sharp corner forces a choice between stopping before the bend and carrying toward the second landing area.',fairway:[[-10,0],[10,0],[20,170],[20,200],[85,250],[98,350],[96,380],[64,380],[60,350],[55,265],[-20,215],[-20,170]],hazards:[{kind:'bunker',label:'Inside bunker',poly:[[23,180],[39,183],[56,215],[35,213]]}],labels:[{x:38,y:200,text:'SAND'}]},
+ {id:'creek-tee',type:'tee',name:'The awkward creek',tag:'Creek across the landing area',hole:'12',par:4,length:395,pin:{x:0,y:395},maxY:430,aimY:240,aimRange:[110,320],bounds:[-75,75],green:{x:0,y:395,rx:19,ry:19},
+ brief:'A creek cuts across the landing area. Compare stopping short with carrying it, including where rollout ends.',fairway:[[-10,0],[10,0],[25,100],[22,190],[18,250],[20,380],[-20,380],[-18,250],[-22,190],[-25,100]],hazards:[{kind:'water',label:'Crossing creek',poly:[[-70,202],[70,210],[70,230],[-70,222]],drop:{x:0,y:188}}],labels:[{x:0,y:217,text:'CREEK'}]},
+ {...structuredClone(EXTRA_HOLES[0]),id:'squeeze-par4',name:'The shrinking invitation',tag:'Short par 4 · tight green entrance',hole:'13',brief:'The fairway is generous for a layup, then narrows toward a guarded green. Extra distance brings extra danger.'},
+ {id:'creek-par3',type:'approach',name:'Par 3: across the creek',tag:'165 yards · par 3 · creek short',hole:'14',par:3,length:165,pin:{x:0,y:165},maxY:215,aimY:165,aimRange:[65,205],bounds:[-65,65],green:{x:0,y:165,rx:19,ry:18},
+ brief:'A creek and a smaller green make both distance and direction important. A safe short shot remains available.',fairway:[[-10,0],[10,0],[24,60],[23,140],[18,165],[-18,165],[-23,140],[-24,60]],hazards:[{kind:'water',label:'Front creek',poly:[[-58,100],[58,106],[58,126],[-58,120]],drop:{x:0,y:88}},{kind:'bunker',label:'Right bunker',poly:[[24,151],[37,154],[39,175],[26,178]]}],labels:[{x:0,y:114,text:'CREEK'},{x:30,y:166,text:'SAND'}]}
+);

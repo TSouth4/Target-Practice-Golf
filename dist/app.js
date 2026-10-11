@@ -79,13 +79,13 @@ function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.que
 function save(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function sided(x,unit='yd'){return Math.abs(x)<.01?'0 '+unit:`${Math.abs(x).toFixed(unit==='°'?1:0)}${unit==='°'?'°':' '+unit} ${x<0?'left':'right'}`;}
-function syncTargetDistance(){state.aim=fitTarget(state.aim,state.pattern);let p=patternAtTarget(state.aim,state.pattern);const carry=clamp(p.carry,50,330);if(Math.abs(carry-p.carry)>.0001){state.aim=aimAtDistance(state.aim,carry+p.roll);p=patternAtTarget(state.aim,p);}state.pattern=p;}
+function syncTargetDistance(){state.aim=fitTarget(state.aim,state.pattern);let p=patternAtTarget(state.aim,state.pattern);const carry=clamp(p.carry,50,330);if(Math.abs(carry-p.carry)>.0001){state.aim=aimAtDistance(state.aim,carry+p.roll,p.aimXRange);p=patternAtTarget(state.aim,p);}state.pattern=p;}
 function depthRange(){const max=Math.min(scene().aimRange[1],reachLimit(state.pattern)/Math.hypot(1,state.aim.x/Math.max(1,state.aim.y)));return[Math.min(scene().aimRange[0],max),max];}
-function chooseDepth(y){state.aim=aimAtDepth(state.aim,Math.round(y),depthRange());hasAim=true;syncTargetDistance();updateControls();dirty();}
+function chooseDepth(y){state.aim=aimAtDepth(state.aim,Math.round(y),depthRange(),state.pattern.aimXRange);hasAim=true;syncTargetDistance();updateControls();dirty();}
 function updateControls(){
  syncTargetDistance();
  for(const el of document.querySelectorAll('[data-cost]'))el.value=state.costs[el.dataset.cost];
- $('aimX').value=state.aim.x;$('aimY').min=depthRange()[0];$('aimY').max=depthRange()[1];$('aimY').value=state.aim.y;
+ $('aimX').min=(state.pattern.aimXRange||[-60,60])[0];$('aimX').max=(state.pattern.aimXRange||[-60,60])[1];$('aimX').value=state.aim.x;$('aimY').min=depthRange()[0];$('aimY').max=depthRange()[1];$('aimY').value=state.aim.y;
  $('basicHandicap').value=state.basicHandicap;$('courseStyle').value=state.landscape;
  $('driverLimit').value=state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap];
  $('bagTable').innerHTML=trainingBag(basic()).map(c=>`<tr><td>${c.club}</td><td>${Math.round(c.stock)} yd</td><td>${c.roll} yd</td><td>${c.sdSide.toFixed(1)} / ${c.sdLong.toFixed(1)} yd</td></tr>`).join('');
@@ -97,7 +97,7 @@ function updateLabels(){
  $('aimBadge').textContent=hasAim?`◎ ${result?'Committed aim':'Your target'} · ${sided(state.aim.x)} · ${Math.round(state.aim.y)} yd deep`:'◎ Pick direction, then depth';
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;
  $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
- $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}${s.generatorVersion?' · '+s.generatorVersion:''}`;
+ $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':s.par===3?'PAR 3 · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}${s.generatorVersion?' · '+s.generatorVersion:''}`;
  $('holeName').textContent=s.name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;
  for(const [id,on] of [['povBtn',state.view==='pov'],['mapBtn',state.view==='map'],['teeTab',state.practiceFilter==='tee'],['approachTab',state.practiceFilter==='approach'],['mixedTab',state.practiceFilter==='mixed']]){$(id).classList.toggle('active',on);$(id).setAttribute('aria-pressed',on);}
  for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=working;
@@ -320,7 +320,7 @@ $('course').addEventListener('pointerdown',e=>{
  const before={aim:{...state.aim},pattern:structuredClone(state.pattern),hasAim};
  if(local.y<=EYE_CAMERA.horizon+1){lastCourseTap={...tap,before};toast('Choose an aim on the ground, or use the left/right slider.');return;}
  const w=unproject(local.x,local.y);if(w.y<=0)return;
- state.aim.x=Math.round(clamp(w.x/w.y*state.aim.y,-60,60));hasAim=true;syncTargetDistance();updateControls();dirty();lastCourseTap={...tap,before};
+ state.aim.x=Math.round(clamp(w.x/w.y*state.aim.y,...(state.pattern.aimXRange||[-60,60])));hasAim=true;syncTargetDistance();updateControls();dirty();lastCourseTap={...tap,before};
 });
 $('course').addEventListener('dblclick',e=>{if(working||result||editorDraft||progressOpen||e.button!==undefined&&e.button!==0)return;e.preventDefault?.();const tap={...courseTap(e),type:'mouse'};if(isDoubleAimTap(lastDoubleAimTap?{...lastDoubleAimTap,type:'mouse'}:null,tap))return;const local=coursePoint(e);if(local)toggleAimZoom(local);});
 $('aimZoomToggle').addEventListener('click',()=>toggleAimZoom());

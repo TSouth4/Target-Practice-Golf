@@ -42,8 +42,8 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
  .mobile-hazards strong{font-weight:600}.mobile-hazards span{color:#4a6245}
  .mobile-hazards p{font-size:11px;line-height:1.5;color:#637759;margin-top:10px}
  #course .hazard-callout{display:none}
- .mobile-practice-actions{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
- .mobile-practice-actions .simulate-row{position:fixed;bottom:0;left:0;right:0;z-index:6;margin:0;padding:10px max(12px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px));background:var(--white);border-top:1px solid #cbd9bc;box-shadow:0 -3px 14px #203b3014;gap:8px}
+
+ .mobile-practice-actions .simulate-row{position:sticky;top:8px;bottom:auto;z-index:6;margin:10px 0;padding:10px 12px;background:var(--white);border-top:1px solid #cbd9bc;box-shadow:0 -3px 14px #203b3014;gap:8px}
  .mobile-action-target{display:block;width:100%;font-size:12px;line-height:1.5;color:var(--green)}
  .mobile-practice-actions .simulate-row button{flex:1;min-width:0;min-height:44px;font-size:13px}
  .mobile-practice-actions .simulate-row .primary span{display:none}
@@ -56,3 +56,10 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
  button,select{min-height:44px}
 }
 @media(max-width:360px){.mobile-hazards ul{grid-template-columns:1fr;gap:8px}}
+
+/* Place the single action bar immediately beneath the course on every device. */
+.course-stage .simulate-row{position:sticky;top:8px;z-index:6;margin:10px 0 12px;padding:12px;background:var(--white);border:1px solid #cbd9bc;border-radius:6px;box-shadow:0 2px 8px #203b3010}
+.course-stage .mobile-action-target{display:block;flex:1;font-size:13px;color:var(--green)}
+@media(max-width:760px){.course-stage .mobile-action-target{flex-basis:100%;font-size:12px}.course-stage .simulate-row{padding:10px}.course-stage .simulate-row button{min-height:44px;min-width:0;flex:1}}
+
+.course-stage{display:contents}
