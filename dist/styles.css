@@ -30,3 +30,29 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
 
 .target-readout{display:flex;align-items:baseline;gap:10px 22px;flex-wrap:wrap;background:#edf2e5;border:1px solid #cbd9bc;border-radius:6px;padding:13px 16px;margin-top:14px}.target-readout strong{font:24px Georgia,serif;color:#294e36}.target-readout span{font-size:12px;color:#44643c}.target-readout small{width:100%;font-size:11px;line-height:1.6;color:#637759}.retry-guide,.retry-comparison{padding:14px 16px;border-left:3px solid #91ab6b;background:#f0f4e8;margin-top:14px;font-size:12px;line-height:1.7}.retry-comparison h3{font-size:17px}.retry-comparison p{font-size:11px}.retry-comparison .comparison-table td:nth-child(2){color:#667258}.retry-comparison .comparison-table td:nth-child(3){color:#966522}@media(max-width:760px){.target-readout{padding:11px 12px;gap:7px 14px}.target-readout strong{font-size:21px}.target-readout span,.target-readout small{font-size:10px}}
 @media(min-width:761px){.hazard-scout{position:static;width:100%;margin-top:10px;box-shadow:none;display:grid;grid-template-columns:minmax(180px,29%) 1fr;gap:8px 20px;padding:12px 16px;border:1px solid #dce4d1}.hazard-scout #scoutMap{grid-column:1;grid-row:1/6}.hazard-scout .scout-heading{grid-column:2;grid-row:1;font-size:11px}.hazard-scout .scout-key{grid-column:2;grid-row:2;justify-content:flex-start;gap:18px;font-size:10px}.hazard-scout p{grid-column:2;grid-row:3;font-size:10px;margin:0}.hazard-scout #aimDepthWrap{grid-column:2;grid-row:4;margin-top:3px}.hazard-scout #aimDepthWrap label{font-size:12px}}
+
+/* Keep terrain information readable independently of the scaled course drawing. */
+.mobile-hazards,.mobile-action-target{display:none}
+@media(max-width:760px){
+ html{scroll-padding-bottom:120px}
+ .mobile-hazards{display:block;margin:12px 0;padding:12px;background:var(--white);border:1px solid var(--line);border-radius:6px}
+ .mobile-hazards h3{font-size:14px;font-weight:600;margin:0 0 10px}
+ .mobile-hazards ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .mobile-hazards li{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.5}
+ .mobile-hazards strong{font-weight:600}.mobile-hazards span{color:#4a6245}
+ .mobile-hazards p{font-size:11px;line-height:1.5;color:#637759;margin-top:10px}
+ #course .hazard-callout{display:none}
+ .mobile-practice-actions{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+ .mobile-practice-actions .simulate-row{position:fixed;bottom:0;left:0;right:0;z-index:6;margin:0;padding:10px max(12px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px));background:var(--white);border-top:1px solid #cbd9bc;box-shadow:0 -3px 14px #203b3014;gap:8px}
+ .mobile-action-target{display:block;width:100%;font-size:12px;line-height:1.5;color:var(--green)}
+ .mobile-practice-actions .simulate-row button{flex:1;min-width:0;min-height:44px;font-size:13px}
+ .mobile-practice-actions .simulate-row .primary span{display:none}
+ .mobile-practice-actions #sampleStatus{display:none}
+ input[type=range]{appearance:none;-webkit-appearance:none;height:44px;background:transparent;margin:0 0 6px;touch-action:pan-y}
+ input[type=range]::-webkit-slider-runnable-track{height:4px;background:#b3c2a7;border-radius:2px}
+ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--green);border:2px solid var(--white);margin-top:-10px}
+ input[type=range]::-moz-range-track{height:4px;background:#b3c2a7;border-radius:2px}
+ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--green);border:2px solid var(--white)}
+ button,select{min-height:44px}
+}
+@media(max-width:360px){.mobile-hazards ul{grid-template-columns:1fr;gap:8px}}

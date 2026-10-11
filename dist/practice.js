@@ -1,5 +1,6 @@
 import {random,lie} from './model.js';
 import {decorateScenario} from './landscape.js';
+import {generateTeeScenario} from './tee-generator.js';
 export const PRACTICE_SEQUENCE=['cedar','water','bend','tucked','drivable','bowl','narrow','split','par5-open','par5-carry'];
 export function nextScenario(id,filter='mixed',seed=1,recent=[]){
  const typeOf=key=>['cedar','bend','drivable','narrow'].includes(key)?'tee':'approach';
@@ -12,6 +13,7 @@ export function nextScenario(id,filter='mixed',seed=1,recent=[]){
 export function generateScenario(base,seed=0){
  const s=structuredClone(base);s.elevationM=base.type==='tee'?9:8;s.variantSeed=seed;
  if(!seed)return decorateScenario(s);
+ if(base.type==='tee')return generateTeeScenario(base,seed);
  const rng=random(seed),width=.9+rng()*.22,depth=.94+rng()*.12,mirror=base.id==='bend'&&rng()<.5?-1:1;
  const at=p=>({x:p.x*width*mirror,y:p.y*depth});
  s.fairway=s.fairway.map(([x,y])=>{const q=at({x,y});return[q.x,q.y];});

@@ -97,7 +97,7 @@ function updateLabels(){
  $('aimBadge').textContent=hasAim?`◎ ${result?'Committed aim':'Your target'} · ${sided(state.aim.x)} · ${Math.round(state.aim.y)} yd deep`:'◎ Pick direction, then depth';
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;
  $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
- $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}`;
+ $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}${s.generatorVersion?' · '+s.generatorVersion:''}`;
  $('holeName').textContent=s.name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;
  for(const [id,on] of [['povBtn',state.view==='pov'],['mapBtn',state.view==='map'],['teeTab',state.practiceFilter==='tee'],['approachTab',state.practiceFilter==='approach'],['mixedTab',state.practiceFilter==='mixed']]){$(id).classList.toggle('active',on);$(id).setAttribute('aria-pressed',on);}
  for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=working;
@@ -117,6 +117,10 @@ function updateLabels(){
  $('targetDistance').textContent=`${Math.round(facts.total)} yd target`; $('targetClub').textContent=`${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry)} carry + ${Math.round(p.roll)} roll`;
  $('targetContext').textContent=`${Math.round(facts.toPin)} yd from target to pin${facts.crossings.length?' · Along this aim line: '+facts.crossings.join('; '):''}`;
  $('targetReadout').hidden=!!result;
+ $('mobileActionTarget').textContent=hasAim?`${Math.round(facts.total)} yd · ${p.club}`:'Choose direction and depth';
+ $('mobileActionTarget').hidden=!!result||working;
+ $('mobileHazards').hidden=!!result||phase==='shooting'||phase==='zooming';
+ $('appRoot').classList.toggle('mobile-practice-actions',!editorDraft&&!progressOpen);
  $('retryGuide').hidden=!!result||!retryValid();$('retryGuide').textContent=retryValid()?`Guided retry · ${retryHint} Adjust your original target, then commit. Same hole, profile and 4,000-shot sample; patterns hidden again.`:'';
  $('stockShot').textContent=p.autoBag?`${p.customBag?'My ':''}${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry+p.roll)} yd · ${Math.round(reachLimit(p))} yd limit`:`Planned distance: ${Math.round(p.carry+p.roll)} yd · custom`;
  $('cameraBadge').textContent=phase==='shooting'?'SHOT TRACERS':phase==='zooming'?'ZOOMING TO LANDING AREA':state.view==='map'?'LANDING-AREA ZOOM':`${aimZoom?'2× TARGET ZOOM · ':''}EYE LEVEL · ${elevation()} M ABOVE LANDING`;
@@ -191,10 +195,13 @@ function drawCourse(){
  if(map){const c=analysisCamera();for(let y=Math.ceil(c.minY/10)*10;y<c.maxY;y+=10){const at=project({x:c.centerX-450/c.scale,y});html+=`<text x="30" y="${at.y}" fill="#87977a" font-size="9" font-family="Arial">${y} yd</text>`;}}
  // Teaching overlays keep exact hazard edges visible without revealing shot patterns.
  html+='<g id="hazardEdges" fill="none" stroke-linejoin="round">';
- for(const h of s.hazards.filter(h=>['water','bunker'].includes(h.kind)))html+=`<polygon points="${polygon(h.poly)}" stroke="${h.kind==='water'?'#d1f6ff':'#fff1c7'}" stroke-width="${map?1:3}"/><polygon points="${polygon(h.poly)}" stroke="${h.kind==='water'?'#167caa':'#99703d'}" stroke-width="1.3"/>`;
+ // Water already has a shoreline in the relief renderer; a second bright outline looks artificial.
+ for(const h of s.hazards.filter(h=>h.kind==='bunker'))html+=`<polygon points="${polygon(h.poly)}" stroke="#fff1c7" stroke-width="${map?1:3}"/><polygon points="${polygon(h.poly)}" stroke="#99703d" stroke-width="1.3"/>`;
  for(const bx of s.bounds)html+=line({x:bx,y:25},{x:bx,y:s.maxY},'stroke="#c15a4f" stroke-width="2" stroke-dasharray="8 7" opacity=".75"');
  html+='</g>';
  const callouts=hazardCallouts(s,state.landscape);
+ const terrainHazards=s.hazards.filter(h=>['water','bunker'].includes(h.kind));
+ $('mobileHazardList').innerHTML=callouts.map((l,i)=>`<li><strong>${escapeHTML(terrainHazards[i]?.label||l.label)}</strong><span>${escapeHTML(l.distance)}</span></li>`).join('');
  if(map){for(const l of s.labels)html+=textAt(l.x,l.y,l.text==='TREES'&&state.landscape==='desert'?'SCRUB':l.text,'fill="#425d48" font-family="Arial" font-size="11" font-weight="700" text-anchor="middle"');}
  else{let left=0,right=0;for(const l of callouts){const at=project(l),side=l.x<0?'left':'right',index=side==='left'?left++:right++,labelX=side==='left'?100:860,top=112+index*52;
  html+=`<g class="hazard-callout" data-kind="${l.kind}"><line x1="${at.x}" y1="${at.y}" x2="${labelX}" y2="${top+25}" stroke="${l.color}" stroke-width="1.5"/><circle cx="${at.x}" cy="${at.y}" r="4" fill="${l.color}" stroke="#fffef0"/><rect x="${labelX-78}" y="${top-6}" width="156" height="42" rx="5" fill="#203f32ee" stroke="${l.color}"/><text x="${labelX}" y="${top+9}" fill="#fffef0" font-family="Arial" font-size="12" font-weight="700" text-anchor="middle">${l.label}</text><text x="${labelX}" y="${top+25}" fill="#e2e8cf" font-family="Arial" font-size="10" text-anchor="middle">${l.distance}</text></g>`;}}

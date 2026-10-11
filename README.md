@@ -1,5 +1,42 @@
 # Target Practice
 
+## Current development update: v12.1.0
+
+The original v12.0.0 import remains the baseline on `main`. This update adds:
+
+- Readable mobile hazard names and terrain distances below the course, replacing the tiny in-scene callouts on narrow screens.
+- A persistent mobile practice action bar with selected distance/club, Commit & shoot, and review actions. It is absent from custom-club and progress screens.
+- 44-pixel-high mobile slider areas, larger thumbs, and minimum 44-pixel button/select heights.
+- Removal of the extra bright water outline; the existing shoreline and hazard scoring remain.
+- Constrained procedural tee variations in the existing cedar, bend, short-par-4, and narrow families: changing centerlines, bend onset, landing widths, hazards, boundaries, green dimensions and positions, and safe pins. Approaches and par-5 second shots retain their previous generator.
+
+Seed zero retains each authored baseline. Nonzero tee seeds use `tee-v1`, shown beside the scenario seed. These seeds now produce the new geometry rather than the older rescaled tee layout; historical seed reports need their source/generator version. Retries within this version retain exactly the same geometry and draws. The generator tries at most eight candidates, rejects invalid geometry/unsafe pins or drops/missing reachable landing areas, and falls back to the authored family. It still represents four designed tee architectures, not unlimited strategic variety or calibrated golf advice.
+
+Validation: 106 automated tests passed, including checks over 2,000 generated tee examples, representative 180/250/330-yard reach profiles, geometry rejection, and a reach-dependent green-versus-layup decision. Headless Chromium checks passed on desktop and simulated 320/390-pixel phones, including real touch dispatch, sliders, normal/reduced motion, hidden answers, retry, saving, and orientation resizing. Actual device checks of this update and Safari/Firefox checks remain outstanding. See `BROWSER-REVIEW.md`.
+
+The private hosted site has not been updated by this GitHub change. `.openai/hosting.json` identifies the existing site but does not grant publishing access.
+
+### Optional browser checks
+
+The browser scripts are development tools, not runtime dependencies. In a separate terminal, serve the existing checkout without creating another worktree:
+
+```sh
+cd /workspace/Target-Practice-Golf
+python -m http.server 8765 --bind 127.0.0.1 --directory dist
+```
+
+In the test terminal:
+
+```sh
+npm install --prefix /tmp/target-practice-browser --cache /tmp/target-practice-npm-cache playwright-core --no-audit --no-fund
+export TARGET_PRACTICE_PLAYWRIGHT=/tmp/target-practice-browser/node_modules/playwright-core
+node scripts/browser-review/check.cjs
+node scripts/browser-review/gestures.cjs
+node scripts/browser-review/mobile-and-generated.cjs
+```
+
+These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.
+
 Private, buildless golf decision trainer. Serve `dist/` as static assets. The app has no dependencies or third-party asset requests. Settings and member-preview decision history save in browser localStorage; raw simulated shot data stays on the page. Branding lives in `dist/config.js`. Preserve the existing Site identity, URL and owner-only audience.
 
 ## Practice
