@@ -1,6 +1,10 @@
 # Target Practice
 
-## Current development update: v12.2.1
+## Current development update: v12.2.2
+
+New scenarios automatically mix East Coast woodland, Pacific Coast, and desert environments. The landscape selector is removed. Consecutive new scenarios use different environments; retries and reloads preserve the current one. Environment affects scenery, not scoring or the shot model. This version includes all v12.2.1 learning and depth improvements. All 112 automated tests and syntax checks passed, plus desktop and phone browser checks for automatic mixing, retry, and reload.
+
+## Previous development update: v12.2.1
 
 The depth slider is now a vertical control immediately beside the course, with farther targets at the top. It uses the same target, heading, reach limits and commit lock as the terrain map. Keyboard and touch controls remain available.
 

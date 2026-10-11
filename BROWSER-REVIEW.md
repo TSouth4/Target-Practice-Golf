@@ -1,6 +1,10 @@
 # Target Practice — first browser review
 
-## Update: v12.2.1 learning feedback and vertical depth
+## Update: v12.2.2 automatic environments
+
+Browser checks passed at 1440-, 390-, and 320-pixel widths: the selector is absent, Next shot changes environment, Retry preserves it, and reload retains the new environment without exposing shot outcomes. No browser errors were captured. The existing geometry test confirms that scenery does not alter outcomes, and a new sequence test covers deterministic selection, all three environments, and no immediate repeats. `learning.cjs` includes the browser checks.
+
+## Previous update: v12.2.1 learning feedback and vertical depth
 
 All 112 automated tests and syntax checks passed. The core browser flow passed at 1440-, 390-, and 320-pixel widths. Additional checks confirmed a vertical depth control beside the course, keyboard and touch adjustment without revealing outcomes, target locking after commitment, and per-100-shot feedback after retry. No horizontal overflow or page errors were captured. The main coaching now includes the actual lesson and a suggested retry experiment. The expanded outcome table remains available from the rating.
 

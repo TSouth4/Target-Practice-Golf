@@ -1,4 +1,4 @@
-# Publish v12.2.1 in the existing Work project
+# Publish v12.2.2 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 

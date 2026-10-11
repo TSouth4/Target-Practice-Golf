@@ -6,7 +6,7 @@ import {DRIVER_LIMITS,reachLimit,trainingBag} from './bag.js';
 import {FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
 import {BRAND} from './config.js';
 import {EYE_CAMERA,reviewCamera,projectReview,scoutCamera,projectScout,unprojectScout,aimZoomBox,isDoubleAimTap} from './camera.js';
-import {nextScenario,generateScenario} from './practice.js';
+import {nextScenario,generateScenario,nextLandscape} from './practice.js';
 import {TRACER_COLORS,tracerSample,tracerTrajectory} from './tracers.js';
 import {LANDSCAPES,vegetation,drawPlant} from './landscape.js';
 import {projectSurface,unprojectSurface,drawRelief} from './surfaces.js';
@@ -86,7 +86,7 @@ function updateControls(){
  syncTargetDistance();
  for(const el of document.querySelectorAll('[data-cost]'))el.value=state.costs[el.dataset.cost];
  $('aimX').min=(state.pattern.aimXRange||[-60,60])[0];$('aimX').max=(state.pattern.aimXRange||[-60,60])[1];$('aimX').value=state.aim.x;$('aimY').min=depthRange()[0];$('aimY').max=depthRange()[1];$('aimY').value=state.aim.y;
- $('basicHandicap').value=state.basicHandicap;$('courseStyle').value=state.landscape;
+ $('basicHandicap').value=state.basicHandicap;
  $('driverLimit').value=state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap];
  $('bagTable').innerHTML=trainingBag(basic()).map(c=>`<tr><td>${c.club}</td><td>${Math.round(c.stock)} yd</td><td>${c.roll} yd</td><td>${c.sdSide.toFixed(1)} / ${c.sdLong.toFixed(1)} yd</td></tr>`).join('');
  updateLabels();
@@ -128,7 +128,6 @@ function updateLabels(){
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);
  $('course').setAttribute('viewBox',aimZoom&&zoomAllowed?`${aimZoom.x} ${aimZoom.y} ${aimZoom.width} ${aimZoom.height}`:'0 0 960 580');
  $('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
- $('courseStyle').disabled=working;
  $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course or the bird’s-eye map. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
@@ -139,7 +138,7 @@ function updateLabels(){
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
 function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionVerdict').setAttribute('aria-expanded',false);progressMessage='';landingCamera=null;syncTargetDistance();phase='choose';traceShots=[];transition=null;result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;save();updateLabels();drawCourse();}
-function setScenario(id,holeSeed=0){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
+function setScenario(id,holeSeed=0){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=nextLandscape(state.landscape,holeSeed);state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode){if(working)return;resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
@@ -334,7 +333,6 @@ $('useBest').addEventListener('click',()=>{if(best&&!working){state.aim={...best
 $('tryAgain').addEventListener('click',()=>{if(working||!result)return;state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
 $('retryThisHole').addEventListener('click',()=>{if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();});
 $('basicHandicap').addEventListener('change',()=>{if(working||result||state.mode!=='basic')return;state.basicHandicap=$('basicHandicap').value;state.pattern=basic();syncTargetDistance();updateControls();dirty();});
-$('courseStyle').addEventListener('change',()=>{if(working)return;state.landscape=LANDSCAPES[$('courseStyle').value]?$('courseStyle').value:'woodland';save();updateLabels();drawCourse();});
 $('terrainToggle').addEventListener('click',()=>{if(working||result)return;resetAimZoom();state.elevated=!state.elevated;save();updateLabels();drawCourse();});
 $('driverLimit').addEventListener('change',()=>{if(working||result)return;state.basicLimits[state.basicHandicap]=num($('driverLimit').value,180,330,DRIVER_LIMITS[state.basicHandicap]);if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
 $('driverLimitReset').addEventListener('click',()=>{if(working||result)return;delete state.basicLimits[state.basicHandicap];if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});

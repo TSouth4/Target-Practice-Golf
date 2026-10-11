@@ -8,3 +8,9 @@ test('dense vegetation occupies scored recovery zones or OB, preserving clear fa
 test('landscape choices leave shot outcomes identical on the same geometry and seed',()=>{const s=generateScenario(SCENARIOS[1],331),p=basicPattern(5,s),a=fitTarget({x:0,y:250},p),zs=samples(800,811),before=JSON.stringify(s),r=evaluate(a,patternAtTarget(a,p),s,DEFAULT_COSTS,zs);for(const style of Object.keys(LANDSCAPES)){vegetation(s,style);assert.equal(JSON.stringify(s),before);assert.deepEqual(evaluate(a,patternAtTarget(a,p),s,DEFAULT_COSTS,zs),r);}});
 test('relief gives raised greens, lower sand and water, while keeping lie footprints unchanged',()=>{const s=generateScenario(SCENARIOS[2]);for(const [p,kind,sign] of [[{x:0,y:150},'green',1],[{x:-31,y:148},'bunker',-1],[{x:34,y:117},'water',-1]]){assert.equal(lie(p,s),kind);assert.ok(surfaceHeight(s,p)*sign>0);}assert.equal(surfaceHeight(s,{x:0,y:70}),0);assert.equal(surfaceHeight(s,{x:0,y:150}),RELIEF.green);});
 test('clicking the rendered center of green, sand or water resolves to its actual surface location',()=>{const s=generateScenario(SCENARIOS[2]);for(const p of [{x:0,y:150},{x:-31,y:148},{x:34,y:117}])for(const elevation of [0,8]){const screen=projectSurface(s,p,elevation),back=unprojectSurface(s,screen.x,screen.y,elevation);assert.equal(lie(back,s),lie(p,s));assert.ok(Math.hypot(p.x-back.x,p.y-back.y)<1e-6);}});
+
+test('automatic environments are deterministic, cover every style, and avoid immediate repeats',async()=>{
+ const {nextLandscape}=await import('../dist/practice.js');let current='woodland';const seen=new Set([current]);
+ for(let seed=1;seed<=100;seed++){const next=nextLandscape(current,seed);assert.equal(next,nextLandscape(current,seed));assert.notEqual(next,current);assert.ok(LANDSCAPES[next]);seen.add(next);current=next;}
+ assert.equal(seen.size,Object.keys(LANDSCAPES).length);
+});

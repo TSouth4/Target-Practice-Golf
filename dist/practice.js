@@ -1,5 +1,5 @@
 import {SCENARIOS,random} from './model.js';
-import {decorateScenario} from './landscape.js';
+import {decorateScenario,LANDSCAPES} from './landscape.js';
 import {generateTeeScenario} from './tee-generator.js';
 import {generateApproachScenario} from './approach-generator.js';
 export const PRACTICE_SEQUENCE=['cedar','water','bend','tucked','drivable','bowl','narrow','split','par5-open','par5-carry','sharp-dogleg','creek-tee','squeeze-par4','creek-par3'];
@@ -16,4 +16,9 @@ export function generateScenario(base,seed=0){
  if(!seed)return decorateScenario(s);
  if(base.type==='tee')return generateTeeScenario(base,seed);
  return generateApproachScenario(base,seed);
+}
+
+export function nextLandscape(current,seed){
+ const choices=Object.keys(LANDSCAPES).filter(style=>style!==current);
+ return choices[Math.floor(random((seed^0x5a17c9)>>>0)()*choices.length)];
 }
