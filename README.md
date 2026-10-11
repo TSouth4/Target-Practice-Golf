@@ -1,0 +1,59 @@
+# Target Practice
+
+Private, buildless golf decision trainer. Serve `dist/` as static assets. The app has no dependencies or third-party asset requests. Settings and member-preview decision history save in browser localStorage; raw simulated shot data stays on the page. Branding lives in `dist/config.js`. Preserve the existing Site identity, URL and owner-only audience.
+
+## Practice
+
+Every visit starts with the free handicap profile: straight flight, no big-miss mixture, automatic club selection and distance-dependent dispersion. There is one practice screen. Tee / Approach / Mixed filters replace the named hole chooser. Next shot selects a different authored family, avoids the recent six families when possible, and applies a seeded width, length, pin-position and dogleg-direction variation. Mixed favors the other shot type. There are currently ten underlying families, not unlimited distinct architectures. Retry preserves the exact layout and shot sample.
+
+Choose direction on the standing-eye POV and depth along that heading on the terrain-only bird’s-eye inset. Double-tap/double-click toggles a terrain-only 2× crop centered on the tapped area; the Zoom in/out button offers a keyboard-accessible alternative centered on the nominal target. The recognized double gesture restores the selection from before its first tap. Single taps retain normal target selection. The SVG screen transform maps picks back through the crop to the same world geometry. Zoom does not inspect dispersion or comparison targets, resets on commitment, retry, new scenario, profile switch or elevation change, and is never persisted across reloads. Keyboard sliders provide the same controls. No dispersion, mean finish or comparison aim is drawn before commitment. Commit & shoot locks controls, simulates 4,000 seeded outcomes, animates 48 evenly spaced examples colored by final lie, then zooms to the orange selected distribution and blue best sampled comparison. Reduced motion skips animation. Feedback labels and model estimates describe the decision, not the quality of one lucky shot. The landing zoom fits both exact 80% core contours, aim markers and mean finishes with tighter margins; rare tails can leave the frame and still count. Review hides locked aim controls and the repeated scenario brief. Tap the rating to expand a lesson grounded in the run’s hazard rates, nominal proximity, expected cost and club comparison. The lesson includes a target adjustment and distinguishes all-OB/no-usable-comparison cases.
+
+## Member preview
+
+Menu → Customize my Shot opens a separate screen with a deterministic flight illustration and a per-club setup. Drag the gold midpoint and blue carry finish horizontally to edit shape; drag the side-view apex vertically for height. Start / curve / height sliders offer keyboard equivalents. The shape is quadratic: lateral x(t) = carry × tan(start) × t + curve × t². Midpoint M and finish E imply initial tangent S = 4M − E and curve C = 2E − 4M. Limits are ±10° start and ±50 yd curve; outside those limits the other anchor may move. The displayed height is illustrative only.
+
+Each of ten clubs stores carry, rollout, core σ on both axes, shaped start and curve, usual miss bias, lateral/distance correlation, height and an occasional big-miss mixture. Editing another club retains draft edits. Back discards the entire draft; Save applies it and starts a fresh target choice. Empty or out-of-range numerical entries block Save and club changes. Saved older Advanced lab settings migrate into the matching club. Reloading returns to the free profile while preserving the member bag. Free settings and member scoring costs remain separate.
+
+This is an owner-private preview of future member tools. Billing, subscriptions, account-backed profiles and secure paid-feature entitlement enforcement are not implemented. Browser settings are not an access-control system.
+
+## Progress preview
+
+Menu → My progress opens a separate screen without disturbing the current practice target or result. The private prototype records committed free and personal-profile decisions as a preview of a future member feature. Store `target-practice-progress-v1` keeps at most 1,000 attempts, including retries. A scenario encounter ID persists through retry, reload and shot-setting changes; Next shot or a new filtered scenario starts a new encounter. Only the first completed attempt per encounter enters trends. Repeated attempts are counted separately. Runs with no finite comparison are not recorded; an all-OB chosen target with a finite comparison records score zero and unbounded expected cost.
+
+Profiles fingerprint the model version, free handicap/reach or complete personal bag, and scoring costs. Changes start separate comparison groups. Filter by profile and tee/approach/all. Show recent average score and expected regret, a chart of the last 50 first attempts with a rolling average of up to five, rating counts, and recent first attempts. After ten first attempts, compare disjoint first/latest windows of up to ten; no overlap. Hole difficulty and sample mix still vary, so the displayed trend is descriptive practice feedback, not measured handicap, strokes gained or proof of improved course performance. Failed local saving is explicitly shown. There is no cross-device sync, account system or paid entitlement enforcement.
+
+## Statistical model
+
+Coordinates are yards, right positive x and forward positive y. The free handicap profiles have illustrative driver total-distance limits of 280 / 265 / 250 / 225 yd for scratch / 5 / 10 / 20, with separate per-handicap reach overrides in assumptions. These are teaching estimates, not measured averages or universal maxima. `bag.js` exposes estimated club fractions, rollout and spread.
+
+Both profiles automatically select the shortest stock club that reaches the nominal target. Core σ scales by requested distance / stock distance with a 25% floor. Member curve, usual bias and big-miss shifts/shortfall use that same scale; start angle, height, probability and correlation remain fixed. Member tee stock distance is saved carry plus rollout. Approaches exclude Driver, use saved carry as stock distance, and apply zero rollout. Target distance is capped by the longest eligible club, including diagonal targets. The cap applies to the intended target, not every sampled outcome.
+
+The core is a correlated Gaussian. A Bernoulli big-miss component doubles both standard deviations, adds a configured left/right offset and subtracts carry loss. Both-sides uses equal probability. Mean lateral finish is carry × tan(start) + curve + bias. Rotating aim rotates the whole pattern. The 80% contour is a joint core ellipse with radius 1.794σ; per-axis 80% intervals are ±1.282σ. Big misses are outside that core contour.
+
+Water is checked at carry and by exact polygon intersection during rollout, and contact stops the plotted shot. OB is checked at final position when water was not contacted. Non-OB cost is one stroke + penalties + heuristic strokes remaining. Water uses a fixed scenario drop and one penalty stroke. OB repeats the strategy: E = (average non-OB total + 2 × pOB) / (1 − pOB). All-OB expectation is infinite. Recovery and remaining-stroke assumptions are visible and adjustable; this is not a fitted strokes-gained database.
+
+The comparison samples a 6-yard horizontal / 10-yard depth grid and refines near the best in 2-yard steps, using the same 4,000 random draws, personal bag, club selection and distance limits. Search is restricted to the hole’s authored depth range and ±60 yd horizontally. The selected target is included; the result is an approximate sampled optimum. Score = max(0, 100 − 60 × extra expected strokes). When every sampled target is all-OB, the UI shows an ungraded dash and “Pattern needs adjustment” rather than a decision score. Approximate 95% Monte Carlo intervals cover sampling noise only. Feedback uses a 0.05-stroke closeness threshold, a 2-percentage-point extra hazard-exposure threshold, and a 5-yard nominal proximity threshold; ambiguous cases say target needs refining.
+
+## Landscape and limitations
+
+The eye is 1.7 m above the ball. Elevated tees are 9 m and approaches 8 m above the landing area, descending over the first 80 yd. The flat/elevated toggle affects visuals only. Raised greens and exposed sand/water bowls exaggerate relief for readability. Pins, aim markers and tracer contacts follow those surfaces; perspective-correct surface picking and scoring use the same world x/y footprints. Review and scout maps preserve equal yard scales.
+
+East Coast woodland, Pacific Coast and desert change foliage and palettes on the same geometry. Vegetation follows fairway edges with a rough buffer, occupies recovery zones within the stakes and remains OB outside them. Dedicated regional architecture is future work. Airborne tree collision, wind, downhill carry, slope-dependent rollout and real flight physics are excluded. The flight arcs are illustrations with exact scored endpoints.
+
+## Validation and hosting
+
+Run `npm run check` and `npm test`. Tests cover numerical properties, hazard and OB scoring, optimization, camera/picking coordinates, distance limits, generated layouts, commitment/reveal/animation gates, scenario filters and retry, draft save/cancel/validation, mouse/touch flight controls, per-club shapes and misses, persistence, legacy migration and free/member isolation. The DOM harness is not a real browser. Course and editor SVGs are independently rasterized for visual inspection. Full browser QA is unavailable in the current managed environment; do not launch an improvised browser or preview server.
+
+Deploy through Sites’ source workflow helper and private deployment operation. Never change audience to public without the owner’s explicit approval.
+
+## V11: readable hazards and guided retries
+- Exact water/bunker boundary highlights, distinct per-hazard forward yardage callouts, explicit left/right OB distances. Terrain map sits below the POV so it cannot cover the hole.
+- Prominent radial target distance, selected estimated/custom club, carry/roll, straight aim-line hazard entry/exit distances, and target-to-pin distance. These describe geometry, not curved-flight clearance probabilities.
+- Adjust & compare retains the original target, encounter, profile, seed and hole. Recommit after moving the aim to compare original and latest target, club/distance, score, expected cost and water/OB exposure. Repeated retries compare with the original; Next resets. Profile changes suppress comparisons across different assumptions. Retry clouds stay hidden until recommitted. Retry records remain excluded from first-attempt progress.
+- Selected OB woodland/coast trees are 25% taller and 15% wider, preserving playable tree buffers and lie geometry. Desert plants stay the same size.
+- No statistical calibration or new source data is claimed. Native browser/phone QA unavailable in this environment; DOM interaction and rendered SVG checks used.
+
+## V12: outcome dispersion and par-5 decisions
+- Both dispersion clouds share tracer outcome colors. Selected shots are filled circles with dark borders; comparison shots are hollow circles. Gold solid and blue dashed core contours preserve pattern identity. Larger dots still mark big misses, without replacing outcome colors. Outcome percentages use the same palette.
+- Added open and forced-carry par-5 second-shot families to Approach/Mixed practice. Layup depths and going-for-green depths use the same reach limits and optimization. Driver is excluded and approach rollout stays zero. Scores compare modeled strokes from the second-shot location; no first-shot simulation or fitted par-5 scoring database is claimed.
+- Generation remains seeded variations of ten authored strategic families, not a fully procedural course architect.

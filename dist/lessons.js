@@ -1,0 +1,44 @@
+import {shotAt,patternAtTarget} from './model.js';
+const ZERO={z1:0,z2:0,u:1,sign:1};
+const HAZARDS=[['water','water'],['ob','OB'],['bunker','bunkers'],['trees','recovery vegetation']];
+const rate=(r,k)=>r.counts[k]/r.n;
+const pct=v=>(100*v).toFixed(1)+'%';
+const yards=v=>Math.abs(v).toFixed(0)+' yd';
+const nominal=(aim,p)=>shotAt(aim,{...patternAtTarget(aim,p),sdSide:0,sdLong:0,bigPct:0},ZERO);
+export function decisionLesson(aim,p,r,b,s,assessment){
+ const q=b.result,own=nominal(aim,p),comparison=nominal(b.aim,b.pattern||p);
+ const ownDistance=Math.hypot(own.x-s.pin.x,own.y-s.pin.y),bestDistance=Math.hypot(comparison.x-s.pin.x,comparison.y-s.pin.y);
+ const extraHazards=HAZARDS.map(([kind,name])=>({kind,name,gap:rate(r,kind)-rate(q,kind)})).sort((a,b)=>b.gap-a.gap);
+ const leader=extraHazards[0],hazardGap=extraHazards.reduce((sum,h)=>sum+h.gap,0),cost=r.expected-q.expected;
+ let why,principle;
+ if(!Number.isFinite(q.expected)){
+  why='Every shot at every sampled target finished OB. There is no usable comparison in this run, so this rating cannot identify a sound target.';
+  principle='Check the club distances, start line and miss settings before practicing this scenario again.';
+ }else if(!Number.isFinite(r.expected)){
+  why=`All ${r.n.toLocaleString()} of your shots finished OB. In this model, repeating that target after stroke-and-distance never makes progress. The blue target produces some playable outcomes.`;
+  principle='Move the whole pattern inside the boundaries, accounting for your start line and curve as well as your chosen aim.';
+ }else if(assessment.kind==='balanced'){
+  why=`Your target costs only ${Math.max(0,cost).toFixed(2)} extra expected strokes compared with the best sampled target. The full pattern gives a similar balance of proximity and costly misses.`;
+  principle='Keep aiming for a good distribution of outcomes. One shot in a hazard would not, by itself, make this decision wrong.';
+ }else if(assessment.kind==='aggressive'){
+  why=`Your shots reach water, OB, bunkers or recovery vegetation ${(100*hazardGap).toFixed(1)} percentage points more often than the comparison. The largest extra exposure is ${leader.name}: ${pct(rate(r,leader.kind))} versus ${pct(rate(q,leader.kind))}. Those misses outweigh the benefit elsewhere in the pattern.`;
+  principle=s.type==='approach'?'Give the costly side of the green more room. Judge where your misses finish, rather than aiming automatically at the flag.':'Choose a landing area that gives the costly miss more room; adjust depth as well as direction when a different club offers a better tradeoff.';
+ }else if(assessment.kind==='conservative'){
+  why=`Your nominal finish is ${yards(ownDistance)} from the pin, versus ${yards(bestDistance)} for the comparison. Your pattern is farther from the hole, and any safety benefit is not enough to offset the extra remaining-shot cost in this model.`;
+  principle=s.type==='approach'?'Avoid giving up useful proximity just to eliminate every possible miss. Look for the target that balances distance to the flag with the expensive side of the green.':'A shorter club can narrow the pattern, but it can also leave a harder next shot. Compare the whole hole cost before laying back.';
+ }else{
+  why=`A different direction or depth lowers expected cost by ${Math.max(0,cost).toFixed(2)} strokes. This is not clearly an aggression mistake: club choice, proximity and the mix of lies all contribute.`;
+  principle='Compare both patterns against the hazards and pin. Adjust direction and depth together instead of treating every error as too safe or too risky.';
+ }
+ if(s.secondShot){why+=' This is your second shot on a par 5: expected strokes compares going for the green with leaving a shorter next shot, including the cost of missed attempts.';principle+=' Reaching in two is worthwhile only when your club reach and full miss pattern justify the risk.';}
+ const dx=b.aim.x-aim.x,dy=b.aim.y-aim.y;
+ const direction=Math.abs(dx)<1?'keep roughly the same left/right target':`move the target ${yards(dx)} ${dx<0?'left':'right'}`;
+ const depth=Math.abs(dy)<1?'keep roughly the same depth':`set it ${yards(dy)} ${dy<0?'shorter':'deeper'}`;
+ const action=!Number.isFinite(q.expected)?'Adjust your shot setup, then try again.':assessment.kind==='balanced'?'Retry and see whether you can choose a similarly balanced target before the pattern appears.':`On a retry, ${direction} and ${depth}. Compare ${p.club||'your club'} with ${b.pattern?.club||p.club||'the same club'} at that distance.`;
+ return {why,principle,action,rows:[
+  {label:'Expected strokes',you:Number.isFinite(r.expected)?r.expected.toFixed(2):'∞',best:Number.isFinite(q.expected)?q.expected.toFixed(2):'∞'},
+  ...HAZARDS.map(([kind,name])=>({label:name==='OB'?'Out of bounds':name[0].toUpperCase()+name.slice(1),you:pct(rate(r,kind)),best:pct(rate(q,kind))})),
+  {label:'Nominal finish to pin',you:yards(ownDistance),best:yards(bestDistance)},
+  {label:'Selected club / distance',you:`${p.club||'Custom'} · ${yards(p.carry+p.roll)}`,best:`${b.pattern?.club||p.club||'Custom'} · ${yards((b.pattern||p).carry+(b.pattern||p).roll)}`}
+ ],note:'This explains the modeled tradeoff. The blue target is the best sampled target, not a proven optimum. Nominal finish is the core flight without random misses; it is not the average distance of every shot. Costs and shot assumptions can change the recommendation.'};
+}

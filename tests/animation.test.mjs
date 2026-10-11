@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {setupDOM} from './dom-harness.mjs';
+import {TRACER_COLORS} from '../dist/tracers.js';
+const dom=setupDOM({reducedMotion:false}),$=dom.$;
+await import('../dist/app.js');
+test('commit plays outcome-colored examples, locks controls, then zooms before revealing comparison',async()=>{
+ $('basicHandicap').value='20';await $('basicHandicap').fire('change');$('aimX').value='30';await $('aimX').fire('input');
+ const frames=[];let now=0;
+ globalThis.requestAnimationFrame=cb=>setTimeout(()=>{cb(now+=325);frames.push({view:$('course').innerHTML,resultHidden:$('results').hidden,badge:$('cameraBadge').textContent});},0);
+ const pending=$('simulate').fire('click');
+ assert.ok($('results').hidden);assert.ok($('basicHandicap').disabled);assert.ok($('aimY').disabled);
+ for(let i=0;i<1000&&$('cameraBadge').textContent!=='SHOT TRACERS';i++)await new Promise(resolve=>setTimeout(resolve,10));
+ assert.equal($('cameraBadge').textContent,'SHOT TRACERS');assert.ok(!$('traceLegend').hidden);assert.ok($('hazardScout').hidden);
+ const svg=$('course').innerHTML;assert.equal((svg.match(/data-outcome=/g)||[]).length,48);
+ for(const m of svg.matchAll(/data-outcome="(\w+)"[^>]*stroke="(#[a-fA-F0-9]+)"/g))assert.equal(m[2],TRACER_COLORS[m[1]]);
+ assert.ok(svg.includes('data-outcome="ob"'));assert.ok(svg.includes('data-outcome="rough"'));
+ assert.ok(!svg.includes('id="idealCloud"'));assert.ok(!svg.includes('id="shotCloud"'));assert.ok($('results').hidden);
+ const before=JSON.parse(dom.storage.get('golfaim101-v2'));$('aimX').value='-40';await $('aimX').fire('input');await $('approachTab').fire('click');assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).scenario,before.scenario);
+ await pending;
+ assert.equal(frames.length,3);assert.ok(frames.every(f=>f.resultHidden&&f.badge==='ZOOMING TO LANDING AREA'));assert.notEqual(frames[0].view,frames[1].view);
+ assert.ok(!$('results').hidden);assert.ok(!$('traceLegend').hidden);assert.ok($('hazardScout').hidden);assert.equal($('cameraBadge').textContent,'LANDING-AREA ZOOM');assert.ok($('course').innerHTML.includes('id="idealCloud"'));assert.ok(!$('course').innerHTML.includes('id="shotTracers"'));delete globalThis.requestAnimationFrame;
+});
