@@ -1,4 +1,4 @@
-# Publish v12.3.0 in the existing Work project
+# Publish v12.4.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -11,3 +11,5 @@ Keep `.openai/hosting.json` with project ID `appgprj_6ac9a3e7317c8191b1a10027146
 An incomplete upload can leave the selectors visible while the course is blank green. In particular, the new approach module must be published alongside the rest of the files. Check the rendered course after deployment, rather than treating an uploaded archive as proof that the site works.
 
 This environment can save and test the GitHub changes; it has no publishing access to the existing private Work site.
+
+After publishing, try Full screen, the floating map and depth bar, a shot and its feedback overlay, Hide/Show feedback, Retry, and Exit full screen. Test the normal view as well. Browsers without native fullscreen use the page-filling fallback.

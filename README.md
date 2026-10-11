@@ -1,6 +1,14 @@
 # Target Practice
 
-## Current development update: v12.3.0
+## Current development update: v12.4.0
+
+**Full screen** opens an immersive practice layout: course across the viewport, depth on the right, a floating terrain-only bird's-eye map, and aim/commit actions over the course. The map can be collapsed. Results appear in a scrollable overlay; **Hide feedback / Show feedback** toggles that overlay without changing the target or answers. Retry clears the answers, and Next shot stays in the immersive layout. **Exit full screen** or Escape restores the normal view. Opening progress or the club editor also exits immersive practice.
+
+Native browser fullscreen is requested when available; otherwise the same layout fills the page while browser chrome can remain. The camera expands its frame to fit portrait and landscape screens without stretching the course or cropping the original frame. Fullscreen is session-only and does not change the saved shot profile, seed, or target. The floating map shows known terrain, not hidden dispersion or recommended targets.
+
+Validation: all 114 regression tests passed. Real Chromium checks cover native fullscreen on desktop, denied-fullscreen fallback at 390 and 320 pixels and 844-pixel landscape, depth and map controls, hidden answers, commitment lock, feedback collapse, retry, Next shot, rotation, and Escape/button exits. Physical-device and Safari/Firefox checks remain outstanding.
+
+## Previous development update: v12.3.0
 
 Approaches now include front flags just beyond a pond, flags tucked beside side water, front/back flags between sand and water, and flags near one of two side bunkers. This changes existing families rather than adding more copies to the bank. `approach-v2` changes generated geometry and pin placement; older seeds need their generator version to reproduce the prior layout. Seed zero still retains each authored baseline, and Retry preserves the current layout.
 
@@ -71,6 +79,7 @@ node scripts/browser-review/gestures.cjs
 node scripts/browser-review/mobile-and-generated.cjs
 node scripts/browser-review/learning.cjs
 node scripts/browser-review/guarded-feedback.cjs
+node scripts/browser-review/fullscreen.cjs
 ```
 
 These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.

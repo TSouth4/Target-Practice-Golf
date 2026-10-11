@@ -18,6 +18,7 @@ let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',basicL
 let result=null,best=null,oneShot=null,working=false,hasAim=false,toastTimer,phase='choose',traceShots=[],transition=null;
 let editorDraft=null,editorClub='Driver',editorDrag=null,editorInvalid=new Set();
 let landingCamera=null;
+let immersive=false,feedbackExpanded=true,radarExpanded=true,nativeFullscreen=false;
 let retryBaseline=null,retryHint='';
 function retryValid(){return retryBaseline&&retryBaseline.encounter===state.encounter&&retryBaseline.profile===currentProfile()&&retryBaseline.seed===state.seed;}
 let aimZoom=null,lastCourseTap=null,lastDoubleAimTap=null;
@@ -58,7 +59,7 @@ function renderProgress(){
  $('progressEmpty').textContent=summary.first.length?'':summary.retries?'Only retries in this profile so far. Take Next shot to start a new first attempt.':'No first attempts in this profile and shot type yet.';
  $('progressStorage').textContent=progressStored?'Saved locally in this browser. Keeps the latest 1,000 attempts, including retries. Clearing browser data removes this history.':'Local saving is unavailable. History from this visit may be lost when you close the page.';
 }
-function openProgress(){if(working||editorDraft)return;closeMenu();progressOpen=true;progressSelection=currentProfile();$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
+function openProgress(){if(working||editorDraft)return;leaveFullscreen();closeMenu();progressOpen=true;progressSelection=currentProfile();$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
 function closeProgress(){progressOpen=false;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;updateLabels();$('practiceScreen').scrollIntoView({behavior:'auto'});$('menuToggle').focus?.();}
 
 let cachedScene,sceneKey;
@@ -106,7 +107,7 @@ function updateLabels(){
  $('shotModeNote').textContent=advanced?'My shot · member preview · automatic club for depth':'Straight flight · automatic club for your depth';
  $('costEditor').hidden=!advanced;
  $('legend').hidden=!result;$('reviewViews').hidden=!result;$('tryAgain').hidden=!result;$('retryThisHole').hidden=!result;
- $('hazardScout').hidden=!!result||phase==='shooting'||phase==='zooming';$('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
+ $('hazardScout').hidden=!immersive&&(!!result||phase==='shooting'||phase==='zooming');$('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
  $('animationStatus').hidden=!working;
  $('animationStatus').textContent=phase==='shooting'?`Following ${traceShots.length} example shots. Color shows the final lie; percentages will use all 4,000.`:phase==='zooming'?'Now compare your landing pattern with the best sampled aim.':'Calculating 4,000 outcomes…';
  $('newShots').hidden=true;$('sampleStatus').hidden=!result;
@@ -126,7 +127,7 @@ function updateLabels(){
  $('cameraBadge').textContent=phase==='shooting'?'SHOT TRACERS':phase==='zooming'?'ZOOMING TO LANDING AREA':state.view==='map'?'LANDING-AREA ZOOM':`${aimZoom?'2× TARGET ZOOM · ':''}EYE LEVEL · ${elevation()} M ABOVE LANDING`;
  const zoomAllowed=!working&&!result&&!editorDraft&&!progressOpen;
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);
- $('course').setAttribute('viewBox',aimZoom&&zoomAllowed?`${aimZoom.x} ${aimZoom.y} ${aimZoom.width} ${aimZoom.height}`:'0 0 960 580');
+ updateCourseFrame(aimZoom&&zoomAllowed?aimZoom:{x:0,y:0,width:960,height:580});
  $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
  $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course or the bird’s-eye map. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
@@ -135,14 +136,47 @@ function updateLabels(){
  for(const [id,on] of [['stepChoose',!hasAim],['stepCommit',hasAim&&!result],['stepCompare',!!result]])$(id).classList.toggle('current',on);
  for(const id of ['basicHandicap','aimX','aimY'])$(id).disabled=working||!!result;
  for(const el of document.querySelectorAll('[data-cost]'))el.disabled=working||!!result;
+ updateFullscreenControls();
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
+function updateCourseFrame(box){
+ let {x,y,width,height}=box;
+ if(immersive){const bounds=$('course').getBoundingClientRect(),aspect=bounds.width/Math.max(1,bounds.height);
+  if(aspect>width/height){const expanded=height*aspect;x-=(expanded-width)/2;width=expanded;}else{const expanded=width/aspect;y-=(expanded-height)/2;height=expanded;}
+ }
+ $('course').setAttribute('viewBox',`${x} ${y} ${width} ${height}`);
+}
+function updateFullscreenControls(){
+ $('appRoot').classList.toggle('immersive-mode',immersive);
+ $('appRoot').classList.toggle('feedback-collapsed',immersive&&!feedbackExpanded);
+ $('appRoot').classList.toggle('radar-collapsed',immersive&&!radarExpanded);
+ $('fullscreenToggle').textContent=immersive?'Exit full screen ✕':'Full screen ⛶';$('fullscreenToggle').setAttribute('aria-pressed',immersive);
+ $('feedbackToggle').hidden=!immersive||!result;$('feedbackToggle').textContent=feedbackExpanded?'Hide feedback':'Show feedback';$('feedbackToggle').setAttribute('aria-expanded',feedbackExpanded);
+ $('radarToggle').hidden=!immersive;$('radarToggle').textContent=radarExpanded?'Hide map':'Show map';$('radarToggle').setAttribute('aria-expanded',radarExpanded);
+}
+function leaveFullscreen(){
+ if(!immersive)return;immersive=false;nativeFullscreen=false;updateLabels();drawCourse();
+ if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
+ $('fullscreenToggle').focus?.();
+}
+$('fullscreenToggle').addEventListener('click',async()=>{
+ if(immersive){leaveFullscreen();return;}
+ immersive=true;feedbackExpanded=true;radarExpanded=true;closeMenu();updateFullscreenControls();updateLabels();drawCourse();
+ // The immersive layout also works where native fullscreen is unavailable or denied.
+ try{if($('appRoot').requestFullscreen){await $('appRoot').requestFullscreen();nativeFullscreen=!!document.fullscreenElement;}}catch{}
+ if(immersive){updateLabels();drawCourse();}
+});
+$('feedbackToggle').addEventListener('click',()=>{feedbackExpanded=!feedbackExpanded;updateFullscreenControls();});
+$('radarToggle').addEventListener('click',()=>{radarExpanded=!radarExpanded;updateFullscreenControls();});
+document.addEventListener?.('fullscreenchange',()=>{if(nativeFullscreen&&!document.fullscreenElement)leaveFullscreen();else if(immersive)updateLabels();});
+document.addEventListener?.('keydown',event=>{if(event.key==='Escape'&&immersive){event.preventDefault();leaveFullscreen();}});
+globalThis.addEventListener?.('resize',()=>{if(immersive)updateLabels();});
 function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionVerdict').setAttribute('aria-expanded',false);progressMessage='';landingCamera=null;syncTargetDistance();phase='choose';traceShots=[];transition=null;result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;save();updateLabels();drawCourse();}
 function setScenario(id,holeSeed=0){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=nextLandscape(state.landscape,holeSeed);state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode){if(working)return;resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
- if(working)return;closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
+ if(working)return;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
  $('practiceScreen').hidden=true;$('shotEditor').hidden=false;renderEditor();updateLabels();$('shotEditor').scrollIntoView({behavior:'auto'});
 }
 function editorPattern(){return editingPattern(editorDraft.find(c=>c.club===editorClub));}
@@ -178,9 +212,9 @@ function line(a,b,attrs=''){const x=project(a),y=project(b);return `<line x1="${
 function textAt(x,y,label,attrs=''){const p=project({x,y});return `<text x="${p.x}" y="${p.y}" ${attrs}>${label}</text>`;}
 function drawCourse(){
  const s=scene(),p=state.pattern,map=state.view==='map'||phase==='zooming',theme=landscape();
- let html=`<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" y2="1"><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
- if(map){const c=analysisCamera();html+=`<rect width="960" height="580" fill="${theme.ground}"/>`;for(let x=-140;x<=160;x+=20)html+=line({x,y:c.minY-20},{x,y:c.maxY+20},'stroke="#b4c69c" stroke-width="1"');for(let y=Math.floor(c.minY/10)*10;y<c.maxY+20;y+=10)html+=line({x:-140,y},{x:160,y},'stroke="#b4c69c" stroke-width="1"');}
- else{html+=`<rect width="960" height="580" fill="url(#sky)"/><path d="M0 234Q95 212 195 225T390 221T650 224T960 234V250H0Z" fill="#bac8b0"/><rect y="${EYE_CAMERA.horizon}" width="960" height="345" fill="url(#rough)"/><g opacity=".45"><ellipse cx="169" cy="80" rx="80" ry="12" fill="#f6f2e2"/><ellipse cx="658" cy="108" rx="101" ry="11" fill="#f6f2e2"/></g>`;}
+ let html=`<defs><linearGradient id="sky" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="-150" y2="235"':'y2="1"'}><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="235" y2="580"':'y2="1"'}><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
+ if(map){const c=analysisCamera();html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="${theme.ground}"/><rect width="960" height="580" fill="${theme.ground}"/>`;for(let x=-140;x<=160;x+=20)html+=line({x,y:c.minY-20},{x,y:c.maxY+20},'stroke="#b4c69c" stroke-width="1"');for(let y=Math.floor(c.minY/10)*10;y<c.maxY+20;y+=10)html+=line({x:-140,y},{x:160,y},'stroke="#b4c69c" stroke-width="1"');}
+ else{html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="url(#rough)"/><rect x="-3000" y="-3000" width="7000" height="${3000+EYE_CAMERA.horizon}" fill="url(#sky)"/><rect width="960" height="580" fill="url(#sky)"/><path d="M0 234Q95 212 195 225T390 221T650 224T960 234V250H0Z" fill="#bac8b0"/><rect y="${EYE_CAMERA.horizon}" width="960" height="345" fill="url(#rough)"/><g opacity=".45"><ellipse cx="169" cy="80" rx="80" ry="12" fill="#f6f2e2"/><ellipse cx="658" cy="108" rx="101" ry="11" fill="#f6f2e2"/></g>`;}
  html+=`<polygon points="${polygon(s.fairway)}" fill="url(#fairway)" stroke="#5b8d3e" stroke-width="1.4"/>`;
  // Alternating mowing bands are clipped to the exact fairway polygon.
  html+='<g clip-path="url(#fairwayClip)">';for(let y=0;y<s.maxY;y+=24)html+=`<polygon points="${polygon([[-150,y],[150,y],[150,y+12],[-150,y+12]])}" fill="#bcdf81" opacity=".13"/>`;html+='</g>';
@@ -244,7 +278,7 @@ function showResult(){
  const assessment=decisionFeedback(state.aim,state.pattern,r,best,s);
  $('retryComparison').hidden=!retryValid();
  if(retryValid()){$('retryRows').innerHTML=retryRows(retryBaseline,{aim:state.aim,pattern:state.pattern,result:r,score:Number.isFinite(b.expected)?score:null}).map(row=>`<tr><th scope="row">${escapeHTML(row.label)}</th><td>${escapeHTML(row.first)}</td><td>${escapeHTML(row.now)}</td></tr>`).join('');$('retrySummary').textContent=retryImpact(retryBaseline.result.expected,r.expected);}
- $('results').hidden=false;$('scoreValue').textContent=Number.isFinite(b.expected)?score:'—';
+ feedbackExpanded=true;$('results').hidden=false;$('scoreValue').textContent=Number.isFinite(b.expected)?score:'—';
  $('decisionVerdict').textContent=assessment.label;$('decisionVerdict').setAttribute('aria-expanded',false);$('decisionLesson').hidden=true;
  const lesson=decisionLesson(state.aim,state.pattern,r,best,s,assessment);
  $('lessonTitle').textContent=assessment.label+' — why?';$('lessonWhy').textContent=lesson.why;$('lessonPrinciple').textContent=lesson.principle;$('lessonAction').textContent=lesson.action;$('lessonLimit').textContent=lesson.note;
@@ -264,7 +298,7 @@ function showResult(){
  if(penaltyGain>1)note+=` Water / OB exposure falls by ${penaltyGain.toFixed(1)} percentage points.`;
  if(s.type==='approach'&&Math.hypot(best.aim.x-s.pin.x,best.aim.y-s.pin.y)>8)note+=' The flag and the best target do not have to be the same point.';
  $('coachNote').textContent=(lesson.hazardDetail||lesson.why)+'\n\n'+lesson.action+'\n\n'+(lesson.hazardDetail?'':note)+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
- updateLabels();drawCourse();
+ updateLabels();drawCourse();if(immersive)$('feedbackToggle').focus?.();
 }
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function zoomToLanding(camera){

@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.3 guarded pins and descriptive feedback
+## Update: v12.4 full-screen practice
+
+All 114 regression tests and syntax checks passed. `fullscreen.cjs` passed at desktop 1440×1000 with native fullscreen, and fallback layouts at 390×844, 320×740 and 844×390. Browser checks verify the viewport fills the screen, entering preserves the saved target/profile, depth and floating-map input do not reveal answers, commitment locks depth, feedback collapses without clearing results, retry removes answers, Next shot stays immersive, resize retains the mode, and Escape/button exits restore normal controls. No page errors were captured.
+
+Local screenshots show portrait and desktop choice/review layouts. Browser-native fullscreen denial is deliberately tested; the fallback does not remove browser chrome. The camera preserves the original frame while expanding to fit the viewport, and map framing still does not depend on dispersion. Physical-device, Safari and Firefox checks remain outstanding. The hosted site has not been published by this environment.
+
+## Previous update: v12.3 guarded pins and descriptive feedback
 
 All fourteen families passed generated commit/retry browser checks, including the new `approach-v2` layouts. Desktop front-pond and phone side-pond checks confirmed that coaching names the actual hazard, describes the relevant short or lateral miss, shows the measured rate reduction, and retains the expandable lesson. Elevated View is hidden after commitment. The numeric score formula is unchanged; the balanced rating reads Strong decision.
 
