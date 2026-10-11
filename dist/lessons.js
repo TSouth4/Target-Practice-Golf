@@ -34,11 +34,18 @@ export function decisionLesson(aim,p,r,b,s,assessment){
  const dx=b.aim.x-aim.x,dy=b.aim.y-aim.y;
  const direction=Math.abs(dx)<1?'keep roughly the same left/right target':`move the target ${yards(dx)} ${dx<0?'left':'right'}`;
  const depth=Math.abs(dy)<1?'keep roughly the same depth':`set it ${yards(dy)} ${dy<0?'shorter':'deeper'}`;
- const action=!Number.isFinite(q.expected)?'Adjust your shot setup, then try again.':assessment.kind==='balanced'?'Retry and see whether you can choose a similarly balanced target before the pattern appears.':`On a retry, ${direction} and ${depth}. Compare ${p.club||'your club'} with ${b.pattern?.club||p.club||'the same club'} at that distance.`;
+ const action=!Number.isFinite(q.expected)?'Adjust your shot setup, then try again.':assessment.kind==='balanced'?'Retry and see whether you can choose a similarly balanced target before the pattern appears.':`Test an idea on retry: ${direction} and ${depth}. Before committing, predict whether the change will reduce costly misses enough to justify any change in proximity. Then compare ${p.club||'your club'} with ${b.pattern?.club||p.club||'the same club'} at that distance.`;
  return {why,principle,action,rows:[
   {label:'Expected strokes',you:Number.isFinite(r.expected)?r.expected.toFixed(2):'∞',best:Number.isFinite(q.expected)?q.expected.toFixed(2):'∞'},
   ...HAZARDS.map(([kind,name])=>({label:name==='OB'?'Out of bounds':name[0].toUpperCase()+name.slice(1),you:pct(rate(r,kind)),best:pct(rate(q,kind))})),
   {label:'Nominal finish to pin',you:yards(ownDistance),best:yards(bestDistance)},
   {label:'Selected club / distance',you:`${p.club||'Custom'} · ${yards(p.carry+p.roll)}`,best:`${b.pattern?.club||p.club||'Custom'} · ${yards((b.pattern||p).carry+(b.pattern||p).roll)}`}
  ],note:'This explains the modeled tradeoff. The blue target is the best sampled target, not a proven optimum. Nominal finish is the core flight without random misses; it is not the average distance of every shot. Costs and shot assumptions can change the recommendation.'};
+}
+
+export function retryImpact(firstExpected,nowExpected){
+ const gain=firstExpected-nowExpected;
+ if(!Number.isFinite(gain))return 'At least one target produced an all-OB pattern; a finite improvement estimate is unavailable.';
+ const change=Math.abs(gain),per100=(change*100).toFixed(1);
+ return `This target ${gain>=0?'saves':'costs'} an estimated ${change.toFixed(2)} strokes per shot compared with your original decision — ${per100} strokes ${gain>=0?'saved':'lost'} per 100 similar shots. Same hole, profile and random draws. This scales the modeled average; it is not a prediction of your next 100 shots or real-world strokes gained.`;
 }

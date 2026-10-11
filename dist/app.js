@@ -1,6 +1,6 @@
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
 import {targetFacts,hazardCallouts,retryRows} from './guidance.js';
-import {decisionLesson} from './lessons.js';
+import {decisionLesson,retryImpact} from './lessons.js';
 import {PROGRESS_KEY,MODEL_VERSION,readProgress,profileKey,recordAttempt,progressSummary,trendSVG} from './progress.js';
 import {DRIVER_LIMITS,reachLimit,trainingBag} from './bag.js';
 import {FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
@@ -129,7 +129,7 @@ function updateLabels(){
  $('course').setAttribute('viewBox',aimZoom&&zoomAllowed?`${aimZoom.x} ${aimZoom.y} ${aimZoom.width} ${aimZoom.height}`:'0 0 960 580');
  $('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
  $('courseStyle').disabled=working;
- $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the bird’s-eye map for depth. Sliders work too. The pattern stays hidden until you commit.';
+ $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course or the bird’s-eye map. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
  $('aimControls').hidden=!!result;$('scenarioBriefWrap').hidden=!!result;$('appRoot').classList.toggle('review-mode',!!result);
@@ -244,7 +244,7 @@ function showResult(){
  const r=result,b=best.result,regret=Number.isFinite(r.expected)?Math.max(0,r.expected-b.expected):Number.isFinite(b.expected)?Infinity:0,score=decisionScore(r.expected,b.expected),s=scene();
  const assessment=decisionFeedback(state.aim,state.pattern,r,best,s);
  $('retryComparison').hidden=!retryValid();
- if(retryValid()){$('retryRows').innerHTML=retryRows(retryBaseline,{aim:state.aim,pattern:state.pattern,result:r,score:Number.isFinite(b.expected)?score:null}).map(row=>`<tr><th scope="row">${escapeHTML(row.label)}</th><td>${escapeHTML(row.first)}</td><td>${escapeHTML(row.now)}</td></tr>`).join('');const gain=retryBaseline.result.expected-r.expected; $('retrySummary').textContent=Number.isFinite(gain)?`This target ${gain>=0?'reduces':'increases'} modeled expected strokes by ${Math.abs(gain).toFixed(2)} compared with your original decision. Same hole, profile and random draws. This is a practice comparison, not evidence of long-term improvement.`:'At least one target produced an all-OB pattern; a finite improvement estimate is unavailable.';}
+ if(retryValid()){$('retryRows').innerHTML=retryRows(retryBaseline,{aim:state.aim,pattern:state.pattern,result:r,score:Number.isFinite(b.expected)?score:null}).map(row=>`<tr><th scope="row">${escapeHTML(row.label)}</th><td>${escapeHTML(row.first)}</td><td>${escapeHTML(row.now)}</td></tr>`).join('');$('retrySummary').textContent=retryImpact(retryBaseline.result.expected,r.expected);}
  $('results').hidden=false;$('scoreValue').textContent=Number.isFinite(b.expected)?score:'—';
  $('decisionVerdict').textContent=assessment.label;$('decisionVerdict').setAttribute('aria-expanded',false);$('decisionLesson').hidden=true;
  const lesson=decisionLesson(state.aim,state.pattern,r,best,s,assessment);
@@ -264,7 +264,7 @@ function showResult(){
  let note=!Number.isFinite(b.expected)?'No sampled target avoids an all-OB pattern. Adjust the shot settings; the comparison is not meaningful here.':regret<.05?'A bad single outcome can still follow a good decision.':`The comparison moves the target ${sided(dx)} and ${Math.abs(dy).toFixed(0)} yd ${dy>=0?'deeper':'shorter'}. It saves about ${Number.isFinite(regret)?regret.toFixed(2):'many'} expected strokes.`;
  if(penaltyGain>1)note+=` Water / OB exposure falls by ${penaltyGain.toFixed(1)} percentage points.`;
  if(s.type==='approach'&&Math.hypot(best.aim.x-s.pin.x,best.aim.y-s.pin.y)>8)note+=' The flag and the best target do not have to be the same point.';
- $('coachNote').textContent=note+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
+ $('coachNote').textContent=lesson.why+' '+lesson.action+' '+note+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
  updateLabels();drawCourse();
 }
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));

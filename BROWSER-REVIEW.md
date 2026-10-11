@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.2 scenario variety and course actions
+## Update: v12.2.1 learning feedback and vertical depth
+
+All 112 automated tests and syntax checks passed. The core browser flow passed at 1440-, 390-, and 320-pixel widths. Additional checks confirmed a vertical depth control beside the course, keyboard and touch adjustment without revealing outcomes, target locking after commitment, and per-100-shot feedback after retry. No horizontal overflow or page errors were captured. The main coaching now includes the actual lesson and a suggested retry experiment. The expanded outcome table remains available from the rating.
+
+`learning.cjs` reproduces the additional browser checks. Per-100 scaling tests cover savings, losses, no change, differences smaller than display precision, and unbounded comparisons.
+
+## Previous update: v12.2 scenario variety and course actions
 
 Chromium checks passed the core flow at 1440-, 390-, and 320-pixel widths, touch gestures and normal-motion commitments, phone slider and orientation checks, and commit/retry for all fourteen generated families. No page errors were captured. Desktop and phone measurements placed the action bar ten pixels below the course; it remained visible while adjusting the aiming control. Sharp doglegs rendered correctly with the expanded aiming range.
 

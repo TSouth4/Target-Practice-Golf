@@ -1,6 +1,16 @@
 # Target Practice
 
-## Current development update: v12.2.0
+## Current development update: v12.2.1
+
+The depth slider is now a vertical control immediately beside the course, with farther targets at the top. It uses the same target, heading, reach limits and commit lock as the terrain map. Keyboard and touch controls remain available.
+
+Post-shot coaching now shows the actual tradeoff and a suggested experiment in the main feedback, alongside the expandable outcome table. Retry comparisons show the expected stroke difference per shot and per 100 similar shots, calculated before display rounding. These are modeled savings against the original target, not measured real-world strokes gained or a promise about the next 100 shots.
+
+Validation: all 112 automated tests and syntax checks passed, plus desktop and phone browser checks covering the new depth control and retry feedback.
+
+This follow-up is saved separately from the v12.2 publishing branch so Work can finish its current update. Publish the complete follow-up archive when ready.
+
+## Previous development update: v12.2.0
 
 This update expands practice to 14 families: seven tee situations and seven approaches. New families include sharp doglegs, crossing creeks, a short par 4 with a narrowing entrance, and a creek par 3. Reachable par 4s and par-5 second shots remain part of the mix. Every family now varies its geometry, including fairway shape, landing width, green size and position, hazards, and pin placement. Sharp doglegs support aiming up to 120 yards sideways.
 
@@ -45,6 +55,7 @@ export TARGET_PRACTICE_PLAYWRIGHT=/tmp/target-practice-browser/node_modules/play
 node scripts/browser-review/check.cjs
 node scripts/browser-review/gestures.cjs
 node scripts/browser-review/mobile-and-generated.cjs
+node scripts/browser-review/learning.cjs
 ```
 
 These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.
