@@ -71,7 +71,7 @@ export function decisionLesson(aim,p,r,b,s,assessment){
   ...HAZARDS.map(([kind,name])=>({label:name==='OB'?'Out of bounds':name[0].toUpperCase()+name.slice(1),you:pct(rate(r,kind)),best:pct(rate(q,kind))})),
   {label:'Nominal finish to pin',you:yards(ownDistance),best:yards(bestDistance)},
   {label:'Selected club / distance',you:`${p.club||'Custom'} · ${yards(p.carry+p.roll)}`,best:`${b.pattern?.club||p.club||'Custom'} · ${yards((b.pattern||p).carry+(b.pattern||p).roll)}`}
- ],note:'This explains the modeled tradeoff. The blue target is the best sampled target, not a proven optimum. Cost components use playable outcomes; next-shot cost includes putting and water-drop positions, while OB includes repeating the strategy. These are an accounting breakdown, not isolated causal effects. Displayed rounded components may not add exactly. Nominal finish is the core flight without random misses. Costs and shot assumptions can change the recommendation.'};
+ ],note:'Costs use Broadie’s historical PGA TOUR distance-and-lie reference with your shot pattern; they do not predict your personal hole score. Custom cost offsets and forest severity are model adjustments. The blue target is the best sampled target, not a proven optimum. Cost components use playable outcomes; next-shot cost includes putting and water-drop positions, while OB includes repeating the strategy. These are an accounting breakdown, not isolated causal effects. Displayed rounded components may not add exactly. Nominal finish is the core flight without random misses. Costs and shot assumptions can change the recommendation.'};
 }
 
 export function retryImpact(firstExpected,nowExpected){

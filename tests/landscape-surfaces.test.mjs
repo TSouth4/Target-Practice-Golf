@@ -23,8 +23,8 @@ test('seeded woods vary independently, preserve repeatable layouts, and charge d
   for(const h of s.hazards.filter(h=>h.forest)){
    const p={x:h.poly.reduce((sum,v)=>sum+v[0],0)/h.poly.length,y:h.poly.reduce((sum,v)=>sum+v[1],0)/h.poly.length};
    if(lie(p,s)!=='trees')continue;
-   const base=remaining(p,s,{...DEFAULT_COSTS,trees:0},'trees');
-   assert.ok(Math.abs(remaining(p,s,DEFAULT_COSTS,'trees')-base-DEFAULT_COSTS.trees*h.recoveryMultiplier)<1e-9);
+   const base=remaining(p,s,DEFAULT_COSTS,'trees');
+   assert.ok(Math.abs(remaining(p,s,{...DEFAULT_COSTS,trees:.3},'trees')-base-.3*h.recoveryMultiplier)<1e-9);
   }
  }
  assert.equal(sides.size,2);

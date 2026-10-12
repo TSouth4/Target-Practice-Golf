@@ -11,5 +11,5 @@ test('older Advanced settings migrate into the matching personal club while the 
  const driver=saved().memberBag.find(c=>c.club==='Driver');assert.equal(driver.stock,285);assert.equal(driver.start,3);assert.equal(driver.curve,-18);assert.equal(driver.bigPct,12);assert.equal(driver.height,38);
  assert.equal(saved().memberBag.find(c=>c.club==='Hybrid').curve,0);
  await $('advancedMode').fire('click');assert.equal($('club').value,'Driver');assert.equal(Number($('carry').value),270);assert.equal(Number($('curve').value),-18);
- await $('saveEditor').fire('click');assert.equal(saved().pattern.club,'Driver');assert.equal(saved().pattern.start,3);assert.equal(saved().pattern.bigPct,12);assert.equal(saved().costs.bunker,1.2);assert.ok($('results').hidden);assert.ok($('simulate').disabled);
+ await $('saveEditor').fire('click');assert.equal(saved().pattern.club,'Driver');assert.equal(saved().pattern.start,3);assert.equal(saved().pattern.bigPct,12);assert.equal(saved().costs.bunker,0);assert.equal(saved().previousMemberCosts.bunker,1.2);assert.ok($('results').hidden);assert.ok($('simulate').disabled);
 });

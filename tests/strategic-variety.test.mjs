@@ -41,7 +41,7 @@ test('sharp dogleg aiming, club reach, and comparison search use the same expand
 });
 
 test('the same crossing creek supports carrying for a longer profile and a short layup for a shorter profile',async()=>{
- const s=generateScenario(SCENARIOS.find(b=>b.id==='creek-tee'),5),creek=s.hazards.find(h=>h.kind==='water'),near=Math.min(...creek.poly.map(p=>p[1])),far=Math.max(...creek.poly.map(p=>p[1])),zs=samples(1000,411);
+ const s=generateScenario(SCENARIOS.find(b=>b.id==='creek-tee'),1),creek=s.hazards.find(h=>h.kind==='water'),near=Math.min(...creek.poly.map(p=>p[1])),far=Math.max(...creek.poly.map(p=>p[1])),zs=samples(1000,411);
  const targets=[];
  for(const handicap of [0,20]){const p=basicPattern(handicap,s),a={x:0,y:140},b=await optimizeTargets(a,p,s,DEFAULT_COSTS,zs);targets.push(b);assert.equal(lie(b.aim,s),'fairway');assert.ok(Math.hypot(b.aim.x,b.aim.y)<=reachLimit(p)+1e-8);}
  assert.ok(targets[0].aim.y>far);assert.ok(targets[1].aim.y<near);

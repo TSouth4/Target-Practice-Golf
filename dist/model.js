@@ -1,5 +1,6 @@
 import {DRIVER_LIMITS,clubPattern,reachLimit} from './bag.js';
 import {EXTRA_HOLES} from './holes.js';
+import {BASELINE_ID,baselineStrokes,baselineLookup} from './strokes-baseline.js';
 // Geometry, rendering, and simulation share these exact yard coordinates.
 export const SCENARIOS = [
  {id:'cedar',type:'tee',name:'Cedar corridor',tag:'OB right · water left',hole:'01',par:4,length:410,pin:{x:8,y:410},maxY:440,aimY:270,aimRange:[170,310],bounds:[-76,47],
@@ -31,7 +32,7 @@ export const SCENARIOS = [
    {kind:'trees',label:'Back recovery',poly:[[-57,197],[42,197],[42,215],[-57,215]]}],labels:[{x:-30,y:159,text:'SAND'},{x:46,y:178,text:'OB'}]}
  ,...EXTRA_HOLES
 ];
-export const DEFAULT_COSTS = {rough:.22,bunker:.45,trees:.9,waterExtra:0,base150:3.1,longSlope:.55,puttBase:1.2};
+export const DEFAULT_COSTS = {baseline:BASELINE_ID,rough:0,bunker:0,trees:0,waterExtra:0,base150:2.945,longSlope:0,puttBase:0};
 // These are deliberately illustrative, not empirical handicap-conditioned data.
 const PRESETS = {
  0:{tee:[265,11,9,2,32],approach:[155,5,6,2,18]},
@@ -61,20 +62,16 @@ export function inGreen(p,s){return ((p.x-s.green.x)/s.green.rx)**2+((p.y-s.gree
 export function lie(p,s){if(p.x<s.bounds[0]||p.x>s.bounds[1]||p.y<0||p.y>s.maxY+100)return 'ob';for(const h of s.hazards)if(inPoly(p,h.poly))return h.kind;if(inGreen(p,s))return 'green';return inPoly(p,s.fairway)?'fairway':'rough';}
 export function remaining(p,s,c,kind=lie(p,s)){
  const d=Math.hypot(p.x-s.pin.x,p.y-s.pin.y);
- if(kind==='green')return Math.min(2.8,c.puttBase+.3*Math.log1p(d*3));
+ if(kind==='green')return Math.max(1,baselineStrokes('green',d)+c.puttBase);
  const base=fairwayRemaining(d,c);
  const woods=kind==='trees'?s.hazards.find(h=>h.forest&&inPoly(p,h.poly)):null;
- return base+(c[kind]||0)*(woods?.recoveryMultiplier||1);
+ const lieExtra=['rough','bunker','trees'].includes(kind)?baselineStrokes(kind,d)-baselineStrokes('fairway',d)+(c[kind]||0):0;
+ return base+lieExtra*(woods?.recoveryMultiplier||1);
 }
-// Illustrative short-game anchors, not fitted player data. A pitch still needs
-// a stroke and subsequent putting; the old straight line priced it too cheaply.
-// Scale the anchors with the editable 150-yard baseline, preserving that value.
+// Default costs use the documented distance/lie table. Optional custom offsets
+// are teaching adjustments, not measured handicap-conditioned benchmarks.
 export function fairwayRemaining(d,c){
- if(d>150)return c.base150+(d-150)*c.longSlope/100;
- const anchors=[[0,0],[20,1/3],[50,4/7],[100,16/21],[150,1]];
- const distance=Math.max(0,d);
- for(let i=1;i<anchors.length;i++){const [x,b]=anchors[i],[prev,a]=anchors[i-1];if(distance<=x)return 2.05+(c.base150-2.05)*(a+(b-a)*(distance-prev)/(x-prev));}
- return c.base150;
+ return baselineStrokes('fairway',d)+(c.base150-2.945)*Math.min(1,d/150)+c.longSlope*Math.max(0,d-150)/100;
 }
 export function random(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
 export function samples(n=4000,seed=7142026){const rng=random(seed),out=[];for(let i=0;i<n;i++){const r=Math.sqrt(-2*Math.log(Math.max(1e-12,rng()))),theta=2*Math.PI*rng();out.push({z1:r*Math.cos(theta),z2:r*Math.sin(theta),u:rng(),sign:rng()<.5?-1:1});}return out;}
@@ -98,9 +95,12 @@ export function outcome(end,s){
 export function evaluate(aim,p,s,c,zs,collect=false){
  const counts={fairway:0,green:0,rough:0,bunker:0,water:0,trees:0,ob:0};let subtotal=0;const points=collect?[]:null;const vals=[];
  const costs=collect?{nextShot:0,rough:0,bunker:0,trees:0,water:0,ob:0}:null;
+ let baselineClamped=0;
  for(const z of zs){const end=shotAt(aim,p,z),o=outcome(end,s);counts[o.kind]++;
   const v=o.kind==='ob'?null:o.kind==='water'?2+c.waterExtra+remaining(o.drop,s,c,'rough'):1+remaining(end,s,c,o.kind);
   if(costs&&v!==null){
+   const position=o.kind==='water'?o.drop:end,kind=o.kind==='water'?'rough':o.kind;
+   if(baselineLookup(kind,Math.hypot(position.x-s.pin.x,position.y-s.pin.y)).clamped)baselineClamped++;
    const base=remaining(o.kind==='water'?o.drop:end,s,c,o.kind==='green'?'green':'fairway');
    costs.nextShot+=base;
    if(['rough','bunker','trees','water'].includes(o.kind))costs[o.kind]+=v-1-base;
@@ -113,7 +113,7 @@ export function evaluate(aim,p,s,c,zs,collect=false){
  let breakdown=null;
  if(costs&&pob<1){const playable=n-counts.ob;for(const key of Object.keys(costs))costs[key]/=playable;costs.ob=2*pob/(1-pob);breakdown={shot:1,...costs};}
  let variance=0;if(Number.isFinite(expected))for(const v of vals)variance+=((v===null?2+expected:v)-expected)**2;
- return {counts,expected,se:Math.sqrt(variance/n)/Math.sqrt(n)/Math.max(.001,1-pob),points,n,penalty:(counts.water+counts.ob)/n,big:zs.filter(z=>z.u<p.bigPct/100).length/n,breakdown};
+ return {counts,expected,se:Math.sqrt(variance/n)/Math.sqrt(n)/Math.max(.001,1-pob),points,n,penalty:(counts.water+counts.ob)/n,big:zs.filter(z=>z.u<p.bigPct/100).length/n,breakdown,baselineClamped:collect?baselineClamped:null};
 }
 export function optimize(aim,p,s,c,zs){
  // Fixed club and aim depth: 61 horizontal candidates plus the selected aim.

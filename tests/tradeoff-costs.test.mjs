@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {evaluate,DEFAULT_COSTS} from '../dist/model.js';
+import {baselineStrokes} from '../dist/strokes-baseline.js';
 import {tradeoffExplanation} from '../dist/lessons.js';
 const box=x=>[[x-2,98],[x+2,98],[x+2,102],[x-2,102]];
 const s={pin:{x:0,y:100},green:{x:0,y:100,rx:3,ry:3},bounds:[-60,60],maxY:180,fairway:[[-10,0],[10,0],[10,180],[-10,180]],hazards:[{kind:'water',poly:box(20),drop:{x:0,y:80}},{kind:'bunker',poly:box(30)},{kind:'trees',poly:box(40),forest:true,recoveryMultiplier:1.5}]};
@@ -10,9 +11,9 @@ test('cost accounting matches expected strokes with every lie, water relief, den
  const r=evaluate({x:0,y:100},p,s,DEFAULT_COSTS,zs,true);
  for(const kind of ['green','fairway','rough','water','bunker','trees','ob'])assert.equal(r.counts[kind],1);
  assert.ok(Math.abs(Object.values(r.breakdown).reduce((a,b)=>a+b,0)-r.expected)<1e-10);
- assert.ok(Math.abs(r.breakdown.bunker-DEFAULT_COSTS.bunker/6)<1e-10);
- assert.ok(Math.abs(r.breakdown.trees-DEFAULT_COSTS.trees*1.5/6)<1e-10);
- assert.ok(Math.abs(r.breakdown.water-(1+DEFAULT_COSTS.rough)/6)<1e-10);
+ assert.ok(Math.abs(r.breakdown.bunker-(baselineStrokes('bunker',30)-baselineStrokes('fairway',30))/6)<1e-10);
+ assert.ok(Math.abs(r.breakdown.trees-(baselineStrokes('trees',40)-baselineStrokes('fairway',40))*1.5/6)<1e-10);
+ assert.ok(Math.abs(r.breakdown.water-(1+baselineStrokes('rough',20)-baselineStrokes('fairway',20))/6)<1e-10);
  assert.ok(Math.abs(r.breakdown.ob-1/3)<1e-10);
  assert.equal(evaluate({x:0,y:100},p,s,DEFAULT_COSTS,zs).expected,r.expected);
 });

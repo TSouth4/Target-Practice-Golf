@@ -1,3 +1,11 @@
+# Distance-and-lie reference upgrade (12.9.0)
+
+Default next-shot costs now use a documented historical PGA TOUR reference published by Mark Broadie, with separate fairway, rough, sand, recovery and putting tables. This replaces the hand-tuned distance curve and fixed hazard surcharges. Costs vary with both distance and lie; putting uses feet. Handicap still changes shot dispersion, not measured personal recovery or putting skill.
+
+Validation: all 139 regression tests passed. Desktop and phone browser checks passed for complete learning/assessment rounds and calculated lessons. Reference-value, unit, range, wedge/iron tradeoff, distance-dependent sand, custom-setting migration and preservation checks are included.
+
+See [STROKES-BASELINE.md](STROKES-BASELINE.md) for data provenance, formulas, range limits, simulator adjustments and remaining limitations. The source transcription and MIT attribution are included. New scores use decision-model-v6 and rounds-v4-model-v6; older completed reports remain readable separately.
+
 # Calculated decision tradeoffs (12.8.0)
 
 Practice coaching now explains changes in modeled next-shot/putting cost versus rough, bunker, trees, water and OB costs. The expandable lesson includes each cost for both targets and the current shot; the text gives the net saving per decision and per 100 similar decisions. No cost difference is inferred from hazard percentages alone.

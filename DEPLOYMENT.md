@@ -1,4 +1,4 @@
-# Publish v12.8.0 in the existing Work project
+# Publish v12.9.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -23,3 +23,5 @@ Check the Intended carry slider and Expected roll readout together: the selected
 The distance bar is now labeled Estimated distances, with Carry and estimated total together above the slider.
 
 After a normal practice shot, tap the rating to open the lesson. Confirm the comparison table includes next-shot/putting, rough, bunker, trees, water and OB cost components, with a calculated tradeoff in the coaching text. Assessment still hides individual coaching.
+
+Deploy the new `dist/benchmark-broadie.js` and `dist/strokes-baseline.js` together with the complete matching dist folder. Costs now use the historical Tour distance-and-lie reference. Check that the model explanation links its sources, the lesson identifies the reference and any endpoint limits, old completed reports remain labeled separately, and an unfinished old-model round restarts. Personal club settings remain saved; old custom cost settings reset for the changed meanings.
