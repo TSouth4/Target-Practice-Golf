@@ -138,3 +138,22 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
 button:disabled{cursor:not-allowed}
 
 .assessment-mode .lesson-steps{display:none}
+#holeMeta{font-size:14px;letter-spacing:.6px;font-weight:700;color:#36543d}
+.roll-estimate{font-size:10px;line-height:1.5;text-align:center;color:#52694a}
+.immersive-mode #holeMeta{display:block;font-size:13px}
+@media(max-width:760px){
+ #holeMeta{font-size:12px}.roll-estimate{font-size:9px}
+ .immersive-mode #holeMeta{display:block;font-size:12px}
+ .immersive-mode .course-view-controls{max-width:62%}
+ .immersive-mode #roundStatus{top:125px}
+ .immersive-mode .course-overlay.top{top:215px}
+}
+@media(max-width:760px){
+ .immersive-mode .course-heading{display:block}
+ .immersive-mode .course-heading>div:first-child{width:max-content;max-width:100%;padding:6px}
+ .immersive-mode #holeMeta{max-width:none}
+ .immersive-mode .course-heading h2{display:none}
+ .immersive-mode .course-view-controls{max-width:none;width:100%;margin-top:6px;padding:4px;justify-content:flex-end}
+ .immersive-mode .view-toggle{padding:2px;gap:1px}
+ .immersive-mode .view-toggle button{font-size:9px;padding:4px}
+}

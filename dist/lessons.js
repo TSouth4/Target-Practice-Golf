@@ -49,7 +49,7 @@ export function decisionLesson(aim,p,r,b,s,assessment){
  }
  const hazardDetail=hazardExplanation(aim,b,r,s);if(hazardDetail)why+=' '+hazardDetail;
  if(s.secondShot){why+=' This is your second shot on a par 5: expected strokes compares going for the green with leaving a shorter next shot, including the cost of missed attempts.';principle+=' Reaching in two is worthwhile only when your club reach and full miss pattern justify the risk.';}
- const dx=b.aim.x-aim.x,dy=b.aim.y-aim.y;
+ const dx=b.aim.x-aim.x,dy=p.aimMode==='carry'?(b.pattern||p).carry-p.carry:b.aim.y-aim.y;
  const direction=Math.abs(dx)<1?'keep roughly the same left/right target':`move the target ${yards(dx)} ${dx<0?'left':'right'}`;
  const depth=Math.abs(dy)<1?'keep roughly the same depth':`set it ${yards(dy)} ${dy<0?'shorter':'deeper'}`;
  const action=!Number.isFinite(q.expected)?'Adjust your shot setup, then try again.':assessment.kind==='balanced'?'Retry and see whether you can choose a similarly balanced target before the pattern appears.':`Test an idea on retry: ${direction} and ${depth}. Before committing, predict whether the change will reduce costly misses enough to justify any change in proximity. Then compare ${p.club||'your club'} with ${b.pattern?.club||p.club||'the same club'} at that distance.`;

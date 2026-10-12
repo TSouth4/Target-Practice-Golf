@@ -1,4 +1,4 @@
-import {ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary} from './rounds.js';
+import {ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary,roundNarrative} from './rounds.js';
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
 import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js';
 import {decisionLesson,retryImpact} from './lessons.js';
@@ -66,7 +66,7 @@ function closeProgress(){progressOpen=false;$('progressScreen').hidden=true;$('p
 
 let cachedScene,sceneKey;
 function scene(){const key=state.scenario+':'+state.holeSeed;if(key!==sceneKey){cachedScene=generateScenario(SCENARIOS.find(s=>s.id===state.scenario),state.holeSeed);sceneKey=key;}return cachedScene;}
-function basic(){return basicPattern(state.basicHandicap,scene(),state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]);}
+function basic(){return {...basicPattern(state.basicHandicap,scene(),state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]),aimMode:'carry'};}
 function elevation(){return state.elevated?scene().elevationM:0;}
 function landscape(){return LANDSCAPES[state.landscape];}
 function num(v,a,b,fallback){return Number.isFinite(Number(v))?clamp(Number(v),a,b):fallback;}
@@ -82,13 +82,13 @@ function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.que
 function save(){if(round?.status==='active'&&!round.answers.length&&state.mode==='basic')round.profile={handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]};try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));}catch{}}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function sided(x,unit='yd'){return Math.abs(x)<.01?'0 '+unit:`${Math.abs(x).toFixed(unit==='°'?1:0)}${unit==='°'?'°':' '+unit} ${x<0?'left':'right'}`;}
-function syncTargetDistance(){state.aim=fitTarget(state.aim,state.pattern);let p=patternAtTarget(state.aim,state.pattern);const carry=clamp(p.carry,50,330);if(Math.abs(carry-p.carry)>.0001){state.aim=aimAtDistance(state.aim,carry+p.roll,p.aimXRange);p=patternAtTarget(state.aim,p);}state.pattern=p;}
-function depthRange(){const max=Math.min(scene().aimRange[1],reachLimit(state.pattern)/Math.hypot(1,state.aim.x/Math.max(1,state.aim.y)));return[Math.min(scene().aimRange[0],max),max];}
-function chooseDepth(y){if(round?.kind==='assessment'&&roundRecorded())return;state.aim=aimAtDepth(state.aim,Math.round(y),depthRange(),state.pattern.aimXRange);hasAim=true;syncTargetDistance();updateControls();dirty();}
+function syncTargetDistance(){state.aim=fitTarget(state.aim,state.pattern);let p=patternAtTarget(state.aim,state.pattern);const carry=clamp(p.carry,50,330);if(Math.abs(carry-p.carry)>.0001){state.aim=aimAtDistance(state.aim,carry+(p.aimMode==='carry'?0:p.roll),p.aimXRange);p=patternAtTarget(state.aim,p);}state.pattern=p;}
+function depthRange(){const max=Math.min(scene().aimRange[1],reachLimit(state.pattern));return[Math.min(scene().aimRange[0],max),max];}
+function chooseDepth(carry){if(round?.kind==='assessment'&&roundRecorded())return;state.aim=aimAtDistance(state.aim,clamp(Math.round(carry),...depthRange()),state.pattern.aimXRange);hasAim=true;syncTargetDistance();updateControls();dirty();}
 function updateControls(){
  syncTargetDistance();
  for(const el of document.querySelectorAll('[data-cost]'))el.value=state.costs[el.dataset.cost];
- $('aimX').min=(state.pattern.aimXRange||[-60,60])[0];$('aimX').max=(state.pattern.aimXRange||[-60,60])[1];$('aimX').value=state.aim.x;$('aimY').min=depthRange()[0];$('aimY').max=depthRange()[1];$('aimY').value=state.aim.y;
+ $('aimX').min=(state.pattern.aimXRange||[-60,60])[0];$('aimX').max=(state.pattern.aimXRange||[-60,60])[1];$('aimX').value=state.aim.x;$('aimY').min=depthRange()[0];$('aimY').max=depthRange()[1];$('aimY').value=state.pattern.carry;
  $('basicHandicap').value=state.basicHandicap;
  $('driverLimit').value=state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap];
  $('bagTable').innerHTML=trainingBag(basic()).map(c=>`<tr><td>${c.club}</td><td>${Math.round(c.stock)} yd</td><td>${c.roll} yd</td><td>${c.sdSide.toFixed(1)} / ${c.sdLong.toFixed(1)} yd</td></tr>`).join('');
@@ -96,11 +96,13 @@ function updateControls(){
 }
 function updateLabels(){
  const p=state.pattern,s=scene();
- $('aimXOut').textContent=sided(state.aim.x);$('aimYOut').textContent=Math.round(state.aim.y)+' yd';
- $('aimBadge').textContent=hasAim?`◎ ${result?'Committed aim':'Your target'} · ${sided(state.aim.x)} · ${Math.round(state.aim.y)} yd deep`:'◎ Pick direction, then depth';
+ $('aimXOut').textContent=sided(state.aim.x);$('aimYOut').textContent=Math.round(p.carry)+' yd';$('rollEstimate').textContent=`Expected roll ~${Math.round(p.roll)} yd`;
+ $('aimBadge').textContent=hasAim?`◎ ${result?'Committed carry':'Your carry'} · ${Math.round(p.carry)} yd · ${sided(state.aim.x)}`:'◎ Pick direction, then depth';
+ if(round?.kind==='assessment'&&roundRecorded())$('aimBadge').textContent='◎ Decision recorded · next scenario when ready';
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;
- $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
- $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':s.par===3?'PAR 3 · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}${s.generatorVersion?' · '+s.generatorVersion:''}`;
+ $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='assessment-review'?`${traceShots.length} example flights · report at the end`:phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
+ $('holeMeta').textContent=`PAR ${s.par} · ${s.secondShot?'SECOND SHOT · ':''}${s.length} YD${s.type==='approach'?' TO FLAG':''}`;
+ $('scenarioDiagnostics').textContent=`Scenario ${s.id} · layout seed ${state.holeSeed} · shot seed ${state.seed} · ${s.generatorVersion||'authored baseline'} · ${s.woodlandVersion||''}`;
  $('greenYardageList').hidden=!!result;$('greenYardageList').innerHTML=greenYardages(s).map(item=>`<span><small>${item.label}</small><strong>${Math.round(item.distance)} yd</strong></span>`).join('');
  $('holeName').textContent=s.name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;const woods=s.woods?.filter(w=>w.recoveryMultiplier>1);if(woods?.length)$('scenarioBrief').textContent+=' '+(woods[0].side<0?'Left':'Right')+' woods are denser and closer; the other side leaves more recovery room.';
  for(const [id,on] of [['povBtn',state.view==='pov'],['mapBtn',state.view==='map'],['teeTab',state.practiceFilter==='tee'],['approachTab',state.practiceFilter==='approach'],['mixedTab',state.practiceFilter==='mixed']]){$(id).classList.toggle('active',on);$(id).setAttribute('aria-pressed',on);}
@@ -112,27 +114,27 @@ function updateLabels(){
  $('legend').hidden=!result;$('reviewViews').hidden=!result;$('tryAgain').hidden=!result;$('retryThisHole').hidden=!result;
  $('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
  $('animationStatus').hidden=!working;
- $('animationStatus').textContent=phase==='shooting'?`Following ${traceShots.length} example shots. Color shows the final lie; percentages will use all 4,000.`:phase==='zooming'?'Now compare your landing pattern with the best sampled aim.':'Calculating 4,000 outcomes…';
+ $('animationStatus').textContent=round?.kind==='assessment'&&phase==='shooting'?'Watching example flights · your report comes after all ten decisions.':phase==='shooting'?`Following ${traceShots.length} example shots. Color shows the final lie; percentages will use all 4,000.`:phase==='zooming'?'Now compare your landing pattern with the best sampled aim.':'Calculating 4,000 outcomes…';
  $('newShots').hidden=true;$('sampleStatus').hidden=!result;
  $('singleShot').hidden=true;$('useBest').hidden=true;
  $('simulate').hidden=!!result;$('simulate').disabled=working||!hasAim;
  if(!working)$('simulate').innerHTML=hasAim?'Commit & shoot <span>↗</span>':'Pick a target first <span>↗</span>';
  const facts=targetFacts(state.aim,p,s);
- $('targetDistance').textContent=`${Math.round(facts.total)} yd target`; $('targetClub').textContent=`${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry)} carry + ${Math.round(p.roll)} roll`;
- $('targetContext').textContent=`${Math.round(facts.toPin)} yd from target to pin${facts.crossings.length?' · Along this aim line: '+facts.crossings.join('; '):''}`;
+ $('targetDistance').textContent=`${Math.round(p.carry)} yd intended carry`; $('targetClub').textContent=`${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry)} carry + ${Math.round(p.roll)} roll`;
+ $('targetContext').textContent=`${Math.round(facts.toPin)} yd from carry target to pin${facts.crossings.length?' · Along this aim line: '+facts.crossings.join('; '):''}`;
  $('targetReadout').hidden=!!result;
- $('mobileActionTarget').textContent=hasAim?`${Math.round(facts.total)} yd · ${p.club}`:'Choose direction and depth';
+ $('mobileActionTarget').textContent=hasAim?`${Math.round(p.carry)} yd carry · ~${Math.round(p.roll)} yd roll · ${p.club}`:'Choose direction and carry';
  $('mobileActionTarget').hidden=!!result||working;
  $('mobileHazards').hidden=!!result||phase==='shooting'||phase==='zooming';
  $('appRoot').classList.toggle('mobile-practice-actions',!editorDraft&&!progressOpen&&!roundView);
  $('retryGuide').hidden=!!result||!retryValid();$('retryGuide').textContent=retryValid()?`Guided retry · ${retryHint} Adjust your original target, then commit. Same hole, profile and 4,000-shot sample; patterns hidden again.`:'';
- $('stockShot').textContent=p.autoBag?`${p.customBag?'My ':''}${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry+p.roll)} yd · ${Math.round(reachLimit(p))} yd limit`:`Planned distance: ${Math.round(p.carry+p.roll)} yd · custom`;
+ $('stockShot').textContent=p.autoBag?`${p.customBag?'My ':''}${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry+p.roll)} yd · ${Math.round(reachLimit(p))} yd carry limit`:`Planned distance: ${Math.round(p.carry+p.roll)} yd · custom`;
  $('cameraBadge').textContent=phase==='shooting'?'SHOT TRACERS':phase==='zooming'?'ZOOMING TO LANDING AREA':state.view==='map'?'LANDING-AREA ZOOM':`${aimZoom?'2× TARGET ZOOM · ':''}EYE LEVEL · ${elevation()} M ABOVE LANDING`;
  const zoomAllowed=!working&&!result&&!editorDraft&&!progressOpen;
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);
  updateCourseFrame(aimZoom&&zoomAllowed?aimZoom:{x:0,y:0,width:960,height:580});
  $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
- $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course. Sliders work too. The pattern stays hidden until you commit.';
+ $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the carry bar beside the course. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
  $('aimControls').hidden=!!result;$('scenarioBriefWrap').hidden=!!result;$('appRoot').classList.toggle('review-mode',!!result);
@@ -146,7 +148,7 @@ function updateLabels(){
 function roundRecorded(){return !!round?.answers.some(answer=>answer.index===round.index);}
 function updateRoundControls(){
  const active=round?.status==='active',assessment=active&&round.kind==='assessment',locked=active&&round.answers.length>0;
- $('appRoot').classList.toggle('assessment-mode',assessment);$('practiceIntro').textContent=assessment?'Choose ten targets. Your grades and shot patterns stay hidden until the final report.':'Read the hole. Choose direction and depth. Commit, then see the whole pattern.';
+ $('appRoot').classList.toggle('assessment-mode',assessment);$('practiceIntro').textContent=assessment?'Choose ten targets. Watch your example shot flights. Grades and recommendations stay hidden until the final report.':'Read the hole. Choose direction and carry. Commit, then see the whole pattern.';
  $('roundStatus').hidden=!active;$('roundStatus').textContent=active?`${assessment?'Assessment':'Learning round'} · ${round.index+1} / ${round.schedule.length}${roundResumed?' · Resumed':''}${roundRecorded()?' · Decision recorded':''}${assessment?' · Feedback at the end':''}`:'';
  if(active){for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=true;}
  if(locked){for(const id of ['basicHandicap','driverLimit','driverLimitReset'])$(id).disabled=true;}
@@ -173,13 +175,12 @@ function showRoundScreen(intro=false){
  leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;
  $('roundEyebrow').textContent=intro?'BASELINE ASSESSMENT':'FIRST-ATTEMPT RECAP';$('roundTitle').textContent=intro?'Assessment Test':round.kind==='assessment'?'Your assessment report':'Your five-shot round';
  $('closeRound').hidden=!intro&&round?.kind==='assessment';$('roundReport').hidden=intro;$('startAssessment').hidden=!intro;$('startLearningRound').hidden=intro;
- $('roundDescription').textContent=intro?'Choose targets on 10 new scenarios using your straight-shot handicap profile. No grades, shot patterns, recommended targets or retries appear during the test. Your report arrives after shot 10. Starting replaces the current round.':'First attempts only. Retries helped you experiment and did not change this recap.';
+ $('roundDescription').textContent=intro?'Choose targets on 10 new scenarios using your straight-shot handicap profile. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round.':'First attempts only. Retries helped you experiment and did not change this recap.';
  if(!intro){const summary=roundSummary(round);$('roundPerShot').textContent=summary.average===null?'Unavailable':'+'+summary.average.toFixed(2);$('roundPer100').textContent=summary.per100===null?'Unavailable':'+'+summary.per100.toFixed(1);$('roundScore').textContent=summary.score===null?'—':summary.score.toFixed(1)+' / 100';
- $('roundTendencies').textContent=`${summary.kinds.balanced} strong decisions · ${summary.kinds.aggressive} too aggressive · ${summary.kinds.conservative} too conservative · ${summary.kinds.refine} needed refining.`;
- const focus=summary.kinds.aggressive>=2?'Practice giving your costly miss more room, then test whether the safer target gives up worthwhile proximity.':summary.kinds.conservative>=2?'Practice comparing a closer target against your safe layup; check whether the safety benefit justifies the longer next shot.':summary.kinds.refine>=2?'Practice adjusting direction and depth together, watching both hazard exposure and the next-shot distance.':'Keep testing your reasoning on new scenarios. A strong decision can still produce a poor single outcome.';
- $('roundTendencies').textContent+=' '+focus;
- $('roundDirections').textContent=`Compared with the sampled targets, ${summary.direction.short} selections were more than 5 yd short, ${summary.direction.long} long, ${summary.direction.left} left, and ${summary.direction.right} right. These directions describe target differences, not your ball flight.`;
+ const narrative=roundNarrative(summary);$('roundTendencies').textContent=narrative.tendencies;$('roundDirections').textContent=narrative.directions;
+ if(round.version!=='rounds-v2-model-v4')$('roundDirections').textContent=$('roundDirections').textContent.replaceAll('intended carry','forward target depth').replaceAll('carry-target','target-position');
  $('roundLimits').textContent='The per-100 number scales this round’s average modeled cost against the best sampled targets. It is not measured real-world strokes gained or a prediction of your next 100 shots. This small round suggests practice opportunities, not established habits. If a comparison is unbounded, a finite total is unavailable.';
+ if(round.version!=='rounds-v2-model-v4')$('roundLimits').textContent='Previous-model report: targets used finishing distance rather than intended carry. Keep this report separate from new-model results. '+$('roundLimits').textContent;
  if(round.kind==='assessment')$('roundDescription').textContent=`Your 10 first-attempt decisions, using the ${round.profile.handicap} handicap straight-shot profile with a ${round.profile.limit} yd distance limit. Try a learning round to test adjustments with immediate feedback. Personal clubs and unlimited practice remain available in this private pilot.`;
  }
  $('roundScreen').scrollIntoView({behavior:'auto'});$('closeRound').focus?.();save();
@@ -187,7 +188,7 @@ function showRoundScreen(intro=false){
 function recordRoundDecision(r,b){
  if(round?.status!=='active')return;
  const assessment=decisionFeedback(state.aim,state.pattern,r,b,scene());
- addRoundAnswer(round,{kind:assessment.kind,score:decisionScore(r.expected,b.result.expected,state.aim,b.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(b.result.expected)?Math.max(0,r.expected-b.result.expected):null,dx:b.aim.x-state.aim.x,dy:b.aim.y-state.aim.y});save();
+ addRoundAnswer(round,{kind:assessment.kind,score:decisionScore(r.expected,b.result.expected,state.aim,b.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(b.result.expected)?Math.max(0,r.expected-b.result.expected):null,dx:b.aim.x-state.aim.x,dy:b.pattern.carry-state.pattern.carry});save();
 }
 function nextRoundSlot(){
  if(working||!roundRecorded())return;roundResumed=false;
@@ -339,15 +340,15 @@ function showResult(){
  $('decisionVerdict').setAttribute('data-kind',assessment.kind);$('decisionReason').textContent=assessment.reason;
  $('scoreCircle').style.borderColor=score>=85?'#9bb773':score>=60?'#cba96e':'#c78169';
  $('resultTitle').textContent=assessment.kind==='balanced'?'A sound target.':'A better target is available.';
- $('resultSummary').textContent=!Number.isFinite(b.expected)?'Every sampled target produced only OB shots. Adjust the shot pattern.':regret<.05?'Your target is close to the best sampled direction and depth.':`Best sampled target: ${sided(best.aim.x)}, ${Math.round(best.aim.y)} yd deep.`;
+ $('resultSummary').textContent=!Number.isFinite(b.expected)?'Every sampled target produced only OB shots. Adjust the shot pattern.':regret<.05?'Your target is close to the best sampled direction and depth.':`Best sampled target: ${sided(best.aim.x)}, ${Math.round(best.pattern.carry)} yd carry.`;
  $('expectedValue').textContent=Number.isFinite(r.expected)?r.expected.toFixed(2):'∞';$('uncertainty').textContent=Number.isFinite(r.expected)?`± ${(1.96*r.se).toFixed(2)} · approximate 95% sampling error`:'Every simulated shot was OB';
  $('regretValue').textContent=!Number.isFinite(b.expected)?'—':Number.isFinite(regret)?`+${regret.toFixed(2)}`:'∞';$('penaltyValue').textContent=(r.penalty*100).toFixed(1)+'%';
  $('shownCount').textContent=`4,000 simulated · 500 plotted · ${best.evaluated} targets compared`;
  const order=['green','fairway','rough','bunker','trees','water','ob'];
  $('outcomeBar').innerHTML=order.map(k=>`<div style="width:${r.counts[k]/r.n*100}%;background:${COLORS[k]}" title="${NAMES[k]}: ${(r.counts[k]/r.n*100).toFixed(1)}%"></div>`).join('');
  $('outcomeBreakdown').innerHTML=order.filter(k=>r.counts[k]>0).map(k=>`<span><i style="background:${COLORS[k]}"></i>${NAMES[k]} <strong>${(r.counts[k]/r.n*100).toFixed(1)}%</strong></span>`).join('');
- const penaltyGain=(r.penalty-b.penalty)*100,dx=best.aim.x-state.aim.x,dy=best.aim.y-state.aim.y;
- let note=!Number.isFinite(b.expected)?'No sampled target avoids an all-OB pattern. Adjust the shot settings; the comparison is not meaningful here.':regret<.05?'A bad single outcome can still follow a good decision.':`The comparison moves the target ${sided(dx)} and ${Math.abs(dy).toFixed(0)} yd ${dy>=0?'deeper':'shorter'}. It saves about ${Number.isFinite(regret)?regret.toFixed(2):'many'} expected strokes.`;
+ const penaltyGain=(r.penalty-b.penalty)*100,dx=best.aim.x-state.aim.x,dy=best.pattern.carry-state.pattern.carry;
+ let note=!Number.isFinite(b.expected)?'No sampled target avoids an all-OB pattern. Adjust the shot settings; the comparison is not meaningful here.':regret<.05?'A bad single outcome can still follow a good decision.':`The comparison moves the target ${sided(dx)} and ${Math.abs(dy).toFixed(0)} yd ${dy>=0?'more carry':'less carry'}. It saves about ${Number.isFinite(regret)?regret.toFixed(2):'many'} expected strokes.`;
  if(penaltyGain>1)note+=` Water / OB exposure falls by ${penaltyGain.toFixed(1)} percentage points.`;
  if(s.type==='approach'&&Math.hypot(best.aim.x-s.pin.x,best.aim.y-s.pin.y)>8)note+=' The flag and the best target do not have to be the same point.';
  $('coachNote').textContent=(lesson.hazardDetail||lesson.why)+'\n\n'+lesson.action+'\n\n'+(lesson.hazardDetail?'':note)+(state.pattern.autoBag?` Your ${state.pattern.club}${state.pattern.customBag?'':' estimate'}: ${Math.round(state.pattern.carry+state.pattern.roll)} yd. Comparison: ${best.pattern.club}, ${Math.round(best.pattern.carry+best.pattern.roll)} yd. ${state.pattern.customBag?'Comparison uses your saved club settings, scaled to that distance.':'Shorter clubs use narrower patterns.'}`:' Custom dispersion stays fixed as target depth changes.')+' Off-frame finishes count in the totals.';$('oneOutcome').textContent='A single shot can reward a poor decision. Judge the full pattern.';
@@ -369,8 +370,9 @@ async function run(newSeed=false){
   const comparison={aim:b.aim,pattern:b.pattern,evaluated:b.evaluated,result:evaluate(b.aim,b.pattern,scene(),state.costs,zs,true)};
   if(snapshot!==JSON.stringify(state)){toast('Settings changed. Commit the updated target.');return;}
   if(round?.kind==='assessment'&&round.status==='active'){
-   recordRoundDecision(r,comparison);phase='choose';traceShots=[];transition=null;hasAim=false;result=null;best=null;save();updateLabels();drawCourse();
-   if(round.answers.length===10){round.status='complete';showRoundScreen();}return;
+   traceShots=tracerSample(r.points);phase='shooting';updateLabels();drawCourse();
+   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await wait(2200);
+   recordRoundDecision(r,comparison);phase='assessment-review';transition=null;hasAim=false;result=null;best=null;save();updateLabels();drawCourse();return;
   }
   traceShots=tracerSample(r.points);phase='shooting';$('simulate').innerHTML='Shots in flight…';updateLabels();drawCourse();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await wait(2200);

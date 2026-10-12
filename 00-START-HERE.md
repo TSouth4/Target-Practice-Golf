@@ -2,7 +2,7 @@ Treat the existing code as a working baseline, not something you must defend. Ex
 
 # Target Practice — start here
 
-Development note: `README.md` describes the v12.6.0 learning rounds, assessment and earlier learning improvements. The v12.0.0 details below describe the original uploaded baseline; the specification is the product brief, not a claim that later development is absent. The original private hosted site has not been updated by this GitHub development change.
+Development note: `README.md` describes the v12.7.0 intended carry, observed assessment flights and earlier learning improvements. The v12.0.0 details below describe the original uploaded baseline; the specification is the product brief, not a claim that later development is absent. The original private hosted site has not been updated by this GitHub development change.
 
 Read Target-Practice-Codex-Specification.md, then inspect the source before editing. This is the working private v12.0.0 prototype, not a request to start over. Review it independently and challenge weak assumptions. Preserve a working baseline and use a separate branch or experiment for major redesigns.
 

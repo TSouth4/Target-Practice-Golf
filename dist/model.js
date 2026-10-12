@@ -42,7 +42,7 @@ const PRESETS = {
 export function preset(handicap,type){const [carry,sdSide,sdLong,bigPct,bigShift]=PRESETS[handicap][type];return {carry,roll:type==='tee'?15:0,sdSide,sdLong,bigPct,bigShift,bigDirection:'both',bigShort:12,start:0,curve:0,bias:0,height:type==='tee'?32:25,rho:0};}
 export function basicPattern(handicap,s,driverLimit=DRIVER_LIMITS[handicap]){const driver=preset(handicap,'tee'),iron=preset(handicap,'approach');const p={...preset(handicap,s.type),autoBag:true,handicap,driverLimit,shotType:s.type,aimXRange:s.aimXRange||[-60,60],driverSide:driver.sdSide,driverLong:driver.sdLong,ironSide:iron.sdSide,ironLong:iron.sdLong,start:0,curve:0,bias:0,rho:0,bigPct:0,bigShort:0};return patternAtTarget(fitTarget({x:0,y:s.aimY},p),p);}
 // The target sets nominal straight-flight finish distance. Custom curve/bias still moves the finish.
-export function patternAtTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return p.autoBag?clubPattern(distance,p):{...p,carry:Math.max(1,distance-p.roll)};}
+export function patternAtTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return p.autoBag?clubPattern(distance,p):{...p,carry:Math.max(1,distance-(p.aimMode==='carry'?0:p.roll))};}
 export function fitTarget(aim,p){const distance=Math.hypot(aim.x,aim.y);return distance>reachLimit(p)?aimAtDistance(aim,reachLimit(p),p.aimXRange):{...aim};}
 export function aimAtDepth(aim,y,range,lateralRange=[-60,60]){const depth=clamp(y,...range);return{x:clamp(aim.x/Math.max(1,aim.y)*depth,...lateralRange),y:depth};}
 export function aimAtDistance(aim,distance,lateralRange=[-60,60]){const theta=Math.atan2(aim.x,aim.y),x=clamp(Math.sin(theta)*distance,...lateralRange);return{x,y:Math.sqrt(Math.max(1,distance*distance-x*x))};}

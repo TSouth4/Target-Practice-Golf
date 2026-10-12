@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.6 learning rounds and assessment
+## Update: v12.7 intended carry and observed assessment flights
+
+All 128 regression tests passed. New numerical checks validate that carry targets land at the requested distance before baseline rollout, limits use carry capacity, diagonal targets preserve rollout length, and custom clubs are selected correctly even when their rollout differs. Approach rollout remains zero.
+
+Desktop and 390-pixel phone browser checks completed learning/assessment rounds with 48 observed ground-level flights per assessment decision, no grades/comparison clouds/overhead review, and a report opened after the tenth flight. Carry-specific browser checks confirm the 250-yard carry plus 15-yard Driver rollout example, readable public par/distance without variant strings, fullscreen layout and zero-roll approaches. Focused lesson and recap checks were rerun after wording refinements. No page errors were captured. Physical-device, Safari and Firefox checks remain outstanding.
+
+## Previous update: v12.6 learning rounds and assessment
 
 All 125 automated tests passed. `rounds.cjs` completed learning and assessment rounds at 1440- and 390-pixel widths. It verified first-attempt-only recaps despite retries, reloading a recorded decision without duplication, ten decisions with no visible grades/clouds/recommendations, profile selection and locking, an aggregate per-100 value calculated from stored unrounded regret, completed-report reload, and restarting learning. The phone assessment ran in native fullscreen and exited to its final report. No page errors were captured.
 

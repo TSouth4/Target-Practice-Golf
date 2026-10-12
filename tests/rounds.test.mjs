@@ -36,3 +36,8 @@ test('wide driving and crossing-water layouts produce different sensible clubs f
  for(const id of ['cedar','creek-tee']){const s=generateScenario(SCENARIOS.find(b=>b.id===id),3),p=basicPattern(5,s),b=await optimizeTargets({x:0,y:200},p,s,DEFAULT_COSTS,zs);choices.push(b.pattern.club);}
  assert.equal(choices[0],'Driver');assert.notEqual(choices[1],'Driver');
 });
+
+test('completed previous-model reports remain readable while unfinished incompatible rounds restart',()=>{
+ const r=createRound('practice',37,{handicap:'5',limit:265});for(let i=0;i<5;i++){r.index=i;addRoundAnswer(r,{kind:'balanced',score:99,regret:.01,dx:0,dy:0});}r.status='complete';r.version='rounds-v1-model-v3';
+ assert.equal(readRound(JSON.stringify(r)).answers.length,5);r.status='active';assert.equal(readRound(JSON.stringify(r)),null);
+});

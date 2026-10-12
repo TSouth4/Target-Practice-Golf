@@ -1,6 +1,20 @@
 # Target Practice
 
-## Current development update: v12.6.0
+## Current development update: v12.7.0
+
+The right-side control now specifies **Intended carry**, measured along the chosen direction. Club selection uses carry capacity; baseline rollout is then added to determine the finish. The depth control preserves heading as carry changes, and shows the current **Expected roll** estimate. Basic driver limits and saved club stock distances still include rollout; stock carry is stock total minus roll. Approaches retain zero baseline rollout. Finishing dots continue to represent final positions, not landing points. Wind, firmness and terrain-dependent rollout are separate future model work.
+
+The public course heading shows larger par and distance text without variant/version numbers. Current scenario ID, layout seed, shot seed and generator versions remain in How the model works for reproducing issues.
+
+Assessment now shows 48 representative ground-level shot flights after each decision. Grades, coaching, comparison targets and overhead review stay hidden. Flights remain visible until Next scenario; after the tenth flight choose **View assessment report**. This is an assessment with outcome observation, which can influence later decisions. Reduced-motion mode shows static example flights rather than requiring animation. No retries during the assessment.
+
+Recaps use conversational counts, such as “Your target choices were too aggressive on 5 of your 10 decisions,” and identify the most frequent carry or lateral target difference. They describe simulation decisions, not measured physical misses or established habits. Carry differences are measured against the sampled comparison’s carry, not just its forward coordinate.
+
+Progress now uses `decision-model-v4` and sessions use `rounds-v2-model-v4`; earlier progress remains readable separately. Older in-progress rounds restart under the new carry model rather than combining incompatible decisions. Completed previous-model reports remain readable with a previous-model label. This update leaves the strokes-remaining cost model unchanged; nonlinear next-shot costs and quantified layup-versus-bunker explanations are the next planned model update.
+
+Validation: all 128 regression tests passed, plus a focused previous-report preservation check. Carry-specific checks cover landing/finishing separation, reach limits, angled targets, custom clubs with different rollout, and zero-roll approaches. Desktop and phone browser checks cover intended carry, readable heading and rollout, full learning and assessment sessions, observed flights with no individual assessment coaching, reports, reload and full-screen assessment. Physical-device and Safari/Firefox checks remain outstanding.
+
+## Previous development update: v12.6.0
 
 Practice starts with a randomized five-scenario learning round. The menu offers **Learning round**, **Assessment Test**, and **Unlimited practice** for the private pilot. Learning rounds show immediate feedback and allow retries; only the original decision contributes to the recap. Assessment starts with an introduction, then ten straight-profile decisions with no individual grades, patterns, recommendations or retries. Its aggregate report appears after decision ten. Neither mode has a daily limit or payment gate during this pilot.
 
@@ -103,6 +117,7 @@ node scripts/browser-review/learning.cjs
 node scripts/browser-review/guarded-feedback.cjs
 node scripts/browser-review/fullscreen.cjs
 node scripts/browser-review/rounds.cjs
+node scripts/browser-review/intended-carry.cjs
 ```
 
 These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.

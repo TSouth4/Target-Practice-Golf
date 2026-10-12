@@ -15,8 +15,8 @@ try{for(const width of [1440,390]){
  await page.locator('#menuToggle').click();await page.locator('#assessmentMenu').click();assert.equal(await page.locator('#startAssessment').isVisible(),true);await page.locator('#startAssessment').click();await page.locator('#basicHandicap').selectOption('10');assert.equal((await session()).profile.handicap,'10');if(width===390)await page.locator('#fullscreenToggle').click();
  for(let i=0;i<10;i++){
   await pick();await page.waitForFunction(i=>JSON.parse(localStorage.getItem('target-practice-round-v1')).answers.length===i+1,i,{timeout:60000});
-  assert.equal(await page.locator('#results').isVisible(),false);assert.equal(await page.locator('#shotCloud,#idealCloud,#meanFinish,#shotTracers').count(),0);assert.equal(await page.locator('#retryThisHole').isVisible(),false);
-  if(i<9){assert.equal(await page.locator('#roundReport').isVisible(),false);if(i===2)await page.reload();await page.locator('#roundContinue').click();}
+  assert.equal(await page.locator('#results').isVisible(),false);assert.equal(await page.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);assert.equal(await page.locator('#retryThisHole').isVisible(),false);
+  assert.equal(await page.locator('#roundReport').isVisible(),false);assert.equal(await page.locator('#shotTracers .shot-tracer').count(),48);if(i===0)await page.screenshot({path:`${out}/assessment-flights-${width}.png`,fullPage:true});if(i===2)await page.reload();await page.locator('#roundContinue').click();
  }
  await page.locator('#roundReport').waitFor({state:'visible'});if(width===390)await page.waitForFunction(()=>!document.fullscreenElement);r=await session();assert.equal(r.answers.length,10);assert.equal(r.status,'complete');assert.equal(await page.evaluate(()=>localStorage.getItem('target-practice-progress-v1')),historyBefore);
  const average=r.answers.reduce((sum,a)=>sum+a.regret,0)/10;assert.equal(await page.locator('#roundPer100').innerText(),'+'+(average*100).toFixed(1));

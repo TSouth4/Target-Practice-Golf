@@ -12,11 +12,11 @@ test('five-shot learning round supports retry without replacing the original rec
  for(let i=1;i<5;i++){await commit();await $('tryAgain').fire('click');}
  assert.equal(session().status,'complete');assert.equal(session().answers.length,5);assert.ok(!$('roundReport').hidden);assert.ok($('practiceScreen').hidden);
 });
-test('assessment withholds every individual result and retry until the ten-shot aggregate report',async()=>{
+test('assessment shows flights while withholding individual grades and comparisons until the aggregate report',async()=>{
  const historyBefore=dom.storage.get(PROGRESS_KEY);await $('assessmentMenu').fire('click');assert.ok(!$('startAssessment').hidden);await $('startAssessment').fire('click');
  for(let i=0;i<10;i++){
   await commit();assert.ok($('results').hidden);assert.ok($('retryThisHole').hidden);assert.ok(!$('course').innerHTML.includes('id="shotCloud"'));assert.ok(!$('course').innerHTML.includes('id="idealCloud"'));assert.equal(session().answers.length,i+1);
-  if(i<9){assert.ok($('roundReport').hidden);await $('roundContinue').fire('click');}
+  assert.ok($('roundReport').hidden);assert.ok($('course').innerHTML.includes('id="shotTracers"'));await $('roundContinue').fire('click');
  }
  assert.equal(session().status,'complete');assert.ok(!$('roundReport').hidden);assert.ok($('practiceScreen').hidden);assert.equal(dom.storage.get(PROGRESS_KEY),historyBefore);assert.match($('roundLimits').textContent,/not measured real-world/);
 });
