@@ -19,3 +19,5 @@ Confirm that the pre-shot bird’s-eye map is absent in normal and full-screen p
 Test the menu’s Learning round and Assessment Test. Finish five learning scenarios, including a retry, and confirm the recap uses first attempts. Finish ten assessment decisions and confirm example flights appear from ground level while grades, coaching and comparison patterns stay hidden until the aggregate report. Reload an unfinished round and a finished report. Include the new `dist/rounds.js` module in the complete deployment. Daily limits and payments are not part of this private pilot.
 
 Check the Intended carry slider and Expected roll readout together: the selected carry is where the nominal straight shot lands, while finishing dots include rollout. Check the larger par/distance heading. After the tenth assessment flight, choose View assessment report; its wording should describe target decisions conversationally.
+
+The distance bar is now labeled Estimated distances, with Carry and estimated total together above the slider.

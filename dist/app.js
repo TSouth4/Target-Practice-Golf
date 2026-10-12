@@ -96,7 +96,7 @@ function updateControls(){
 }
 function updateLabels(){
  const p=state.pattern,s=scene();
- $('aimXOut').textContent=sided(state.aim.x);$('aimYOut').textContent=Math.round(p.carry)+' yd';$('rollEstimate').textContent=`Expected roll ~${Math.round(p.roll)} yd`;
+ $('aimXOut').textContent=sided(state.aim.x);$('aimYOut').textContent=`Carry ${Math.round(p.carry)} yd`;$('rollEstimate').textContent=`(${Math.round(p.carry+p.roll)} total)`;$('aimY').setAttribute('aria-valuetext',`${Math.round(p.carry)} yards intended carry, ${Math.round(p.carry+p.roll)} yards estimated total`);
  $('aimBadge').textContent=hasAim?`◎ ${result?'Committed carry':'Your carry'} · ${Math.round(p.carry)} yd · ${sided(state.aim.x)}`:'◎ Pick direction, then depth';
  if(round?.kind==='assessment'&&roundRecorded())$('aimBadge').textContent='◎ Decision recorded · next scenario when ready';
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;

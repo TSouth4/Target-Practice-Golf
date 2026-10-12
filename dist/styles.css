@@ -157,3 +157,8 @@ button:disabled{cursor:not-allowed}
  .immersive-mode .view-toggle{padding:2px;gap:1px}
  .immersive-mode .view-toggle button{font-size:9px;padding:4px}
 }
+
+.course-with-depth #aimDepthWrap .roll-estimate{display:block;font-weight:400}
+
+.course-with-depth #aimDepthWrap label{width:100%}
+.course-with-depth #aimDepthWrap output{white-space:normal}

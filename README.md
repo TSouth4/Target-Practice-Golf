@@ -1,3 +1,5 @@
+The distance bar now reads **Estimated distances**, with **Carry 180 yd (185 total)** above the slider. Total is nominal carry plus expected rollout. Desktop and phone browser checks passed.
+
 # Approach layup scoring correction (12.7.1)
 
 The previous linear short-game estimate underpriced 20–50 yard pitches and could recommend an 80-yard layup on a reachable 122-yard front-water approach. The off-green estimate now interpolates explicit illustrative anchors: 2.05 strokes at 0 yd, 2.40 at 20, 2.65 at 50, 2.85 at 100 and the editable baseline at 150. Beyond 150 the existing distance rate remains. These are teaching assumptions, not empirical golfer data. The model still does not simulate subsequent shots or subsequent creek-crossing risk, and requires further golfer/coach validation.
