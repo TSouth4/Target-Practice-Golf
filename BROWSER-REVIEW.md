@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.4 full-screen practice
+## Update: v12.5 yardages and asymmetric woods
+
+All 116 regression tests passed, including checks over 7,000 generated layouts and repeatable asymmetric woods. Additional focused checks verify that reversing dense/open woods shifts the sampled target toward the more forgiving side, and previous-model history remains readable without relabeling it as current-model progress.
+
+Full-screen browser checks passed on desktop, portrait phones and a landscape phone layout with no radar. Front/flag/back labels remain visible during selection; answers stay hidden and Retry restores the same situation. All fourteen generated families passed commit/retry checks. Tree height is visual, recovery-zone severity affects scoring, and automatic environments do not change outcomes. Physical-device and Safari/Firefox checks remain outstanding.
+
+## Previous update: v12.4 full-screen practice
 
 All 114 regression tests and syntax checks passed. `fullscreen.cjs` passed at desktop 1440×1000 with native fullscreen, and fallback layouts at 390×844, 320×740 and 844×390. Browser checks verify the viewport fills the screen, entering preserves the saved target/profile, depth and floating-map input do not reveal answers, commitment locks depth, feedback collapses without clearing results, retry removes answers, Next shot stays immersive, resize retains the mode, and Escape/button exits restore normal controls. No page errors were captured.
 

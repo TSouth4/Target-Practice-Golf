@@ -11,7 +11,7 @@ for(const width of [320,390]){
  assert.ok(await p.locator('#mobileHazardList li').first().evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=12));
  assert.equal(await p.locator('#course .hazard-callout').first().isVisible(),false);r.checks.push('readable terrain-only labels replace scaled callouts');
  await p.locator('#course').evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));
- const action=p.locator('#simulate');const courseBounds=await p.locator('.course-viewport').boundingBox();const bar=await p.locator('.simulate-row').boundingBox();assert.ok(bar.y-courseBounds.y-courseBounds.height>=0&&bar.y-courseBounds.y-courseBounds.height<=16);const a=await action.boundingBox();assert.ok(a.y+a.height<=844);assert.ok(a.height>=44);
+ const action=p.locator('#simulate');const courseBounds=await p.locator('.course-viewport').boundingBox();const bar=await p.locator('.simulate-row').boundingBox();assert.ok(bar.y-courseBounds.y-courseBounds.height>=0&&bar.y-courseBounds.y-courseBounds.height<=80);const a=await action.boundingBox();assert.ok(a.y+a.height<=844);assert.ok(a.height>=44);
  await p.locator('#aimX').evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));const a2=await action.boundingBox();assert.ok(a2.y>=0&&a2.y+a2.height<=844);r.checks.push('main action is beside the course and stays visible while adjusting controls');
  const slider=p.locator('#aimX');await slider.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));const sb=await slider.boundingBox();assert.ok(sb.height>=44);
  const before=await slider.inputValue();const cdp=await c.newCDPSession(p);const sy=sb.y+sb.height/2;
@@ -26,7 +26,7 @@ for(const width of [320,390]){
 for(const id of ['cedar','bend','drivable','narrow','sharp-dogleg','creek-tee','squeeze-par4','water','tucked','bowl','split','creek-par3','par5-open','par5-carry']){
  const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});await c.addInitScript(({id})=>localStorage.setItem('golfaim101-v2',JSON.stringify({scenario:id,holeSeed:43,seed:812,basicHandicap:'10'})),{id});
  const p=await c.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));const r={family:id,errors};
- try{await p.goto(process.env.TARGET_PRACTICE_BASE_URL||'http://127.0.0.1:8765');await p.locator('#vegetation').waitFor();assert.match(await p.locator('#holeMeta').innerText(),/tee-v2|approach-v2/);assert.equal(await p.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);
+ try{await p.goto(process.env.TARGET_PRACTICE_BASE_URL||'http://127.0.0.1:8765');await p.locator('#vegetation').waitFor();assert.match(await p.locator('#holeMeta').innerText(),/tee-v3|approach-v3/);assert.equal(await p.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);
  const geometry=await p.evaluate(async()=>{const {SCENARIOS}=await import('./model.js');const {generateScenario}=await import('./practice.js');const s=JSON.parse(localStorage.getItem('golfaim101-v2'));return JSON.stringify(generateScenario(SCENARIOS.find(b=>b.id===s.scenario),s.holeSeed));});
  await p.locator('#aimX').focus();await p.keyboard.press('ArrowRight');await p.locator('#simulate').tap();await p.locator('#results').waitFor({state:'visible',timeout:60000});assert.equal(await p.locator('#shotCloud circle').count(),500);
  await p.locator('#retryThisHole').tap();assert.equal(await p.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);

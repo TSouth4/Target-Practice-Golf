@@ -1,4 +1,4 @@
-# Publish v12.4.0 in the existing Work project
+# Publish v12.5.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -12,4 +12,6 @@ An incomplete upload can leave the selectors visible while the course is blank g
 
 This environment can save and test the GitHub changes; it has no publishing access to the existing private Work site.
 
-After publishing, try Full screen, the floating map and depth bar, a shot and its feedback overlay, Hide/Show feedback, Retry, and Exit full screen. Test the normal view as well. Browsers without native fullscreen use the page-filling fallback.
+After publishing, try Full screen, the front/flag/back yardage labels and depth bar, a shot and its feedback overlay, Hide/Show feedback, Retry, and Exit full screen. Test the normal view as well. Browsers without native fullscreen use the page-filling fallback.
+
+Confirm that the pre-shot bird’s-eye map is absent in normal and full-screen practice. Green yardages should remain readable on a phone. The overhead landing comparison is available after commitment. Deploy all files together; the new generator and progress model versions are part of this update.

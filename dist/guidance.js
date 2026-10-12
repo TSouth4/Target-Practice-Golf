@@ -21,3 +21,10 @@ export function retryRows(first,now){const f=x=>Number.isFinite(x)?x.toFixed(2):
  {label:'Decision score',first:first.score===null?'—':first.score+' / 100',now:now.score===null?'—':now.score+' / 100'},
  {label:'Expected strokes',first:f(first.result.expected),now:f(now.result.expected)},
  {label:'Water + OB',first:(first.result.penalty*100).toFixed(1)+'%',now:(now.result.penalty*100).toFixed(1)+'%'}];}
+
+// Front/back are intersections of the ball-to-green-center line with the green ellipse.
+export function greenYardages(s){
+ const g=s.green,length=Math.hypot(g.x,g.y),dx=g.x/length,dy=g.y/length;
+ const radius=1/Math.sqrt((dx/g.rx)**2+(dy/g.ry)**2);
+ return [{label:'GREEN FRONT',kind:'front',x:g.x-dx*radius,y:g.y-dy*radius,distance:length-radius},{label:'FLAG',kind:'flag',...s.pin,distance:Math.hypot(s.pin.x,s.pin.y)},{label:'GREEN BACK',kind:'back',x:g.x+dx*radius,y:g.y+dy*radius,distance:length+radius}];
+}

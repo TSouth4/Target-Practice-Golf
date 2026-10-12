@@ -1,6 +1,14 @@
 # Target Practice
 
-## Current development update: v12.4.0
+## Current development update: v12.5.0
+
+The pre-shot bird's-eye map is removed, including the floating fullscreen radar. Choose direction from the ground view and depth with the right-side slider. Front, flag, and back yardages use course callouts; narrow screens use readable matching labels below the course or above it in fullscreen. Front/back are intersections of the ball-to-green-center line with the actual green ellipse; flag yardage is the direct ball-to-pin distance. These are terrain information, independent of the chosen target. The overhead landing comparison remains available after commitment.
+
+Seeded woods now vary independently on each side in fairway setback, starting distance, density and visual height. Dense woods have a higher recovery cost; open woods are less costly. The base recovery setting is multiplied by the zone's severity, so custom costs still apply. Geometry, vegetation and scoring share the same zones. Tree height remains visual; airborne branch collision is not modeled. Seed zero preserves baseline severity.
+
+Generator versions are now `tee-v3` and `approach-v3`, with `woods-v2`. Retry retains exactly the current layout and random sample. Progress uses `decision-model-v2` so new scores are not mixed into earlier-model trends. Earlier history remains readable and is labeled “previous model.”
+
+## Previous development update: v12.4.0
 
 **Full screen** opens an immersive practice layout: course across the viewport, depth on the right, a floating terrain-only bird's-eye map, and aim/commit actions over the course. The map can be collapsed. Results appear in a scrollable overlay; **Hide feedback / Show feedback** toggles that overlay without changing the target or answers. Retry clears the answers, and Next shot stays in the immersive layout. **Exit full screen** or Escape restores the normal view. Opening progress or the club editor also exits immersive practice.
 

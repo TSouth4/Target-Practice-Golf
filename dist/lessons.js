@@ -6,7 +6,7 @@ const pct=v=>(100*v).toFixed(1)+'%';
 const yards=v=>Math.abs(v).toFixed(0)+' yd';
 const nominal=(aim,p)=>shotAt(aim,{...patternAtTarget(aim,p),sdSide:0,sdLong:0,bigPct:0},ZERO);
 export function hazardExplanation(aim,b,r,s){
- const candidates=s.hazards.filter(h=>!h.forest);
+ const candidates=s.hazards;
  const hits=(result,h)=>{
   if(result.points)return result.points.filter(point=>point.kind===h.kind&&(h.kind==='water'?segmentHitsPoly(point.landing||point,point,h.poly):inPoly(point,h.poly))).length/result.n;
   return candidates.filter(other=>other.kind===h.kind).length===1?rate(result,h.kind):null;
@@ -20,7 +20,7 @@ export function hazardExplanation(aim,b,r,s){
  else if(Math.abs(cx-s.green.x)<(s.green.rx||10)&&cy<s.green.y&&dy>2)move=`The comparison aims deeper, giving shorter finishes more room beyond ${h.label}`;
  else if(Math.abs(cx-s.green.x)<(s.green.rx||10)&&cy>s.green.y&&dy< -2)move=`The comparison aims shorter, giving longer finishes more room before ${h.label}`;
  else if((cx<s.green.x-2&&dx>2)||(cx>s.green.x+2&&dx< -2))move=`The comparison moves ${dx>0?'right':'left'}, giving ${dx>0?'left':'right'} misses more room away from ${h.label}`;
- return `${move}. Shots finishing in ${h.label} fall from ${pct(own)} to ${pct(best)}. The comparison balances proximity with the cost of those misses.`;
+ return `${move}. Shots finishing in ${h.label} fall from ${pct(own)} to ${pct(best)}. The comparison balances proximity with the cost of those misses.${h.forest?' Dense woods have a higher modeled recovery cost than open woods.':''}`;
 }
 export function decisionLesson(aim,p,r,b,s,assessment){
  const q=b.result,own=nominal(aim,p),comparison=nominal(b.aim,b.pattern||p);

@@ -18,9 +18,9 @@ for(const mobile of [false,true]){
  assert.equal(await page.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);
  report.checks.push('double gesture preserves target and zooms without answers');
  await page.locator('#aimZoomToggle').click();
- const old=await page.locator('#targetDistance').innerText();const map=page.locator('#scoutMap');await map.scrollIntoViewIfNeeded();const m=await map.boundingBox();
+ const old=await page.locator('#targetDistance').innerText();const map=page.locator('#aimY');await map.scrollIntoViewIfNeeded();const m=await map.boundingBox();
  if(mobile)await page.touchscreen.tap(m.x+m.width*.5,m.y+m.height*.8);else await page.mouse.click(m.x+m.width*.5,m.y+m.height*.8);
- assert.notEqual(await page.locator('#targetDistance').innerText(),old);report.checks.push('terrain map changes target depth');
+ assert.notEqual(await page.locator('#targetDistance').innerText(),old);report.checks.push('vertical slider changes target depth');
  const started=Date.now();await page.locator('#simulate').click();await page.locator('#shotTracers').waitFor({timeout:60000});
  assert.equal(await page.locator('#shotCloud,#idealCloud,#meanFinish').count(),0);assert.equal(await page.locator('#aimX').isDisabled(),true);
  await page.locator('#results').waitFor({state:'visible',timeout:60000});report.commitDurationMs=Date.now()-started;report.checks.push('normal-motion tracers precede answer reveal and lock controls');

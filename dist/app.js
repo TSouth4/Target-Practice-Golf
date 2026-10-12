@@ -1,11 +1,11 @@
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
-import {targetFacts,hazardCallouts,retryRows} from './guidance.js';
+import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js';
 import {decisionLesson,retryImpact} from './lessons.js';
 import {PROGRESS_KEY,MODEL_VERSION,readProgress,profileKey,recordAttempt,progressSummary,trendSVG} from './progress.js';
 import {DRIVER_LIMITS,reachLimit,trainingBag} from './bag.js';
 import {FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
 import {BRAND} from './config.js';
-import {EYE_CAMERA,reviewCamera,projectReview,scoutCamera,projectScout,unprojectScout,aimZoomBox,isDoubleAimTap} from './camera.js';
+import {EYE_CAMERA,reviewCamera,projectReview,aimZoomBox,isDoubleAimTap} from './camera.js';
 import {nextScenario,generateScenario,nextLandscape} from './practice.js';
 import {TRACER_COLORS,tracerSample,tracerTrajectory} from './tracers.js';
 import {LANDSCAPES,vegetation,drawPlant} from './landscape.js';
@@ -18,7 +18,7 @@ let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',basicL
 let result=null,best=null,oneShot=null,working=false,hasAim=false,toastTimer,phase='choose',traceShots=[],transition=null;
 let editorDraft=null,editorClub='Driver',editorDrag=null,editorInvalid=new Set();
 let landingCamera=null;
-let immersive=false,feedbackExpanded=true,radarExpanded=true,nativeFullscreen=false;
+let immersive=false,feedbackExpanded=true,nativeFullscreen=false;
 let retryBaseline=null,retryHint='';
 function retryValid(){return retryBaseline&&retryBaseline.encounter===state.encounter&&retryBaseline.profile===currentProfile()&&retryBaseline.seed===state.seed;}
 let aimZoom=null,lastCourseTap=null,lastDoubleAimTap=null;
@@ -99,7 +99,8 @@ function updateLabels(){
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;
  $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
  $('holeMeta').textContent=`SCENARIO ${s.hole} / ${s.type==='tee'?`PAR ${s.par} · ${s.length} YARDS`:`${s.secondShot?'PAR 5 · SECOND SHOT · ':s.par===3?'PAR 3 · ':''}${s.length} YARDS TO PIN`}${s.variantSeed?' · VARIANT '+s.variantSeed:''}${s.generatorVersion?' · '+s.generatorVersion:''}`;
- $('holeName').textContent=s.name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;
+ $('greenYardageList').hidden=!!result;$('greenYardageList').innerHTML=greenYardages(s).map(item=>`<span><small>${item.label}</small><strong>${Math.round(item.distance)} yd</strong></span>`).join('');
+ $('holeName').textContent=s.name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;const woods=s.woods?.filter(w=>w.recoveryMultiplier>1);if(woods?.length)$('scenarioBrief').textContent+=' '+(woods[0].side<0?'Left':'Right')+' woods are denser and closer; the other side leaves more recovery room.';
  for(const [id,on] of [['povBtn',state.view==='pov'],['mapBtn',state.view==='map'],['teeTab',state.practiceFilter==='tee'],['approachTab',state.practiceFilter==='approach'],['mixedTab',state.practiceFilter==='mixed']]){$(id).classList.toggle('active',on);$(id).setAttribute('aria-pressed',on);}
  for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=working;
  const advanced=state.mode==='advanced';
@@ -107,7 +108,7 @@ function updateLabels(){
  $('shotModeNote').textContent=advanced?'My shot · member preview · automatic club for depth':'Straight flight · automatic club for your depth';
  $('costEditor').hidden=!advanced;
  $('legend').hidden=!result;$('reviewViews').hidden=!result;$('tryAgain').hidden=!result;$('retryThisHole').hidden=!result;
- $('hazardScout').hidden=!immersive&&(!!result||phase==='shooting'||phase==='zooming');$('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
+ $('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
  $('animationStatus').hidden=!working;
  $('animationStatus').textContent=phase==='shooting'?`Following ${traceShots.length} example shots. Color shows the final lie; percentages will use all 4,000.`:phase==='zooming'?'Now compare your landing pattern with the best sampled aim.':'Calculating 4,000 outcomes…';
  $('newShots').hidden=true;$('sampleStatus').hidden=!result;
@@ -129,7 +130,7 @@ function updateLabels(){
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);
  updateCourseFrame(aimZoom&&zoomAllowed?aimZoom:{x:0,y:0,width:960,height:580});
  $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
- $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course or the bird’s-eye map. Sliders work too. The pattern stays hidden until you commit.';
+ $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the depth bar beside the course. Sliders work too. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode'])$(id).disabled=working;
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
  $('aimControls').hidden=!!result;$('scenarioBriefWrap').hidden=!!result;$('appRoot').classList.toggle('review-mode',!!result);
@@ -149,10 +150,8 @@ function updateCourseFrame(box){
 function updateFullscreenControls(){
  $('appRoot').classList.toggle('immersive-mode',immersive);
  $('appRoot').classList.toggle('feedback-collapsed',immersive&&!feedbackExpanded);
- $('appRoot').classList.toggle('radar-collapsed',immersive&&!radarExpanded);
  $('fullscreenToggle').textContent=immersive?'Exit full screen ✕':'Full screen ⛶';$('fullscreenToggle').setAttribute('aria-pressed',immersive);
  $('feedbackToggle').hidden=!immersive||!result;$('feedbackToggle').textContent=feedbackExpanded?'Hide feedback':'Show feedback';$('feedbackToggle').setAttribute('aria-expanded',feedbackExpanded);
- $('radarToggle').hidden=!immersive;$('radarToggle').textContent=radarExpanded?'Hide map':'Show map';$('radarToggle').setAttribute('aria-expanded',radarExpanded);
 }
 function leaveFullscreen(){
  if(!immersive)return;immersive=false;nativeFullscreen=false;updateLabels();drawCourse();
@@ -161,13 +160,12 @@ function leaveFullscreen(){
 }
 $('fullscreenToggle').addEventListener('click',async()=>{
  if(immersive){leaveFullscreen();return;}
- immersive=true;feedbackExpanded=true;radarExpanded=true;closeMenu();updateFullscreenControls();updateLabels();drawCourse();
+ immersive=true;feedbackExpanded=true;closeMenu();updateFullscreenControls();updateLabels();drawCourse();
  // The immersive layout also works where native fullscreen is unavailable or denied.
  try{if($('appRoot').requestFullscreen){await $('appRoot').requestFullscreen();nativeFullscreen=!!document.fullscreenElement;}}catch{}
  if(immersive){updateLabels();drawCourse();}
 });
 $('feedbackToggle').addEventListener('click',()=>{feedbackExpanded=!feedbackExpanded;updateFullscreenControls();});
-$('radarToggle').addEventListener('click',()=>{radarExpanded=!radarExpanded;updateFullscreenControls();});
 document.addEventListener?.('fullscreenchange',()=>{if(nativeFullscreen&&!document.fullscreenElement)leaveFullscreen();else if(immersive)updateLabels();});
 document.addEventListener?.('keydown',event=>{if(event.key==='Escape'&&immersive){event.preventDefault();leaveFullscreen();}});
 globalThis.addEventListener?.('resize',()=>{if(immersive)updateLabels();});
@@ -239,6 +237,13 @@ function drawCourse(){
  else{let left=0,right=0;for(const l of callouts){const at=project(l),side=l.x<0?'left':'right',index=side==='left'?left++:right++,labelX=side==='left'?100:860,top=112+index*52;
  html+=`<g class="hazard-callout" data-kind="${l.kind}"><line x1="${at.x}" y1="${at.y}" x2="${labelX}" y2="${top+25}" stroke="${l.color}" stroke-width="1.5"/><circle cx="${at.x}" cy="${at.y}" r="4" fill="${l.color}" stroke="#fffef0"/><rect x="${labelX-78}" y="${top-6}" width="156" height="42" rx="5" fill="#203f32ee" stroke="${l.color}"/><text x="${labelX}" y="${top+9}" fill="#fffef0" font-family="Arial" font-size="12" font-weight="700" text-anchor="middle">${l.label}</text><text x="${labelX}" y="${top+25}" fill="#e2e8cf" font-family="Arial" font-size="10" text-anchor="middle">${l.distance}</text></g>`;}}
 
+ if(!map){
+  const positions=greenYardages(s);let labels='';
+  for(let i=0;i<positions.length;i++){const item=positions[i],at=project(item),labelX=480,top=78+i*42;
+   labels+=`<g class="green-yardage-callout" data-edge="${item.kind}"><line x1="${at.x}" y1="${at.y}" x2="${labelX}" y2="${top+13}" stroke="#d9e9a9" stroke-width="1.2"/><rect x="${labelX-68}" y="${top-6}" width="136" height="32" rx="5" fill="#203f32ee" stroke="#d9e9a9"/><text x="${labelX}" y="${top+7}" fill="#fffef0" font-family="Arial" font-size="10" font-weight="700" text-anchor="middle">${item.label} · ${Math.round(item.distance)} yd</text></g>`;
+  }
+  html+=labels;
+ }
  const pin=project(s.pin),ph=map?20:clamp(2*EYE_CAMERA.focal/(s.pin.y+6),6,15);html+=`<ellipse cx="${pin.x}" cy="${pin.y}" rx="3.4" ry="1.6" fill="#4b6946"/><path d="M${pin.x} ${pin.y}v-${ph}" stroke="#fffef2" stroke-width="1.6"/><path d="M${pin.x} ${pin.y-ph}l10 3-10 4Z" fill="#f3efda"/>`;
  if(!map)html+=`<text x="${pin.x+15}" y="${pin.y-ph+4}" font-size="9" fill="#fffef4" font-family="Arial" paint-order="stroke" stroke="#3f614c" stroke-width="2">${s.length} yd pin</text>`;
  else if(pin.y<60)html+=`<text x="480" y="65" text-anchor="middle" font-size="11" fill="#52704c" font-family="Arial">↑ Pin ${Math.round(s.pin.y-(analysisCamera().minY+analysisCamera().maxY)/2)} yd farther ahead</text>`;
@@ -258,20 +263,7 @@ function drawCourse(){
  if(hasAim)html+=`<g id="aimMarker" transform="translate(${a.x},${a.y})"><circle r="12" fill="#254c3a99" stroke="#ebc782" stroke-width="2"/><circle r="3" fill="#ebc782"/><path d="M-18 0h8M10 0h8M0-18v8M0 10v8" stroke="#ebc782" stroke-width="1.5"/></g>`;
  if(!map){html+=`<path d="M0 552Q220 541 430 551T960 547V580H0Z" fill="${theme.rough[1]}" opacity=".55"/><ellipse cx="480" cy="549" rx="9" ry="2.5" fill="#29493055"/><circle cx="480" cy="545" r="4.5" fill="url(#ball)"/><path d="M480 549v5" stroke="#e0d2ab" stroke-width="1.5"/>`;}
  else{const z=project(zero);html+=`<circle cx="${z.x}" cy="${z.y}" r="5" fill="#fffdf0" stroke="#557c50"/><text x="${z.x+12}" y="${z.y+4}" font-size="10" fill="#6f8565">YOUR BALL</text>`;}
- $('course').innerHTML=html;if(!result&&phase==='choose')drawScout();
-}
-function drawScout(){
- const s=scene(),theme=landscape(),c=scoutCamera(s),at=p=>projectScout(p,c),poly=points=>points.map(v=>{const q=at({x:v[0],y:v[1]});return `${q.x.toFixed(2)},${q.y.toFixed(2)}`;}).join(' ');
- let h=`<rect width="320" height="240" rx="5" fill="${theme.ground}"/>`;
- for(let y=Math.ceil(c.minY/25)*25;y<c.maxY;y+=25){const q=at({x:0,y});h+=`<line x1="12" y1="${q.y}" x2="308" y2="${q.y}" stroke="#b6c4a3" stroke-width=".6"/><text x="8" y="${q.y-3}" font-family="Arial" font-size="9" fill="#657958">${y} yd</text>`;}
- h+=`<polygon points="${poly(s.fairway)}" fill="#79ae50" stroke="#5c8e39" stroke-width="1.2"/><polygon points="${poly(ringPoints(s.green.x,s.green.y,s.green.rx,s.green.ry))}" fill="#9be34b" stroke="#5d9831" stroke-width="1.2"/>`;
- for(const hazard of s.hazards)h+=`<polygon data-hazard="${hazard.kind}" points="${poly(hazard.poly)}" fill="${hazard.kind==='water'?'#63b6ce':hazard.kind==='bunker'?theme.sand[1]:theme.recovery}" stroke="${hazard.kind==='water'?'#267f9a':hazard.kind==='bunker'?'#b78a43':'#385337'}" stroke-width="1.5"/>`;
- for(const x of s.bounds){const a=at({x,y:c.minY-15}),b=at({x,y:c.maxY+15});h+=`<line data-hazard="ob" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#c65d50" stroke-width="2" stroke-dasharray="5 3"/><text x="${a.x+4}" y="18" fill="#a6483d" font-size="10" font-family="Arial" font-weight="700">OB</text>`;}
- for(const label of s.labels.filter(l=>l.text!=='OB')){const q=at(label);if(q.y>18&&q.y<222)h+=`<text x="${q.x}" y="${q.y}" fill="#193e35" font-family="Arial" font-size="10" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#f7f4e4" stroke-width="3">${label.text==='TREES'&&state.landscape==='desert'?'SCRUB':label.text}</text>`;}
- const pin=at(s.pin);if(pin.y>12&&pin.y<225)h+=`<path d="M${pin.x} ${pin.y}v-14l10 3-10 4" fill="#fffef3" stroke="#385635" stroke-width="1.2"/>`;
- const depth=at(state.aim);h+=`<line id="depthGuide" x1="12" y1="${depth.y}" x2="308" y2="${depth.y}" stroke="#a47935" stroke-width="1.2" stroke-dasharray="3 4" opacity=".7"/>`;
- if(hasAim){const q=at(state.aim),origin=at({x:0,y:0});h+=`<line x1="${origin.x}" y1="${origin.y}" x2="${q.x}" y2="${q.y}" stroke="#8b6531" stroke-width="1.5" stroke-dasharray="5 4"/><g id="scoutAim" transform="translate(${q.x},${q.y})"><circle r="8" fill="#284c38" stroke="#ffe5a4" stroke-width="2"/><path d="M-12 0h7M5 0h7M0-12v7M0 5v7" stroke="#284c38" stroke-width="1.5"/></g>`;}
- $('scoutMap').innerHTML=h;$('scoutRange').textContent=`${Math.round(c.minY)}–${Math.round(c.maxY)} yd ahead · terrain only`;
+ $('course').innerHTML=html;
 }
 function showResult(){
  const r=result,b=best.result,regret=Number.isFinite(r.expected)?Math.max(0,r.expected-b.expected):Number.isFinite(b.expected)?Infinity:0,score=decisionScore(r.expected,b.expected),s=scene();
@@ -357,9 +349,6 @@ $('course').addEventListener('pointerdown',e=>{
 });
 $('course').addEventListener('dblclick',e=>{if(working||result||editorDraft||progressOpen||e.button!==undefined&&e.button!==0)return;e.preventDefault?.();const tap={...courseTap(e),type:'mouse'};if(isDoubleAimTap(lastDoubleAimTap?{...lastDoubleAimTap,type:'mouse'}:null,tap))return;const local=coursePoint(e);if(local)toggleAimZoom(local);});
 $('aimZoomToggle').addEventListener('click',()=>toggleAimZoom());
-function chooseMapDepth(e){if(working||result||e.button!==undefined&&e.button!==0)return;const svg=$('scoutMap'),point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;const ct=svg.getScreenCTM();if(!ct)return;const local=point.matrixTransform(ct.inverse()),w=unprojectScout(local.x,local.y,scoutCamera(scene()));if(w.y<=0)return;chooseDepth(w.y);}
-$('scoutMap').addEventListener('pointerdown',e=>{if(working||result)return;if(e.pointerId!==undefined)$('scoutMap').setPointerCapture?.(e.pointerId);chooseMapDepth(e);});
-$('scoutMap').addEventListener('pointermove',e=>{if(e.buttons===1)chooseMapDepth(e);});
 for(const [id,filter] of [['teeTab','tee'],['approachTab','approach'],['mixedTab','mixed']])$(id).addEventListener('click',()=>practiceFilter(filter));
 for(const [id,view] of [['povBtn','pov'],['mapBtn','map']])$(id).addEventListener('click',()=>{if(!result||working)return;state.view=view;save();updateLabels();drawCourse();});
 $('simulate').addEventListener('click',()=>run());$('newShots').addEventListener('click',()=>run(true));

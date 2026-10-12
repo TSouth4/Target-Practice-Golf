@@ -72,6 +72,14 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
 @media(max-width:760px){.course-with-depth{gap:4px}.course-with-depth #aimDepthWrap{width:48px;padding:6px 2px}.course-with-depth #aimDepthWrap label{font-size:10px}.course-with-depth #aimY{min-height:80px}}
 
 .coach-note{white-space:pre-line}
+.green-yardage-readout{display:none}
+@media(max-width:760px){
+ .green-yardage-callout{display:none}
+ .green-yardage-readout{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+ .green-yardage-readout span{background:#203f32;color:#fffef0;padding:6px;border:1px solid #d9e9a9;border-radius:5px;text-align:center}
+ .green-yardage-readout small{display:block;font-size:9px}.green-yardage-readout strong{display:block;font-size:13px;margin-top:3px}
+ .immersive-mode .green-yardage-readout{position:absolute;z-index:3;left:12px;right:64px;top:165px;margin:0}
+}
 
 /* Immersive practice keeps the same course, controls and results in one viewport. */
 .immersive-mode{overflow:hidden}
@@ -90,11 +98,6 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
 .immersive-mode .course-overlay.top{top:88px;right:80px}
 .immersive-mode .course-overlay.bottom{bottom:125px;right:80px}
 .immersive-mode #aimDepthWrap{position:absolute;z-index:3;right:max(12px,env(safe-area-inset-right));top:26%;bottom:125px;width:60px;background:#fffef9e8}
-.immersive-mode #hazardScout{position:absolute;z-index:3;top:155px;left:max(12px,env(safe-area-inset-left));right:auto;width:220px;display:block;margin:0;padding:10px;background:#fffef9ed;box-shadow:0 3px 16px #0003}
-.immersive-mode .scout-heading{font-size:9px;align-items:center;letter-spacing:0;flex-wrap:wrap}
-.immersive-mode .scout-heading span,.immersive-mode .scout-key,.immersive-mode #scoutRange{display:none}
-.immersive-mode #radarToggle{background:transparent;color:var(--green);min-height:36px;padding:4px;font-size:11px;margin-left:auto}
-.immersive-mode.radar-collapsed #scoutMap{display:none}
 .immersive-mode #aimControls{position:absolute;z-index:3;bottom:88px;left:calc(50% - 180px);width:360px;max-width:calc(100% - 110px);padding:8px 12px;background:#fffef9ed;border-radius:6px}
 .immersive-mode #aimControls label{margin-bottom:2px}
 .immersive-mode #aimX{height:28px;margin:0}
@@ -108,18 +111,15 @@ main{max-width:1220px}.topbar{height:74px}.brand{font-size:18px;letter-spacing:-
  .immersive-mode .course-heading h2{font-size:14px}.immersive-mode #holeMeta{display:none}
  .immersive-mode .course-view-controls{max-width:72%;gap:4px}.immersive-mode .course-view-controls button{font-size:10px;padding:6px}
  .immersive-mode .course-overlay.top{top:130px;left:12px;right:65px}.immersive-mode .course-overlay.top .light{display:none}
- .immersive-mode #hazardScout{top:190px;width:140px;padding:6px}
  .immersive-mode #aimDepthWrap{right:8px;width:48px;top:30%;bottom:155px}
  .immersive-mode #aimControls{left:12px;bottom:105px;width:calc(100% - 80px);max-width:none}
  .immersive-mode .course-overlay.bottom{bottom:170px;left:12px;right:64px;font-size:9px;flex-wrap:wrap}
  .immersive-mode #results{left:12px;right:64px;top:160px;bottom:100px;width:auto}
- .immersive-mode.review-mode #hazardScout{top:auto;bottom:110px}
  .immersive-mode .simulate-row{width:calc(100% - 24px);max-width:none;padding:8px;gap:6px}
  .immersive-mode .simulate-row button{font-size:12px}.immersive-mode #animationStatus{left:12px;right:64px;bottom:105px}
 }
 @media(max-height:500px){
  .immersive-mode .course-heading h2,.immersive-mode #holeMeta,.immersive-mode .course-overlay{display:none}
- .immersive-mode #hazardScout{top:75px;width:150px;padding:5px}
  .immersive-mode #aimDepthWrap{top:75px;bottom:85px}
  .immersive-mode #aimControls{bottom:82px;left:190px;width:calc(100% - 280px)}
  .immersive-mode #results{top:75px;left:180px;right:80px;bottom:85px;width:auto}

@@ -2,7 +2,7 @@ import {random,inPoly,inGreen,lie} from './model.js';
 import {decorateScenario} from './landscape.js';
 
 // Versioned, constrained families: different landing decisions, not random scenery.
-export const TEE_GENERATOR_VERSION='tee-v2';
+export const TEE_GENERATOR_VERSION='tee-v3';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
 const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);

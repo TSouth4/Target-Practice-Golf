@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {rayIntervals,targetFacts,hazardCallouts} from '../dist/guidance.js';
+import {rayIntervals,targetFacts,hazardCallouts,greenYardages} from '../dist/guidance.js';
 import {setupDOM} from './dom-harness.mjs';
 const rectangle=[[-10,100],[10,100],[10,130],[-10,130]];
 test('aim-line yardages follow the ray, including angled, absent and concave intersections',()=>{assert.deepEqual(rayIntervals(rectangle,{x:0,y:200}),[[100,130]]);assert.deepEqual(rayIntervals(rectangle,{x:100,y:200}),[]);assert.deepEqual(rayIntervals([[40,80],[80,80],[80,160],[40,160]],{x:100,y:200}),[[89.442719,178.885438]]);const poly=[[-10,100],[10,100],[10,150],[-10,150],[-10,140],[5,140],[5,110],[-10,110]];assert.deepEqual(rayIntervals(poly,{x:0,y:200}),[[100,110],[140,150]]);});
@@ -10,3 +10,10 @@ async function pick(x){$('aimX').value=String(x);await $('aimX').fire('input');}
 test('terrain and target readout never expose a dispersion before commitment',async()=>{await pick(20);const s=saved();assert.equal($('targetDistance').textContent,`${Math.round(Math.hypot(s.aim.x,s.aim.y))} yd target`);assert.ok($('targetClub').textContent.includes(s.pattern.club));assert.match($('course').innerHTML,/id="hazardEdges"/);assert.doesNotMatch($('course').innerHTML,/id="(yourContour|idealContour|shotCloud)"/);$('aimY').value='180';await $('aimY').fire('input');assert.ok($('targetClub').textContent.includes(saved().pattern.club));assert.notEqual(saved().pattern.club,s.pattern.club);});
 test('guided retry retains original target and random draws, compares actual results, and resets on Next',async()=>{await $('simulate').fire('click');const first=saved(),expected=$('expectedValue').textContent;assert.ok($('retryComparison').hidden);await $('retryThisHole').fire('click');assert.deepEqual(saved().aim,first.aim);assert.equal(saved().seed,first.seed);assert.equal(saved().encounter,first.encounter);assert.ok(!$('retryGuide').hidden);assert.ok($('simulate').disabled);assert.doesNotMatch($('course').innerHTML,/id="(yourContour|idealContour|shotCloud)"/);await pick(-12);await $('simulate').fire('click');assert.ok(!$('retryComparison').hidden);assert.ok($('retryRows').innerHTML.includes(expected));assert.ok($('retryRows').innerHTML.includes($('expectedValue').textContent));assert.match($('retrySummary').textContent,/Same hole, profile and random draws/);await $('retryThisHole').fire('click');await pick(5);await $('simulate').fire('click');assert.ok($('retryRows').innerHTML.includes(expected));await $('tryAgain').fire('click');assert.ok($('retryGuide').hidden);await pick(0);await $('simulate').fire('click');assert.ok($('retryComparison').hidden);});
 test('changed handicap invalidates the retry comparison rather than implying a target-only improvement',async()=>{await $('retryThisHole').fire('click');$('basicHandicap').value='20';await $('basicHandicap').fire('change');assert.ok($('retryGuide').hidden);await pick(0);await $('simulate').fire('click');assert.ok($('retryComparison').hidden);});
+
+test('green front/back intersect the actual ellipse and flag yardage uses its direct distance',()=>{
+ const s={green:{x:30,y:150,rx:14,ry:22},pin:{x:35,y:145}},yardages=greenYardages(s);
+ assert.equal(yardages.length,3);assert.equal(yardages[1].distance,Math.hypot(35,145));
+ for(const edge of [yardages[0],yardages[2]]){assert.ok(Math.abs(((edge.x-30)/14)**2+((edge.y-150)/22)**2-1)<1e-9);assert.ok(Math.abs(edge.x/edge.y-30/150)<1e-9);assert.ok(Math.abs(Math.hypot(edge.x,edge.y)-edge.distance)<1e-9);}
+ assert.ok(yardages[0].distance<Math.hypot(30,150));assert.ok(yardages[2].distance>Math.hypot(30,150));
+});

@@ -10,11 +10,19 @@ function section(s,y){
  return xs.length?[Math.min(...xs),Math.max(...xs)]:[s.green.x-s.green.rx,s.green.x+s.green.rx];
 }
 export function decorateScenario(s){
- const buffer=s.type==='tee'?13:10;
+ const baseline=s.type==='tee'?13:10,rng=random(((s.variantSeed||0)+Number(s.hole)*173+7183)>>>0),denseSide=rng()<.5?-1:1;
+ s.woodlandVersion='woods-v2';s.woods=[];
  for(const side of [-1,1]){
-  const outer=side<0?s.bounds[0]+1:s.bounds[1]-1,inner=[];
-  for(let y=45;y<=s.maxY;y+=7){const edge=section(s,y)[side<0?0:1]+side*buffer;inner.push([side<0?Math.max(outer,edge):Math.min(outer,edge),y]);}
-  if(inner.some(p=>Math.abs(p[0]-outer)>3))s.hazards.push({kind:'trees',label:'Recovery vegetation',forest:true,poly:[...inner,[outer,inner.at(-1)[1]],[outer,inner[0][1]]]});
+  const varied=!!s.variantSeed,dense=side===denseSide;
+  const buffer=varied?(dense?6+rng()*6:18+rng()*10):baseline;
+  const density=varied?(dense?.85+rng()*.15:.3+rng()*.2):1;
+  const recoveryMultiplier=varied?(dense?1.25+rng()*.4:.45+rng()*.25):1;
+  const height=varied?(dense?12+rng()*6:6+rng()*5):11;
+  const start=varied?45+Math.floor(rng()*40):45,outer=side<0?s.bounds[0]+1:s.bounds[1]-1,inner=[];
+  for(let y=start;y<=s.maxY;y+=7){const edge=section(s,y)[side<0?0:1]+side*buffer;inner.push([side<0?Math.max(outer,edge):Math.min(outer,edge),y]);}
+  const woods={side,buffer,density,height,recoveryMultiplier,start};s.woods.push(woods);
+  const runs=[];let run=[];for(const point of inner){if(Math.abs(point[0]-outer)>3)run.push(point);else if(run.length){runs.push(run);run=[];}}if(run.length)runs.push(run);const patch=runs.sort((a,b)=>b.length-a.length)[0]||[];
+  if(patch.length>1)s.hazards.push({kind:'trees',label:`${side<0?'Left':'Right'} ${varied?(dense?'dense woods':'open woods'):'woods'}`,forest:true,...woods,poly:[...patch,[outer,patch.at(-1)[1]],[outer,patch[0][1]]]});
  }
  return s;
 }
@@ -22,7 +30,7 @@ const vegetationCache=new WeakMap();
 export function vegetation(s,style='woodland'){
  let cache=vegetationCache.get(s);if(!cache){cache={};vegetationCache.set(s,cache);}if(cache[style])return cache[style];
  const theme=LANDSCAPES[style],rng=random((s.variantSeed||131)+Number(s.hole)*173),plants=[];
- function add(x,y){const kind=lie({x,y},s);if(!['trees','ob'].includes(kind))return;if(rng()>theme.density)return;const height=theme.shape==='cactus'?3.5+rng()*3:9+rng()*5,width=theme.shape==='cactus'?1.8:3.4+rng()*2.2;const mature=theme.shape!=='cactus'&&kind==='ob'&&rng()<.45;plants.push({x,y,kind,height:height*(mature?1.25:1),width:width*(mature?1.15:1),tone:Math.floor(rng()*3),shape:theme.shape});}
+ function add(x,y){const woods=s.woods?.find(w=>w.side===(x<section(s,y).reduce((a,b)=>a+b,0)/2?-1:1));const kind=lie({x,y},s);if(!['trees','ob'].includes(kind))return;if(rng()>theme.density*(woods?.density||1))return;const height=theme.shape==='cactus'?3.5+rng()*3:9+rng()*5,width=theme.shape==='cactus'?1.8:3.4+rng()*2.2;const mature=theme.shape!=='cactus'&&kind==='ob'&&rng()<.45;plants.push({x,y,kind,height:height*(mature?1.25:1)*(woods?woods.height/11:1),width:width*(mature?1.15:1),tone:Math.floor(rng()*3),shape:theme.shape});}
  for(const h of s.hazards.filter(h=>h.kind==='trees')){const xs=h.poly.map(p=>p[0]),ys=h.poly.map(p=>p[1]);for(let y=Math.min(...ys)+2;y<=Math.max(...ys);y+=7)for(let x=Math.min(...xs)+2;x<=Math.max(...xs);x+=5.5){const p={x:x+(rng()-.5)*3,y:y+(rng()-.5)*3};if(inPoly(p,h.poly))add(p.x,p.y);}}
  // Two overlapping rows beyond the white stakes complete the visual corridor.
  for(let y=45;y<s.maxY+12;y+=7)for(const side of [-1,1])for(let row=0;row<2;row++)add((side<0?s.bounds[0]:s.bounds[1])+side*(5+row*7+rng()*3),y+rng()*5);

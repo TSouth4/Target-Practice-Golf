@@ -2,7 +2,7 @@ import {random} from './model.js';
 import {decorateScenario} from './landscape.js';
 import {validateTeeScenario,validPolygon} from './tee-generator.js';
 
-export const APPROACH_GENERATOR_VERSION='approach-v2';
+export const APPROACH_GENERATOR_VERSION='approach-v3';
 function build(base,seed,attempt){
  const rng=random((seed+attempt*104729)>>>0),between=(a,b)=>a+(b-a)*rng(),side=rng()<.5?-1:1;
  const par5=!!base.secondShot,creek=base.id==='creek-par3'||base.id==='par5-carry';

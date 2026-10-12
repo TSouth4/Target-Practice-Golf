@@ -15,9 +15,9 @@ const out=process.env.TARGET_PRACTICE_REVIEW_OUTPUT||'/tmp/target-practice-brows
   const course=await page.locator('.course-viewport').boundingBox();assert.deepEqual(course,{x:0,y:0,width,height});
   assert.equal(await page.locator('#shotCloud circle').count(),0);
   const after=await page.evaluate(()=>JSON.parse(localStorage.getItem('golfaim101-v2')));assert.deepEqual(after,before);
-  await page.locator('#radarToggle').click();assert.equal(await page.locator('#scoutMap').isVisible(),false);await page.locator('#radarToggle').click();
+  assert.equal(await page.locator('#scoutMap').count(),0);assert.equal(await page.locator('.green-yardage-callout').count(),3);
   const depth=await page.locator('#aimY').inputValue();await page.locator('#aimY').focus();await page.keyboard.press('ArrowDown');assert.notEqual(await page.locator('#aimY').inputValue(),depth);
-  const map=await page.locator('#scoutMap').boundingBox();await page.mouse.click(map.x+map.width*.5,map.y+map.height*.6);assert.equal(await page.locator('#shotCloud circle').count(),0);
+
   await page.screenshot({path:`${out}/fullscreen-choose-${width}.png`});
   await page.locator('#simulate').click();await page.locator('#results').waitFor({state:'visible',timeout:60000});
   assert.equal(await page.locator('#shotCloud circle').count(),500);assert.equal(await page.locator('#aimY').isDisabled(),true);
@@ -25,7 +25,7 @@ const out=process.env.TARGET_PRACTICE_REVIEW_OUTPUT||'/tmp/target-practice-brows
   await page.locator('#feedbackToggle').click();assert.equal(await page.locator('#results').isVisible(),false);assert.equal(await page.locator('#shotCloud circle').count(),500);
   await page.locator('#feedbackToggle').click();assert.equal(await page.locator('#results').isVisible(),true);
   await page.screenshot({path:`${out}/fullscreen-review-${width}.png`});
-  await page.locator('#retryThisHole').click();assert.equal(await page.locator('#results').isVisible(),false);assert.equal(await page.locator('#shotCloud circle').count(),0);assert.equal(await page.locator('#scoutMap').isVisible(),true);
+  await page.locator('#retryThisHole').click();assert.equal(await page.locator('#results').isVisible(),false);assert.equal(await page.locator('#shotCloud circle').count(),0);assert.equal(await page.locator('.green-yardage-callout').count(),3);
   if(width===1440){await page.locator('#aimX').focus();await page.keyboard.press('ArrowRight');await page.locator('#simulate').click();await page.locator('#results').waitFor({state:'visible',timeout:60000});await page.locator('#tryAgain').click();assert.equal(await page.locator('#shotCloud circle').count(),0);assert.equal(await page.locator('#fullscreenToggle').getAttribute('aria-pressed'),'true');}
   await page.setViewportSize({width:height,height:width});assert.equal(await page.locator('#fullscreenToggle').getAttribute('aria-pressed'),'true');
   if(width===844)await page.locator('#fullscreenToggle').click();else await page.keyboard.press('Escape');assert.equal(await page.locator('#fullscreenToggle').getAttribute('aria-pressed'),'false');

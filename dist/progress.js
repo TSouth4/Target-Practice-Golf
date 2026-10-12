@@ -1,11 +1,11 @@
 export const PROGRESS_KEY='target-practice-progress-v1';
-export const MODEL_VERSION='decision-model-v1';
+export const MODEL_VERSION='decision-model-v2';
 export const HISTORY_LIMIT=1000;
 const KINDS=['balanced','aggressive','conservative','refine'];
 const finite=(n,min,max)=>typeof n==='number'&&Number.isFinite(n)&&n>=min&&n<=max;
 export function readProgress(raw){
  try{const data=typeof raw==='string'?JSON.parse(raw):raw;if(!Array.isArray(data))return[];
-  return data.filter(r=>r&&typeof r.id==='string'&&r.id.length<100&&typeof r.encounter==='string'&&r.encounter.length<100&&typeof r.profile==='string'&&r.profile.length<100&&typeof r.profileLabel==='string'&&r.profileLabel.length<100&&r.model===MODEL_VERSION&&['tee','approach'].includes(r.type)&&KINDS.includes(r.kind)&&finite(r.score,0,100)&&finite(r.penalty,0,1)&&(r.regret===null||finite(r.regret,0,1e6))&&Number.isFinite(Date.parse(r.at))&&typeof r.retry==='boolean').slice(-HISTORY_LIMIT).map(r=>({...r,score:Math.round(r.score)}));
+  return data.filter(r=>r&&typeof r.id==='string'&&r.id.length<100&&typeof r.encounter==='string'&&r.encounter.length<100&&typeof r.profile==='string'&&r.profile.length<100&&typeof r.profileLabel==='string'&&r.profileLabel.length<100&&[MODEL_VERSION,'decision-model-v1'].includes(r.model)&&['tee','approach'].includes(r.type)&&KINDS.includes(r.kind)&&finite(r.score,0,100)&&finite(r.penalty,0,1)&&(r.regret===null||finite(r.regret,0,1e6))&&Number.isFinite(Date.parse(r.at))&&typeof r.retry==='boolean').slice(-HISTORY_LIMIT).map(r=>({...r,score:Math.round(r.score),profileLabel:r.model!==MODEL_VERSION&&!r.profileLabel.endsWith(' · previous model')?r.profileLabel+' · previous model':r.profileLabel}));
  }catch{return[];}
 }
 function canonical(value){if(Array.isArray(value))return value.map(canonical);if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])]));return value;}
