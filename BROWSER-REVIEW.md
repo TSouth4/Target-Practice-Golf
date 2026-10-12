@@ -1,6 +1,12 @@
 # Target Practice — first browser review
 
-## Update: v12.5 yardages and asymmetric woods
+## Update: v12.6 learning rounds and assessment
+
+All 125 automated tests passed. `rounds.cjs` completed learning and assessment rounds at 1440- and 390-pixel widths. It verified first-attempt-only recaps despite retries, reloading a recorded decision without duplication, ten decisions with no visible grades/clouds/recommendations, profile selection and locking, an aggregate per-100 value calculated from stored unrounded regret, completed-report reload, and restarting learning. The phone assessment ran in native fullscreen and exited to its final report. No page errors were captured.
+
+A representative same-profile strategy check favors Driver on a wider Cedar layout and 3 wood before wider crossing water. Generator checks cover 7,000 layouts; all fourteen families passed commit/retry browser checks. Unrestricted-practice regression fixtures explicitly select the pilot's Unlimited practice mode. Session and assessment flow tests cover the new default behavior separately. Physical-device and Safari/Firefox checks remain outstanding; publication still happens through Work.
+
+## Previous update: v12.5 yardages and asymmetric woods
 
 All 116 regression tests passed, including checks over 7,000 generated layouts and repeatable asymmetric woods. Additional focused checks verify that reversing dense/open woods shifts the sampled target toward the more forgiving side, and previous-model history remains readable without relabeling it as current-model progress.
 

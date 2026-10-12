@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {setupDOM} from './dom-harness.mjs';
 import {preset} from '../dist/model.js';
 const dom=setupDOM(),$=dom.$,oldPattern={...preset(5,'tee'),carry:270,roll:15,start:3,curve:-18,bias:4,bigPct:12,bigDirection:'left',height:38};
-dom.storage.set('golfaim101-v2',JSON.stringify({scenario:'cedar',basicHandicap:'5',advanced:{pattern:oldPattern,club:'Driver',type:'tee',costs:{bunker:1.2}}}));
+dom.storage.set('golfaim101-v2',JSON.stringify({practiceMode:'free',scenario:'cedar',basicHandicap:'5',advanced:{pattern:oldPattern,club:'Driver',type:'tee',costs:{bunker:1.2}}}));
 await import('../dist/app.js');
 const saved=()=>JSON.parse(dom.storage.get('golfaim101-v2'));
 test('older Advanced settings migrate into the matching personal club while the free lesson remains straight',async()=>{

@@ -1,6 +1,20 @@
 # Target Practice
 
-## Current development update: v12.5.0
+## Current development update: v12.6.0
+
+Practice starts with a randomized five-scenario learning round. The menu offers **Learning round**, **Assessment Test**, and **Unlimited practice** for the private pilot. Learning rounds show immediate feedback and allow retries; only the original decision contributes to the recap. Assessment starts with an introduction, then ten straight-profile decisions with no individual grades, patterns, recommendations or retries. Its aggregate report appears after decision ten. Neither mode has a daily limit or payment gate during this pilot.
+
+Each learning round mixes short par 4, wide tee, and tighter/carry-decision families with two approaches; the order and geometry are seeded and randomized. Assessment mixes five tees and five approaches. Short-par-4 seeds favor a reachable green entrance for the standard distance profiles, while lower custom reach can still require a layup. Wider Cedar layouts and occasional wider crossing water provide representative driver versus shorter-club decisions. `tee-v4` changes those layouts; `approach-v3` and `woods-v2` remain current.
+
+The handicap and distance limit can be selected before the first decision; thereafter the profile is locked for the round. Starting another mode replaces the current round. Unfinished rounds resume on this browser when local saving is available; recorded decisions do not count twice after reload. Finished reports remain available on reload until a new round starts. Assessment answers do not appear in the individual learning progress history.
+
+Reports show first-attempt rating counts, target-direction differences and average extra modeled strokes against sampled targets, scaled to 100 similar decisions before rounding. They include a practice suggestion and distinguish this small sample from established habits or measured real-world strokes gained. Unbounded comparisons show an unavailable finite total.
+
+A 100 now requires a target within 2 yd of the sampled comparison and no more than 0.005 extra modeled strokes. Other choices that round to 100 are capped at 99. New progress uses `decision-model-v3`; earlier-model history remains readable separately. The sampled comparison is an approximation, not a proven optimum.
+
+Validation: all 125 automated tests passed. Browser checks completed entire learning and assessment rounds on desktop and a 390-pixel phone, including retries, resume, profile selection/locking, withheld assessment answers, final aggregate math, saved reports and starting another round. The phone assessment also completed in native fullscreen and returned to its report. All fourteen generated families passed commit/retry checks; layout validation still covers 7,000 examples. Physical-device and Safari/Firefox checks remain outstanding.
+
+## Previous development update: v12.5.0
 
 The pre-shot bird's-eye map is removed, including the floating fullscreen radar. Choose direction from the ground view and depth with the right-side slider. Front, flag, and back yardages use course callouts; narrow screens use readable matching labels below the course or above it in fullscreen. Front/back are intersections of the ball-to-green-center line with the actual green ellipse; flag yardage is the direct ball-to-pin distance. These are terrain information, independent of the chosen target. The overhead landing comparison remains available after commitment.
 
@@ -88,6 +102,7 @@ node scripts/browser-review/mobile-and-generated.cjs
 node scripts/browser-review/learning.cjs
 node scripts/browser-review/guarded-feedback.cjs
 node scripts/browser-review/fullscreen.cjs
+node scripts/browser-review/rounds.cjs
 ```
 
 These scripts use the installed `/usr/bin/chromium`, isolated browser storage, and the local server. Output defaults to `/tmp/target-practice-browser-results`. Override `TARGET_PRACTICE_CHROMIUM`, `TARGET_PRACTICE_BASE_URL`, or `TARGET_PRACTICE_REVIEW_OUTPUT` as needed. Stop only the server you started after testing. These current browser checks supersede the older environment-specific note below that browser QA was unavailable.

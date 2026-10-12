@@ -1,3 +1,4 @@
+import {ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary} from './rounds.js';
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
 import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js';
 import {decisionLesson,retryImpact} from './lessons.js';
@@ -14,7 +15,8 @@ const $=id=>document.getElementById(id);
 const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bigPct','bigDirection','bigShift','bigShort','rho'];
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
-let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',practiceMode:'round',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let round=null,roundView=false,roundResumed=false;try{round=readRound(localStorage.getItem(ROUND_KEY));roundResumed=round?.status==='active';}catch{}
 let result=null,best=null,oneShot=null,working=false,hasAim=false,toastTimer,phase='choose',traceShots=[],transition=null;
 let editorDraft=null,editorClub='Driver',editorDrag=null,editorInvalid=new Set();
 let landingCamera=null;
@@ -36,7 +38,7 @@ function currentProfile(){return profileKey(state.mode,state.basicHandicap,state
 function recordDecision(){
  if(!Number.isFinite(best.result.expected)){progressMessage='No progress entry: this run has no usable target comparison.';return;}
  const assessed=decisionFeedback(state.aim,state.pattern,result,best,scene());
- const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit`:'My clubs',type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty};
+ const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit`:'My clubs',type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected,state.aim,best.aim),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty};
  const recorded=recordAttempt(progressHistory,entry);progressHistory=recorded.history;
  try{localStorage.setItem(PROGRESS_KEY,JSON.stringify(progressHistory));progressStored=true;}catch{progressStored=false;}
  progressMessage=progressStored?(recorded.entry.retry?'Retry saved separately; it does not enter your improvement trend.':'First attempt saved to My progress.'):'Progress is available for this visit, but could not be saved on this device.';
@@ -59,7 +61,7 @@ function renderProgress(){
  $('progressEmpty').textContent=summary.first.length?'':summary.retries?'Only retries in this profile so far. Take Next shot to start a new first attempt.':'No first attempts in this profile and shot type yet.';
  $('progressStorage').textContent=progressStored?'Saved locally in this browser. Keeps the latest 1,000 attempts, including retries. Clearing browser data removes this history.':'Local saving is unavailable. History from this visit may be lost when you close the page.';
 }
-function openProgress(){if(working||editorDraft)return;leaveFullscreen();closeMenu();progressOpen=true;progressSelection=currentProfile();$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
+function openProgress(){if(working||editorDraft)return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();progressOpen=true;progressSelection=currentProfile();$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
 function closeProgress(){progressOpen=false;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;updateLabels();$('practiceScreen').scrollIntoView({behavior:'auto'});$('menuToggle').focus?.();}
 
 let cachedScene,sceneKey;
@@ -68,7 +70,7 @@ function basic(){return basicPattern(state.basicHandicap,scene(),state.basicLimi
 function elevation(){return state.elevated?scene().elevationM:0;}
 function landscape(){return LANDSCAPES[state.landscape];}
 function num(v,a,b,fallback){return Number.isFinite(Number(v))?clamp(Number(v),a,b):fallback;}
-try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.scenario=saved.scenario;if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;state.memberCosts=saved.memberCosts||saved.advanced?.costs||null;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
+try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.scenario=saved.scenario;state.practiceMode=saved.practiceMode==='free'?'free':'round';if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;state.memberCosts=saved.memberCosts||saved.advanced?.costs||null;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
 // Start each visit with the free straight-flight lesson; member setup remains saved.
 state.pattern=basic();state.aim=fitTarget({x:0,y:scene().aimY},state.pattern);
 const initialBag=defaultMemberBag(basic());
@@ -77,12 +79,12 @@ state.memberBag=state.memberBag?cleanMemberBag(state.memberBag,basic()):cleanMem
 state.recent=state.recent.length?state.recent:[state.scenario];
 function member(){return{...basic(),customBag:state.memberBag,shotType:scene().type};}
 function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.querySelectorAll('[data-cost]'))out[el.dataset.cost]=num(state.memberCosts?.[el.dataset.cost],Number(el.min),Number(el.max),DEFAULT_COSTS[el.dataset.cost]);return out;}
-function save(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}}
+function save(){if(round?.status==='active'&&!round.answers.length&&state.mode==='basic')round.profile={handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]};try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));}catch{}}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function sided(x,unit='yd'){return Math.abs(x)<.01?'0 '+unit:`${Math.abs(x).toFixed(unit==='°'?1:0)}${unit==='°'?'°':' '+unit} ${x<0?'left':'right'}`;}
 function syncTargetDistance(){state.aim=fitTarget(state.aim,state.pattern);let p=patternAtTarget(state.aim,state.pattern);const carry=clamp(p.carry,50,330);if(Math.abs(carry-p.carry)>.0001){state.aim=aimAtDistance(state.aim,carry+p.roll,p.aimXRange);p=patternAtTarget(state.aim,p);}state.pattern=p;}
 function depthRange(){const max=Math.min(scene().aimRange[1],reachLimit(state.pattern)/Math.hypot(1,state.aim.x/Math.max(1,state.aim.y)));return[Math.min(scene().aimRange[0],max),max];}
-function chooseDepth(y){state.aim=aimAtDepth(state.aim,Math.round(y),depthRange(),state.pattern.aimXRange);hasAim=true;syncTargetDistance();updateControls();dirty();}
+function chooseDepth(y){if(round?.kind==='assessment'&&roundRecorded())return;state.aim=aimAtDepth(state.aim,Math.round(y),depthRange(),state.pattern.aimXRange);hasAim=true;syncTargetDistance();updateControls();dirty();}
 function updateControls(){
  syncTargetDistance();
  for(const el of document.querySelectorAll('[data-cost]'))el.value=state.costs[el.dataset.cost];
@@ -122,7 +124,7 @@ function updateLabels(){
  $('mobileActionTarget').textContent=hasAim?`${Math.round(facts.total)} yd · ${p.club}`:'Choose direction and depth';
  $('mobileActionTarget').hidden=!!result||working;
  $('mobileHazards').hidden=!!result||phase==='shooting'||phase==='zooming';
- $('appRoot').classList.toggle('mobile-practice-actions',!editorDraft&&!progressOpen);
+ $('appRoot').classList.toggle('mobile-practice-actions',!editorDraft&&!progressOpen&&!roundView);
  $('retryGuide').hidden=!!result||!retryValid();$('retryGuide').textContent=retryValid()?`Guided retry · ${retryHint} Adjust your original target, then commit. Same hole, profile and 4,000-shot sample; patterns hidden again.`:'';
  $('stockShot').textContent=p.autoBag?`${p.customBag?'My ':''}${p.club}${p.customBag?'':' estimate'} · ${Math.round(p.carry+p.roll)} yd · ${Math.round(reachLimit(p))} yd limit`:`Planned distance: ${Math.round(p.carry+p.roll)} yd · custom`;
  $('cameraBadge').textContent=phase==='shooting'?'SHOT TRACERS':phase==='zooming'?'ZOOMING TO LANDING AREA':state.view==='map'?'LANDING-AREA ZOOM':`${aimZoom?'2× TARGET ZOOM · ':''}EYE LEVEL · ${elevation()} M ABOVE LANDING`;
@@ -138,8 +140,67 @@ function updateLabels(){
  for(const id of ['basicHandicap','aimX','aimY'])$(id).disabled=working||!!result;
  for(const el of document.querySelectorAll('[data-cost]'))el.disabled=working||!!result;
  updateFullscreenControls();
+ updateRoundControls();
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
+function roundRecorded(){return !!round?.answers.some(answer=>answer.index===round.index);}
+function updateRoundControls(){
+ const active=round?.status==='active',assessment=active&&round.kind==='assessment',locked=active&&round.answers.length>0;
+ $('appRoot').classList.toggle('assessment-mode',assessment);$('practiceIntro').textContent=assessment?'Choose ten targets. Your grades and shot patterns stay hidden until the final report.':'Read the hole. Choose direction and depth. Commit, then see the whole pattern.';
+ $('roundStatus').hidden=!active;$('roundStatus').textContent=active?`${assessment?'Assessment':'Learning round'} · ${round.index+1} / ${round.schedule.length}${roundResumed?' · Resumed':''}${roundRecorded()?' · Decision recorded':''}${assessment?' · Feedback at the end':''}`:'';
+ if(active){for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=true;}
+ if(locked){for(const id of ['basicHandicap','driverLimit','driverLimitReset'])$(id).disabled=true;}
+ if(assessment){for(const id of ['basicMode','advancedMode','progressMenu'])$(id).disabled=true;}
+ $('roundContinue').hidden=!active||!roundRecorded()||!!result||roundView;$('roundContinue').disabled=working;
+ $('roundContinue').textContent=round?.index===round?.schedule.length-1?(round.kind==='assessment'?'View assessment report':'View round summary'):'Next scenario';
+ if(assessment&&roundRecorded()){$('simulate').hidden=true;$('aimX').disabled=true;$('aimY').disabled=true;$('mobileActionTarget').textContent='Decision recorded · feedback will appear in your report';}
+ if(round&&result)$('tryAgain').innerHTML=round.index===round.schedule.length-1?'Round summary':'Next scenario';else $('tryAgain').innerHTML='Next shot <span>↗</span>';
+}
+function loadRoundSlot(){
+ const slot=round.schedule[round.index];state.seed=slot.drawSeed;setScenario(slot.id,slot.holeSeed);state.encounter=`round-${round.id}-${round.index}`;save();
+}
+function refreshRoundProfile(){
+ if(round?.status!=='active'||round.answers.length)return false;
+ const replacement=createRound(round.kind,round.seed,{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]});replacement.id=round.id;round=replacement;loadRoundSlot();return true;
+}
+function startRound(kind){
+ if(working)return;roundResumed=false;leaveFullscreen();closeMenu();roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;
+ state.mode='basic';state.practiceMode='round';state.costs={...DEFAULT_COSTS};state.practiceFilter='mixed';
+ const seed=(globalThis.crypto?.getRandomValues?.(new Uint32Array(1))[0]||Math.floor(Math.random()*2147483645))%2147483645+1;
+ round=createRound(kind,seed,{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]});round.id=makeId();loadRoundSlot();
+}
+function showRoundScreen(intro=false){
+ leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;
+ $('roundEyebrow').textContent=intro?'BASELINE ASSESSMENT':'FIRST-ATTEMPT RECAP';$('roundTitle').textContent=intro?'Assessment Test':round.kind==='assessment'?'Your assessment report':'Your five-shot round';
+ $('closeRound').hidden=!intro&&round?.kind==='assessment';$('roundReport').hidden=intro;$('startAssessment').hidden=!intro;$('startLearningRound').hidden=intro;
+ $('roundDescription').textContent=intro?'Choose targets on 10 new scenarios using your straight-shot handicap profile. No grades, shot patterns, recommended targets or retries appear during the test. Your report arrives after shot 10. Starting replaces the current round.':'First attempts only. Retries helped you experiment and did not change this recap.';
+ if(!intro){const summary=roundSummary(round);$('roundPerShot').textContent=summary.average===null?'Unavailable':'+'+summary.average.toFixed(2);$('roundPer100').textContent=summary.per100===null?'Unavailable':'+'+summary.per100.toFixed(1);$('roundScore').textContent=summary.score===null?'—':summary.score.toFixed(1)+' / 100';
+ $('roundTendencies').textContent=`${summary.kinds.balanced} strong decisions · ${summary.kinds.aggressive} too aggressive · ${summary.kinds.conservative} too conservative · ${summary.kinds.refine} needed refining.`;
+ const focus=summary.kinds.aggressive>=2?'Practice giving your costly miss more room, then test whether the safer target gives up worthwhile proximity.':summary.kinds.conservative>=2?'Practice comparing a closer target against your safe layup; check whether the safety benefit justifies the longer next shot.':summary.kinds.refine>=2?'Practice adjusting direction and depth together, watching both hazard exposure and the next-shot distance.':'Keep testing your reasoning on new scenarios. A strong decision can still produce a poor single outcome.';
+ $('roundTendencies').textContent+=' '+focus;
+ $('roundDirections').textContent=`Compared with the sampled targets, ${summary.direction.short} selections were more than 5 yd short, ${summary.direction.long} long, ${summary.direction.left} left, and ${summary.direction.right} right. These directions describe target differences, not your ball flight.`;
+ $('roundLimits').textContent='The per-100 number scales this round’s average modeled cost against the best sampled targets. It is not measured real-world strokes gained or a prediction of your next 100 shots. This small round suggests practice opportunities, not established habits. If a comparison is unbounded, a finite total is unavailable.';
+ if(round.kind==='assessment')$('roundDescription').textContent=`Your 10 first-attempt decisions, using the ${round.profile.handicap} handicap straight-shot profile with a ${round.profile.limit} yd distance limit. Try a learning round to test adjustments with immediate feedback. Personal clubs and unlimited practice remain available in this private pilot.`;
+ }
+ $('roundScreen').scrollIntoView({behavior:'auto'});$('closeRound').focus?.();save();
+}
+function recordRoundDecision(r,b){
+ if(round?.status!=='active')return;
+ const assessment=decisionFeedback(state.aim,state.pattern,r,b,scene());
+ addRoundAnswer(round,{kind:assessment.kind,score:decisionScore(r.expected,b.result.expected,state.aim,b.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(b.result.expected)?Math.max(0,r.expected-b.result.expected):null,dx:b.aim.x-state.aim.x,dy:b.aim.y-state.aim.y});save();
+}
+function nextRoundSlot(){
+ if(working||!roundRecorded())return;roundResumed=false;
+ if(round.index===round.schedule.length-1){round.status='complete';showRoundScreen();return;}
+ round.index++;loadRoundSlot();
+}
+$('practiceRoundMenu').addEventListener('click',()=>startRound('practice'));
+$('assessmentMenu').addEventListener('click',()=>{if(!working)showRoundScreen(true);});
+$('startAssessment').addEventListener('click',()=>startRound('assessment'));
+$('startLearningRound').addEventListener('click',()=>startRound('practice'));
+$('closeRound').addEventListener('click',()=>{roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;updateLabels();});
+$('roundContinue').addEventListener('click',nextRoundSlot);
+$('freePracticeMenu').addEventListener('click',()=>{if(working)return;round=null;state.practiceMode='free';roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();dirty();});
 function updateCourseFrame(box){
  let {x,y,width,height}=box;
  if(immersive){const bounds=$('course').getBoundingClientRect(),aspect=bounds.width/Math.max(1,bounds.height);
@@ -171,10 +232,10 @@ document.addEventListener?.('keydown',event=>{if(event.key==='Escape'&&immersive
 globalThis.addEventListener?.('resize',()=>{if(immersive)updateLabels();});
 function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionVerdict').setAttribute('aria-expanded',false);progressMessage='';landingCamera=null;syncTargetDistance();phase='choose';traceShots=[];transition=null;result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;save();updateLabels();drawCourse();}
 function setScenario(id,holeSeed=0){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=nextLandscape(state.landscape,holeSeed);state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
-function setMode(mode){if(working)return;resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
+function setMode(mode){if(working||round?.kind==='assessment'&&round.status==='active')return;round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
- if(working)return;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
+ if(working)return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
  $('practiceScreen').hidden=true;$('shotEditor').hidden=false;renderEditor();updateLabels();$('shotEditor').scrollIntoView({behavior:'auto'});
 }
 function editorPattern(){return editingPattern(editorDraft.find(c=>c.club===editorClub));}
@@ -266,7 +327,7 @@ function drawCourse(){
  $('course').innerHTML=html;
 }
 function showResult(){
- const r=result,b=best.result,regret=Number.isFinite(r.expected)?Math.max(0,r.expected-b.expected):Number.isFinite(b.expected)?Infinity:0,score=decisionScore(r.expected,b.expected),s=scene();
+ const r=result,b=best.result,regret=Number.isFinite(r.expected)?Math.max(0,r.expected-b.expected):Number.isFinite(b.expected)?Infinity:0,score=decisionScore(r.expected,b.expected,state.aim,best.aim),s=scene();
  const assessment=decisionFeedback(state.aim,state.pattern,r,best,s);
  $('retryComparison').hidden=!retryValid();
  if(retryValid()){$('retryRows').innerHTML=retryRows(retryBaseline,{aim:state.aim,pattern:state.pattern,result:r,score:Number.isFinite(b.expected)?score:null}).map(row=>`<tr><th scope="row">${escapeHTML(row.label)}</th><td>${escapeHTML(row.first)}</td><td>${escapeHTML(row.now)}</td></tr>`).join('');$('retrySummary').textContent=retryImpact(retryBaseline.result.expected,r.expected);}
@@ -299,7 +360,7 @@ async function zoomToLanding(camera){
  await new Promise(resolve=>{let started;function frame(now){started??=now;const t=Math.min(1,(now-started)/650);transition.progress=t*t*(3-2*t);drawCourse();if(t<1)requestAnimationFrame(frame);else resolve();}requestAnimationFrame(frame);});
 }
 async function run(newSeed=false){
- if(working||!hasAim)return;if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
+ if(working||!hasAim||round?.kind==='assessment'&&roundRecorded())return;if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
  resetAimZoom();working=true;phase='calculating';result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;
  $('newShots').disabled=true;$('simulate').innerHTML='Calculating 4,000 shots…';updateLabels();drawCourse();
  const snapshot=JSON.stringify(state);await wait(30);
@@ -307,10 +368,14 @@ async function run(newSeed=false){
   const zs=samples(4000,state.seed),r=evaluate(state.aim,state.pattern,scene(),state.costs,zs,true),b=await optimizeTargets(state.aim,state.pattern,scene(),state.costs,zs,()=>wait(0));
   const comparison={aim:b.aim,pattern:b.pattern,evaluated:b.evaluated,result:evaluate(b.aim,b.pattern,scene(),state.costs,zs,true)};
   if(snapshot!==JSON.stringify(state)){toast('Settings changed. Commit the updated target.');return;}
+  if(round?.kind==='assessment'&&round.status==='active'){
+   recordRoundDecision(r,comparison);phase='choose';traceShots=[];transition=null;hasAim=false;result=null;best=null;save();updateLabels();drawCourse();
+   if(round.answers.length===10){round.status='complete';showRoundScreen();}return;
+  }
   traceShots=tracerSample(r.points);phase='shooting';$('simulate').innerHTML='Shots in flight…';updateLabels();drawCourse();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await wait(2200);
   await zoomToLanding(comparisonCamera(comparison));
-  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';recordDecision();showResult();save();
+  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';recordRoundDecision(r,comparison);recordDecision();showResult();save();
  }
  catch(error){console.error(error);phase='choose';traceShots=[];transition=null;drawCourse();toast('Simulation failed. Reset the pattern and try again.');}
  finally{working=false;$('newShots').disabled=false;updateLabels();}
@@ -336,6 +401,7 @@ for(const axis of ['X','Y'])$('aim'+axis).addEventListener('input',()=>{if(worki
 function coursePoint(e){const svg=$('course'),point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;const ct=svg.getScreenCTM();return ct?point.matrixTransform(ct.inverse()):null;}
 function courseTap(e){return{at:Number.isFinite(e.timeStamp)?e.timeStamp:performance.now(),x:e.clientX,y:e.clientY,type:e.pointerType||'mouse'};}
 $('course').addEventListener('pointerdown',e=>{
+ if(round?.kind==='assessment'&&roundRecorded())return;
  if(working||editorDraft||progressOpen||e.isPrimary===false||e.button!==undefined&&e.button!==0)return;
  if(result){toast('Take the next shot or retry this hole to choose a fresh target.');return;}
  const local=coursePoint(e);if(!local)return;const tap=courseTap(e);
@@ -353,12 +419,12 @@ for(const [id,filter] of [['teeTab','tee'],['approachTab','approach'],['mixedTab
 for(const [id,view] of [['povBtn','pov'],['mapBtn','map']])$(id).addEventListener('click',()=>{if(!result||working)return;state.view=view;save();updateLabels();drawCourse();});
 $('simulate').addEventListener('click',()=>run());$('newShots').addEventListener('click',()=>run(true));
 $('useBest').addEventListener('click',()=>{if(best&&!working){state.aim={...best.aim};hasAim=true;syncTargetDistance();updateControls();dirty();}});
-$('tryAgain').addEventListener('click',()=>{if(working||!result)return;state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
-$('retryThisHole').addEventListener('click',()=>{if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();});
-$('basicHandicap').addEventListener('change',()=>{if(working||result||state.mode!=='basic')return;state.basicHandicap=$('basicHandicap').value;state.pattern=basic();syncTargetDistance();updateControls();dirty();});
+$('tryAgain').addEventListener('click',()=>{if(working||!result)return;if(round){if(round.status==='complete')showRoundScreen();else nextRoundSlot();return;}state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
+$('retryThisHole').addEventListener('click',()=>{if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected,state.aim,best.aim):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();});
+$('basicHandicap').addEventListener('change',()=>{if(working||result||state.mode!=='basic'||round?.answers.length)return;state.basicHandicap=$('basicHandicap').value;if(refreshRoundProfile())return;state.pattern=basic();syncTargetDistance();updateControls();dirty();});
 $('terrainToggle').addEventListener('click',()=>{if(working||result)return;resetAimZoom();state.elevated=!state.elevated;save();updateLabels();drawCourse();});
-$('driverLimit').addEventListener('change',()=>{if(working||result)return;state.basicLimits[state.basicHandicap]=num($('driverLimit').value,180,330,DRIVER_LIMITS[state.basicHandicap]);if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
-$('driverLimitReset').addEventListener('click',()=>{if(working||result)return;delete state.basicLimits[state.basicHandicap];if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
+$('driverLimit').addEventListener('change',()=>{if(working||result||round?.answers.length)return;state.basicLimits[state.basicHandicap]=num($('driverLimit').value,180,330,DRIVER_LIMITS[state.basicHandicap]);if(refreshRoundProfile())return;if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
+$('driverLimitReset').addEventListener('click',()=>{if(working||result||round?.answers.length)return;delete state.basicLimits[state.basicHandicap];if(refreshRoundProfile())return;if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
 $('basicMode').addEventListener('click',()=>setMode('basic'));$('advancedMode').addEventListener('click',openEditor);
 $('playOne').addEventListener('click',()=>{if(!result)return;const rng=random(state.seed+Math.floor(performance.now()));oneShot=result.points[Math.floor(rng()*result.n)];$('oneOutcome').textContent=`${NAMES[oneShot.kind]} · ${Math.round(oneShot.y)} yd forward, ${sided(oneShot.x)}${oneShot.big?' · big-miss component':''}. This is one draw from your pattern.`;drawCourse();});
 for(const id of ['modelTop','modelFooter'])$(id).addEventListener('click',()=>{$('assumptions').hidden=!$('assumptions').hidden;if(!$('assumptions').hidden)$('assumptions').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});
@@ -368,4 +434,8 @@ $('closeProgress').addEventListener('click',closeProgress);
 $('progressProfile').addEventListener('change',()=>{progressSelection=$('progressProfile').value;renderProgress();});
 $('progressType').addEventListener('change',()=>{progressType=['all','tee','approach'].includes($('progressType').value)?$('progressType').value:'all';renderProgress();});
 $('brandName').textContent=BRAND.name;$('brandFooter').textContent=BRAND.name;document.title=BRAND.title;
+if(round?.status==='active'){
+ state.mode='basic';state.basicHandicap=round.profile.handicap;state.basicLimits[round.profile.handicap]=round.profile.limit;state.costs={...DEFAULT_COSTS};state.practiceMode='round';loadRoundSlot();
+}else if(round?.status==='complete'){showRoundScreen();}
+else if(state.practiceMode!=='free'){startRound('practice');}
 updateControls();drawCourse();save();

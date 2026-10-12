@@ -71,4 +71,6 @@ Consider an iPhone/Android app when user feedback establishes a concrete need, s
 - Keep a short prioritised issue list; fix blockers before adding more features.
 - Set dates once the first validation pass establishes the amount of work. Do not guess a launch date yet.
 
-**Next task:** Make a practical browser/phone test checklist and use it to assess the unchanged prototype. This plan does not authorise deployment, broader access, payments, or app-store submission.
+**Current checkpoint:** v12.6 adds five-shot learning rounds and the menu’s ten-shot Assessment Test, first-attempt recaps, randomized openings, mixed tee strategies and a stricter criterion for earning 100. Owner playtesting and automated/browser checks have guided the development; broader device checks and an approved external pilot remain outstanding.
+
+**Next task:** Playtest the complete round and assessment flows in the private web app. Use the feedback to refine the session experience, then implement intended carry, rollout visualization, steady wind and firmness as a separate update. Difficulty and free/paid limits remain decisions to validate in the pilot. Broader access, payments and app-store submission require separate authorization.

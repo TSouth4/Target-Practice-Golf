@@ -2,7 +2,7 @@ import {random,inPoly,inGreen,lie} from './model.js';
 import {decorateScenario} from './landscape.js';
 
 // Versioned, constrained families: different landing decisions, not random scenery.
-export const TEE_GENERATOR_VERSION='tee-v3';
+export const TEE_GENERATOR_VERSION='tee-v4';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
 const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
@@ -50,7 +50,8 @@ function buildTee(base,seed,attempt){
  const side=rng()<.5?-1:1,greenY=short?between(235,305):between(335,425);
  const bendStart=between(125,205),bend=side*(sharp?between(65,100):dogleg?between(35,58):tight?between(0,7):between(4,18));
  const betweenTurn=between(38,70),sway=between(-12,12),center=y=>bend*smooth((y-bendStart)/(sharp?betweenTurn:greenY-bendStart))+sway*Math.sin(Math.PI*clamp(y/greenY,0,1));
- const earlyWidth=tight?between(14,19):between(24,34),lateWidth=tight?between(9,14):squeeze?between(8,12):between(12,22),neckY=between(205,280),neckDepth=between(3,tight?5:12);
+ const openLanding=base.id==='cedar'&&seed%3===0;
+ const earlyWidth=openLanding?between(38,48):tight?between(14,19):between(24,34),lateWidth=openLanding?between(24,34):tight?between(9,14):squeeze?between(8,12):between(12,22),neckY=between(205,280),neckDepth=openLanding?between(2,5):between(3,tight?5:12);
  const width=y=>y<65?10+(earlyWidth-10)*y/65:Math.max(8,earlyWidth+(lateWidth-earlyWidth)*smooth((y-100)/(greenY-100))-neckDepth*Math.exp(-(((y-neckY)/45)**2)));
  const green={x:center(greenY),y:greenY,rx:short?between(12,18):tight?between(12,16):between(15,22),ry:between(16,22)};
  const fairwayEnd=short?greenY-green.ry-15:greenY-green.ry*.45;
@@ -71,11 +72,11 @@ function buildTee(base,seed,attempt){
  };
  let strategicTag;
  if(creek){
-  const creekY=between(175,240),creekWidth=between(10,24),tilt=between(-10,10),left=bounds[0]+2,right=bounds[1]-2;
+  const wideCrossing=seed%3===0,creekY=wideCrossing?between(225,245):between(175,240),creekWidth=wideCrossing?between(45,55):between(10,24),tilt=wideCrossing?between(-5,5):between(-10,10),left=bounds[0]+2,right=bounds[1]-2;
   s.hazards.push({kind:'water',label:'Crossing creek',poly:[[left,creekY+tilt],[right,creekY-tilt],[right,creekY-tilt+creekWidth],[left,creekY+tilt+creekWidth]],drop:{x:center(creekY-25),y:creekY-25}});
   s.labels.push({x:center(creekY),y:creekY+creekWidth/2,text:'CREEK'});
-  bank('bunker','Bunker beyond the creek',side,creekY+creekWidth+20,creekY+creekWidth+45,4,10);
-  strategicTag='Crossing creek · stop short or carry';
+  if(!wideCrossing)bank('bunker','Bunker beyond the creek',side,creekY+creekWidth+20,creekY+creekWidth+45,4,10);
+  strategicTag=wideCrossing?'Wide crossing water · carry or layup':'Crossing creek · stop short or carry';
   s.brief='The creek crosses the landing area at a changing distance and angle. Compare stopping before it with carrying to a narrower landing zone; carry and rollout both matter.';
  }else if(short){
   // The pond stays outside the actual green; front sand stops before its edge.
@@ -103,8 +104,8 @@ function buildTee(base,seed,attempt){
  // Pin placement is within the central ellipse, away from all generated hazards.
  const angle=between(0,Math.PI*2),radius=between(0,.6);s.pin={x:green.x+Math.cos(angle)*green.rx*radius,y:green.y+Math.sin(angle)*green.ry*radius};
  s.length=Math.round(Math.hypot(s.pin.x,s.pin.y));s.aimRange=[short?110:125,short?Math.ceil(greenY+green.ry+5):320];s.aimY=short?Math.round(greenY):250;
- s.name=dogleg?`The ${sharp?'sharp ':''}${side<0?'left':'right'}-hand bend`:base.name;s.tag=strategicTag;
- s.generation={attempt,bendStart,bend,earlyWidth,lateWidth,neckY,neckDepth,hazardSide:side};
+ s.name=dogleg?`The ${sharp?'sharp ':''}${side<0?'left':'right'}-hand bend`:base.name;s.tag=openLanding?'Wide landing area · long par 4':strategicTag;if(openLanding)s.brief='A wider landing area gives the longer club more room. Compare that distance advantage with the side hazards and the recovery room beyond the fairway.';
+ s.generation={openLanding,attempt,bendStart,bend,earlyWidth,lateWidth,neckY,neckDepth,hazardSide:side};
  return s;
 }
 

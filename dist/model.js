@@ -131,4 +131,9 @@ export function decisionFeedback(aim,p,r,b,s){
  if(distance(aim)>distance(b.aim)+FEEDBACK_RULES.proximityGap)return{kind:'conservative',label:'Too conservative',reason:'You give up more distance or proximity than the safety gain is worth in this model.'};
  return{kind:'refine',label:'Target needs refining',reason:'A different direction or depth lowers the modeled cost; this is not clearly a simple risk-versus-safety mistake.'};
 }
-export function decisionScore(expected,best){if(!Number.isFinite(expected))return 0;return Math.round(clamp(100-60*Math.max(0,expected-best),0,100));}
+export function decisionScore(expected,best,aim=null,bestAim=null){
+ if(!Number.isFinite(expected)||!Number.isFinite(best))return 0;
+ const regret=Math.max(0,expected-best),score=Math.round(clamp(100-60*regret,0,100));
+ const close=aim&&bestAim?Math.hypot(aim.x-bestAim.x,aim.y-bestAim.y)<=2:regret===0;
+ return score===100&&(!close||regret>.005)?99:score;
+}
