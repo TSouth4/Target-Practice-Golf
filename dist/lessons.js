@@ -5,6 +5,17 @@ const rate=(r,k)=>r.counts[k]/r.n;
 const pct=v=>(100*v).toFixed(1)+'%';
 const yards=v=>Math.abs(v).toFixed(0)+' yd';
 const nominal=(aim,p)=>shotAt(aim,{...patternAtTarget(aim,p),sdSide:0,sdLong:0,bigPct:0},ZERO);
+const COST_LABELS={nextShot:'Next-shot / putting cost',rough:'Rough recovery cost',bunker:'Bunker recovery cost',trees:'Tree recovery cost',water:'Water penalty / recovery cost',ob:'OB penalty / repeat cost'};
+export function tradeoffExplanation(r,q){
+ if(!r.breakdown||!q.breakdown||!Number.isFinite(r.expected)||!Number.isFinite(q.expected))return null;
+ const changes=Object.keys(COST_LABELS).map(key=>({key,change:q.breakdown[key]-r.breakdown[key]}));
+ const improving=changes.filter(v=>v.change<-.005),worsening=changes.filter(v=>v.change>.005);
+ const describe=({key,change})=>`${COST_LABELS[key].toLowerCase()} ${change<0?'falls':'rises'} by ${Math.abs(change).toFixed(2)}`;
+ const pieces=[];if(improving.length)pieces.push(improving.map(describe).join('; '));if(worsening.length)pieces.push(worsening.map(describe).join('; '));
+ const net=r.expected-q.expected;
+ const text=pieces.length?`Compared with your target, ${pieces.join('; ')} strokes per decision. Overall, the comparison ${net>=0?'saves':'costs'} ${Math.abs(net).toFixed(2)} modeled strokes (${Math.abs(net*100).toFixed(1)} per 100 similar decisions).`:'The calculated cost components are almost identical for these two targets.';
+ return {text,rows:Object.entries(COST_LABELS).map(([key,label])=>({label,you:r.breakdown[key].toFixed(2),best:q.breakdown[key].toFixed(2)}))};
+}
 export function hazardExplanation(aim,b,r,s){
  const candidates=s.hazards;
  const hits=(result,h)=>{
@@ -48,17 +59,19 @@ export function decisionLesson(aim,p,r,b,s,assessment){
   principle='Compare both patterns against the hazards and pin. Adjust direction and depth together instead of treating every error as too safe or too risky.';
  }
  const hazardDetail=hazardExplanation(aim,b,r,s);if(hazardDetail)why+=' '+hazardDetail;
+ const tradeoff=tradeoffExplanation(r,q);if(tradeoff)why+=' '+tradeoff.text;
  if(s.secondShot){why+=' This is your second shot on a par 5: expected strokes compares going for the green with leaving a shorter next shot, including the cost of missed attempts.';principle+=' Reaching in two is worthwhile only when your club reach and full miss pattern justify the risk.';}
  const dx=b.aim.x-aim.x,dy=p.aimMode==='carry'?(b.pattern||p).carry-p.carry:b.aim.y-aim.y;
  const direction=Math.abs(dx)<1?'keep roughly the same left/right target':`move the target ${yards(dx)} ${dx<0?'left':'right'}`;
  const depth=Math.abs(dy)<1?'keep roughly the same depth':`set it ${yards(dy)} ${dy<0?'shorter':'deeper'}`;
  const action=!Number.isFinite(q.expected)?'Adjust your shot setup, then try again.':assessment.kind==='balanced'?'Retry and see whether you can choose a similarly balanced target before the pattern appears.':`Test an idea on retry: ${direction} and ${depth}. Before committing, predict whether the change will reduce costly misses enough to justify any change in proximity. Then compare ${p.club||'your club'} with ${b.pattern?.club||p.club||'the same club'} at that distance.`;
- return {why,principle,action,hazardDetail,rows:[
+ return {why,principle,action,hazardDetail,tradeoff:tradeoff?.text||'',rows:[
   {label:'Expected strokes',you:Number.isFinite(r.expected)?r.expected.toFixed(2):'∞',best:Number.isFinite(q.expected)?q.expected.toFixed(2):'∞'},
+  ...(tradeoff?[{label:'Current shot',you:'1.00',best:'1.00'},...tradeoff.rows]:[]),
   ...HAZARDS.map(([kind,name])=>({label:name==='OB'?'Out of bounds':name[0].toUpperCase()+name.slice(1),you:pct(rate(r,kind)),best:pct(rate(q,kind))})),
   {label:'Nominal finish to pin',you:yards(ownDistance),best:yards(bestDistance)},
   {label:'Selected club / distance',you:`${p.club||'Custom'} · ${yards(p.carry+p.roll)}`,best:`${b.pattern?.club||p.club||'Custom'} · ${yards((b.pattern||p).carry+(b.pattern||p).roll)}`}
- ],note:'This explains the modeled tradeoff. The blue target is the best sampled target, not a proven optimum. Nominal finish is the core flight without random misses; it is not the average distance of every shot. Costs and shot assumptions can change the recommendation.'};
+ ],note:'This explains the modeled tradeoff. The blue target is the best sampled target, not a proven optimum. Cost components use playable outcomes; next-shot cost includes putting and water-drop positions, while OB includes repeating the strategy. These are an accounting breakdown, not isolated causal effects. Displayed rounded components may not add exactly. Nominal finish is the core flight without random misses. Costs and shot assumptions can change the recommendation.'};
 }
 
 export function retryImpact(firstExpected,nowExpected){

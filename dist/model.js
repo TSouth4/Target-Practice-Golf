@@ -97,15 +97,23 @@ export function outcome(end,s){
 }
 export function evaluate(aim,p,s,c,zs,collect=false){
  const counts={fairway:0,green:0,rough:0,bunker:0,water:0,trees:0,ob:0};let subtotal=0;const points=collect?[]:null;const vals=[];
+ const costs=collect?{nextShot:0,rough:0,bunker:0,trees:0,water:0,ob:0}:null;
  for(const z of zs){const end=shotAt(aim,p,z),o=outcome(end,s);counts[o.kind]++;
   const v=o.kind==='ob'?null:o.kind==='water'?2+c.waterExtra+remaining(o.drop,s,c,'rough'):1+remaining(end,s,c,o.kind);
+  if(costs&&v!==null){
+   const base=remaining(o.kind==='water'?o.drop:end,s,c,o.kind==='green'?'green':'fairway');
+   costs.nextShot+=base;
+   if(['rough','bunker','trees','water'].includes(o.kind))costs[o.kind]+=v-1-base;
+  }
   if(v!==null)subtotal+=v;vals.push(v);if(collect)points.push({...end,...o.finish,kind:o.kind});
  }
  const n=zs.length,pob=counts.ob/n;
  // Repeating the same strategy after stroke-and-distance: E = (nonOB + 2*pOB)/(1-pOB).
  const expected=pob===1?Infinity:(subtotal/n+2*pob)/(1-pob);
+ let breakdown=null;
+ if(costs&&pob<1){const playable=n-counts.ob;for(const key of Object.keys(costs))costs[key]/=playable;costs.ob=2*pob/(1-pob);breakdown={shot:1,...costs};}
  let variance=0;if(Number.isFinite(expected))for(const v of vals)variance+=((v===null?2+expected:v)-expected)**2;
- return {counts,expected,se:Math.sqrt(variance/n)/Math.sqrt(n)/Math.max(.001,1-pob),points,n,penalty:(counts.water+counts.ob)/n,big:zs.filter(z=>z.u<p.bigPct/100).length/n};
+ return {counts,expected,se:Math.sqrt(variance/n)/Math.sqrt(n)/Math.max(.001,1-pob),points,n,penalty:(counts.water+counts.ob)/n,big:zs.filter(z=>z.u<p.bigPct/100).length/n,breakdown};
 }
 export function optimize(aim,p,s,c,zs){
  // Fixed club and aim depth: 61 horizontal candidates plus the selected aim.

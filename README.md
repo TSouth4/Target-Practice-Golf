@@ -1,3 +1,11 @@
+# Calculated decision tradeoffs (12.8.0)
+
+Practice coaching now explains changes in modeled next-shot/putting cost versus rough, bunker, trees, water and OB costs. The expandable lesson includes each cost for both targets and the current shot; the text gives the net saving per decision and per 100 similar decisions. No cost difference is inferred from hazard percentages alone.
+
+Validation: all 134 regression tests passed. Added checks verify exact accounting across every lie, water relief, dense-woods costs, OB repeats and unbounded results. Desktop and phone browser checks verified the expanded lesson and main coaching text.
+
+Collected simulations expose an exact accounting breakdown of the existing expectation: one current stroke, average baseline remaining cost among non-OB outcomes, incremental lie/penalty costs on those outcomes, and OB repeat overhead 2p/(1-p). Baseline remaining cost uses the actual water drop for water outcomes. Forest recovery multipliers are preserved. All-OB results have no finite breakdown. Components sum to the original expected strokes before display rounding; scoring and target selection are unchanged. The components are not isolated causal effects: changing targets also changes which outcomes remain playable and their locations. They do not simulate subsequent shots.
+
 The distance bar now reads **Estimated distances**, with **Carry 180 yd (185 total)** above the slider. Total is nominal carry plus expected rollout. Desktop and phone browser checks passed.
 
 # Approach layup scoring correction (12.7.1)

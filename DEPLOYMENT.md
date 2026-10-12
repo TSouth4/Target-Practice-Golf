@@ -1,4 +1,4 @@
-# Publish v12.7.1 in the existing Work project
+# Publish v12.8.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -21,3 +21,5 @@ Test the menu’s Learning round and Assessment Test. Finish five learning scena
 Check the Intended carry slider and Expected roll readout together: the selected carry is where the nominal straight shot lands, while finishing dots include rollout. Check the larger par/distance heading. After the tenth assessment flight, choose View assessment report; its wording should describe target decisions conversationally.
 
 The distance bar is now labeled Estimated distances, with Carry and estimated total together above the slider.
+
+After a normal practice shot, tap the rating to open the lesson. Confirm the comparison table includes next-shot/putting, rough, bunker, trees, water and OB cost components, with a calculated tradeoff in the coaching text. Assessment still hides individual coaching.
