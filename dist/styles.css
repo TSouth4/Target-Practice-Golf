@@ -162,3 +162,6 @@ button:disabled{cursor:not-allowed}
 
 .course-with-depth #aimDepthWrap label{width:100%}
 .course-with-depth #aimDepthWrap output{white-space:normal}
+
+#rolloutKey{width:100%;white-space:normal;line-height:1.35}
+@media(max-height:500px){.immersive-mode #aimDepthWrap #rolloutKey{display:none}}

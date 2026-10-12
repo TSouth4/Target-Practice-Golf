@@ -141,3 +141,7 @@ Test iPhone Safari and Android Chrome when devices are available. Mobile emulati
 Current workspace evidence is in `/workspace/browser-review/`: `results.json`, `gestures.json`, and nine screenshots. The temporary browser scripts are in `/tmp/target-practice-browser/`; they use Playwright Core with the installed system Chromium and isolated browser storage. No application dependencies were added.
 
 Milestone 1 is partially complete. Next, gather physical-phone feedback and address mobile readability first, then rerun the affected browser checks. Broader scenario generation can follow once the main practice experience is comfortable to use.
+
+## Landing and rollout markers (12.10.0)
+
+144 regression tests passed. The browser rollout script passed at 1440 px and 390 px: neutral pre-shot planned finish, hidden dispersion, zoom/full screen, review center landing/finish, retry reset, zero-roll approach, and a center flight landing in water that cannot continue its roll. A separate 844 × 390 full-screen check verified the extra key hides to preserve space for the carry bar. Screenshots were inspected for phone planning/review and landscape full screen. These are Chromium viewport checks, not physical-device or Safari certification.

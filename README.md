@@ -1,3 +1,11 @@
+# Landing and rollout markers (12.10.0)
+
+After choosing a target, a small hollow marker and short dotted line show the planned straight-line finish after rollout, before curve and misses. The carry target remains the gold ring. The distance bar includes a compact marker key; zero-roll approaches use one location. The planning aid does not reveal dispersion, a center-flight curve, hazard outcomes or an ideal target.
+
+Validation: all 144 regression tests passed. Desktop and phone browser checks covered planning, zoom, full screen, review, retry, zero-roll approaches and a water landing that stops rollout. A landscape full-screen check verified the compact carry bar.
+
+Normal shot review now distinguishes the core center flight landing from its finish. This is a deterministic illustration of the core flight, not the average of all simulated outcomes. Its rollout stops at the same water-contact position used by scoring. This fixes the previous visual marker that could continue hypothetically beyond water. Assessment still shows its example flights without center markers or individual coaching. Scores, shot distributions and baseline costs are unchanged.
+
 # Distance-and-lie reference upgrade (12.9.0)
 
 Default next-shot costs now use a documented historical PGA TOUR reference published by Mark Broadie, with separate fairway, rough, sand, recovery and putting tables. This replaces the hand-tuned distance curve and fixed hazard surcharges. Costs vary with both distance and lie; putting uses feet. Handicap still changes shot dispersion, not measured personal recovery or putting skill.
