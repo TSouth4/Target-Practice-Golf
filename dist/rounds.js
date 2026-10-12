@@ -2,7 +2,7 @@ import {random,SCENARIOS} from './model.js';
 import {generateScenario} from './practice.js';
 import {greenYardages} from './guidance.js';
 export const ROUND_KEY='target-practice-round-v1';
-export const ROUND_VERSION='rounds-v2-model-v4';
+export const ROUND_VERSION='rounds-v3-model-v5';
 const groups=[['drivable'],['cedar'],['narrow','squeeze-par4','creek-tee'],['bend','sharp-dogleg'],['creek-tee','drivable']];
 export function createRound(kind,seed,profile){
  const rng=random(seed),count=kind==='assessment'?10:5,approaches=['water','tucked','bowl','split','creek-par3','par5-open','par5-carry'],schedule=[];
@@ -21,7 +21,7 @@ export function createRound(kind,seed,profile){
  return {id:`${kind}-${seed}`,version:ROUND_VERSION,kind,seed,profile,schedule,index:0,answers:[],status:'active'};
 }
 export function readRound(raw){
- try{const r=JSON.parse(raw);if(!r||!(r.version===ROUND_VERSION||r.version==='rounds-v1-model-v3'&&r.status==='complete')||!['practice','assessment'].includes(r.kind)||!['active','complete'].includes(r.status))return null;
+ try{const r=JSON.parse(raw);if(!r||!(r.version===ROUND_VERSION||['rounds-v2-model-v4','rounds-v1-model-v3'].includes(r.version)&&r.status==='complete')||!['practice','assessment'].includes(r.kind)||!['active','complete'].includes(r.status))return null;
   if(!Number.isInteger(r.seed)||r.seed<1||r.seed>2147483646||typeof r.id!=='string'||r.id.length<1||r.id.length>60)return null;
   const count=r.kind==='assessment'?10:5;
   if(!Array.isArray(r.schedule)||r.schedule.length!==count||!Number.isInteger(r.index)||r.index<0||r.index>=count||!Array.isArray(r.answers)||r.answers.length>count)return null;

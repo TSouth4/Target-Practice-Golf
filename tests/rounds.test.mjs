@@ -38,6 +38,5 @@ test('wide driving and crossing-water layouts produce different sensible clubs f
 });
 
 test('completed previous-model reports remain readable while unfinished incompatible rounds restart',()=>{
- const r=createRound('practice',37,{handicap:'5',limit:265});for(let i=0;i<5;i++){r.index=i;addRoundAnswer(r,{kind:'balanced',score:99,regret:.01,dx:0,dy:0});}r.status='complete';r.version='rounds-v1-model-v3';
- assert.equal(readRound(JSON.stringify(r)).answers.length,5);r.status='active';assert.equal(readRound(JSON.stringify(r)),null);
+ const r=createRound('practice',37,{handicap:'5',limit:265});for(let i=0;i<5;i++){r.index=i;addRoundAnswer(r,{kind:'balanced',score:99,regret:.01,dx:0,dy:0});}for(const version of ['rounds-v1-model-v3','rounds-v2-model-v4']){r.status='complete';r.version=version;assert.equal(readRound(JSON.stringify(r)).answers.length,5);r.status='active';assert.equal(readRound(JSON.stringify(r)),null);}
 });

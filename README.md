@@ -1,3 +1,13 @@
+# Approach layup scoring correction (12.7.1)
+
+The previous linear short-game estimate underpriced 20–50 yard pitches and could recommend an 80-yard layup on a reachable 122-yard front-water approach. The off-green estimate now interpolates explicit illustrative anchors: 2.05 strokes at 0 yd, 2.40 at 20, 2.65 at 50, 2.85 at 100 and the editable baseline at 150. Beyond 150 the existing distance rate remains. These are teaching assumptions, not empirical golfer data. The model still does not simulate subsequent shots or subsequent creek-crossing risk, and requires further golfer/coach validation.
+
+A reproducible 20-handicap example (water family, seed 578, 122 yd flag) now favors a green target around 130 yd instead of an 81 yd layup. This does not force all approaches to favor the green. Header distances equal rounded ball-to-pin geometry; the 149 yd marker in the supplied screenshot was the committed target, not the flag.
+
+Validation: 131 regression tests passed, including a 4,000-shot front-water comparison and full learning/assessment UI flows. An additional 700 generated approaches had consistent flag yardages. Syntax checks passed.
+
+New progress uses decision-model-v5 and rounds-v3-model-v5. Old completed reports are preserved with a previous-model notice; unfinished old-model rounds restart so a report cannot mix scoring assumptions.
+
 # Target Practice
 
 ## Current development update: v12.7.0

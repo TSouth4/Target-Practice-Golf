@@ -1,4 +1,4 @@
-import {ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary,roundNarrative} from './rounds.js';
+import {ROUND_VERSION,ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary,roundNarrative} from './rounds.js';
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
 import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js';
 import {decisionLesson,retryImpact} from './lessons.js';
@@ -178,9 +178,9 @@ function showRoundScreen(intro=false){
  $('roundDescription').textContent=intro?'Choose targets on 10 new scenarios using your straight-shot handicap profile. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round.':'First attempts only. Retries helped you experiment and did not change this recap.';
  if(!intro){const summary=roundSummary(round);$('roundPerShot').textContent=summary.average===null?'Unavailable':'+'+summary.average.toFixed(2);$('roundPer100').textContent=summary.per100===null?'Unavailable':'+'+summary.per100.toFixed(1);$('roundScore').textContent=summary.score===null?'—':summary.score.toFixed(1)+' / 100';
  const narrative=roundNarrative(summary);$('roundTendencies').textContent=narrative.tendencies;$('roundDirections').textContent=narrative.directions;
- if(round.version!=='rounds-v2-model-v4')$('roundDirections').textContent=$('roundDirections').textContent.replaceAll('intended carry','forward target depth').replaceAll('carry-target','target-position');
+ if(round.version==='rounds-v1-model-v3')$('roundDirections').textContent=$('roundDirections').textContent.replaceAll('intended carry','forward target depth').replaceAll('carry-target','target-position');
  $('roundLimits').textContent='The per-100 number scales this round’s average modeled cost against the best sampled targets. It is not measured real-world strokes gained or a prediction of your next 100 shots. This small round suggests practice opportunities, not established habits. If a comparison is unbounded, a finite total is unavailable.';
- if(round.version!=='rounds-v2-model-v4')$('roundLimits').textContent='Previous-model report: targets used finishing distance rather than intended carry. Keep this report separate from new-model results. '+$('roundLimits').textContent;
+ if(round.version!==ROUND_VERSION)$('roundLimits').textContent='Previous-model report: scoring assumptions have changed. Keep this report separate from new-model results. '+$('roundLimits').textContent;
  if(round.kind==='assessment')$('roundDescription').textContent=`Your 10 first-attempt decisions, using the ${round.profile.handicap} handicap straight-shot profile with a ${round.profile.limit} yd distance limit. Try a learning round to test adjustments with immediate feedback. Personal clubs and unlimited practice remain available in this private pilot.`;
  }
  $('roundScreen').scrollIntoView({behavior:'auto'});$('closeRound').focus?.();save();

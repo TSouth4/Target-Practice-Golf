@@ -62,9 +62,19 @@ export function lie(p,s){if(p.x<s.bounds[0]||p.x>s.bounds[1]||p.y<0||p.y>s.maxY+
 export function remaining(p,s,c,kind=lie(p,s)){
  const d=Math.hypot(p.x-s.pin.x,p.y-s.pin.y);
  if(kind==='green')return Math.min(2.8,c.puttBase+.3*Math.log1p(d*3));
- const base=d<=150?2.05+(c.base150-2.05)*d/150:c.base150+(d-150)*c.longSlope/100;
+ const base=fairwayRemaining(d,c);
  const woods=kind==='trees'?s.hazards.find(h=>h.forest&&inPoly(p,h.poly)):null;
  return base+(c[kind]||0)*(woods?.recoveryMultiplier||1);
+}
+// Illustrative short-game anchors, not fitted player data. A pitch still needs
+// a stroke and subsequent putting; the old straight line priced it too cheaply.
+// Scale the anchors with the editable 150-yard baseline, preserving that value.
+export function fairwayRemaining(d,c){
+ if(d>150)return c.base150+(d-150)*c.longSlope/100;
+ const anchors=[[0,0],[20,1/3],[50,4/7],[100,16/21],[150,1]];
+ const distance=Math.max(0,d);
+ for(let i=1;i<anchors.length;i++){const [x,b]=anchors[i],[prev,a]=anchors[i-1];if(distance<=x)return 2.05+(c.base150-2.05)*(a+(b-a)*(distance-prev)/(x-prev));}
+ return c.base150;
 }
 export function random(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
 export function samples(n=4000,seed=7142026){const rng=random(seed),out=[];for(let i=0;i<n;i++){const r=Math.sqrt(-2*Math.log(Math.max(1e-12,rng()))),theta=2*Math.PI*rng();out.push({z1:r*Math.cos(theta),z2:r*Math.sin(theta),u:rng(),sign:rng()<.5?-1:1});}return out;}
