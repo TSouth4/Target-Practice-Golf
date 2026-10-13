@@ -170,3 +170,10 @@ button:disabled{cursor:not-allowed}
 @media(max-width:760px){.lesson-catalog{grid-template-columns:1fr}.tutorial-card{padding:12px}.tutorial-card h3{font-size:17px}.tutorial-actions button{min-height:44px}.tutorial-card-heading .text-button{font-size:10px}.tutorial-card p{font-size:12px}}
 
 #tutorialCollapse{min-height:44px;min-width:74px}
+/* Explanation cards are illustrations, not playable holes. */
+.tutorial-mode .lesson-intro{display:none}
+.tutorial-explaining .course-panel > :not(#tutorialCard){display:none!important}
+.tutorial-explaining .tutorial-card{max-width:760px;margin:20px auto;padding:24px}
+.tutorial-illustration svg{display:block;width:100%;max-height:390px;background:#f5f4e9;border-radius:12px}
+.tutorial-illustration .micro{text-align:center}
+@media(max-width:600px){.tutorial-explaining .tutorial-card{padding:16px;margin:8px auto}.tutorial-illustration svg{min-height:205px}}

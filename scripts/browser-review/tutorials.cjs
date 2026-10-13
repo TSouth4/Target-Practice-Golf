@@ -10,7 +10,7 @@ const assert=require('node:assert/strict');
   for(let i=0;i<CURRICULUM.length;i++){
    await page.locator('#lessonStart'+(i+1)).click();await page.waitForFunction(()=>!document.getElementById('tutorialNext').disabled);
    if(i===0){assert.match(await page.locator('#tutorialText').innerText(),/third shot/);assert.equal(await page.locator('#lessonTargetHint').count(),0);await page.locator('#tutorialCollapse').click();assert.equal(await page.locator('#tutorialBody').isVisible(),false);await page.locator('#tutorialCollapse').click();}
-   for(let j=0;j<CURRICULUM[i].intro.length;j++)await page.locator('#tutorialNext').click();
+   for(let j=0;j<CURRICULUM[i].intro.length;j++){assert.equal(await page.locator('#simulate').isVisible(),false);assert.equal(await page.locator('#course').isVisible(),false);assert.equal(await page.locator('#tutorialIllustration svg').getAttribute('data-lesson-topic'),CURRICULUM[i].intro[j].topic);await page.screenshot({path:`${process.env.TARGET_PRACTICE_REVIEW_OUTPUT||'/tmp'}/lesson-explain-${i+1}-${j+1}-${width}.png`});await page.locator('#tutorialNext').click();}
    const hint=await page.locator('#lessonTargetHint').evaluate(e=>({x:Number(e.dataset.targetX),carry:Number(e.dataset.targetCarry)}));
    assert.equal(await page.locator('#yourContour').count(),0);
    await page.screenshot({path:`${process.env.TARGET_PRACTICE_REVIEW_OUTPUT||'/tmp'}/lesson-guided-${i+1}-${width}.png`});
@@ -18,10 +18,6 @@ const assert=require('node:assert/strict');
    for(const [id,value] of [['aimY',Math.round(hint.carry)],['aimX',hint.x]])await page.locator('#'+id).evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));},value);
    await page.locator('#simulate').click();await page.waitForFunction(()=>document.getElementById('tutorialTitle').textContent.startsWith('Success'));
    assert.equal(await page.locator('#results').isVisible(),false);if(i===3)assert.match(await page.locator('#tutorialMessage').innerText(),/Bunker exposure/);
-   await page.locator('#tryAgain').click();await page.waitForFunction(()=>!document.getElementById('aimX').disabled);
-   assert.equal(await page.locator('#lessonTargetHint').count(),0);assert.equal(await page.locator('#idealCloud').count(),0);
-   await page.locator('#aimX').evaluate(e=>{e.value=2;e.dispatchEvent(new Event('input',{bubbles:true}));});
-   await page.locator('#simulate').click();await page.locator('#results').waitFor({state:'visible',timeout:60000});
    await page.locator('#tryAgain').click();await page.locator('#tutorialRecap').waitFor({state:'visible'});assert.match(await page.locator('#tutorialRecapTitle').innerText(),/Lesson complete/);
    await page.locator('#tutorialReview').click();assert.equal(await page.locator('#decisionLesson').isVisible(),true);await page.locator('#tryAgain').click();
    const progress=await page.evaluate(()=>JSON.parse(localStorage.getItem('target-practice-lessons-v1')));assert.ok(progress.completed.includes(CURRICULUM[i].id));

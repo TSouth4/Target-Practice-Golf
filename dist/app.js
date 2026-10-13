@@ -1,3 +1,4 @@
+import {tutorialGraphic} from './tutorial-graphics.js';
 import {CURRICULUM,CURRICULUM_VERSION,LESSON_KEY,LESSON_PROFILE,lessonById,lessonFixture,nearLessonTarget,readLessonCompletion} from './curriculum.js';
 import {plannedRollout,centerFlight} from './rollout.js';
 import {ROUND_VERSION,ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummary,roundNarrative} from './rounds.js';
@@ -172,14 +173,14 @@ function closeLessons(){
 async function startTutorial(id){
  if(working)return;const definition=lessonById(id);if(!definition)return;if(!tutorialReturn)openLessons();
  round=null;roundView=false;progressOpen=false;lessonScreenOpen=false;state.mode='basic';state.practiceMode='free';state.basicHandicap=LESSON_PROFILE.handicap;state.basicLimits[LESSON_PROFILE.handicap]=LESSON_PROFILE.limit;state.costs={...DEFAULT_COSTS};
- tutorial={id,stage:'intro',index:0,collapsed:false,guide:null,guidedAnswer:null,independentAnswer:null};$('lessonsScreen').hidden=true;$('practiceScreen').hidden=false;await loadTutorialFixture();
+ tutorial={id,stage:'intro',index:0,collapsed:false,guide:null,guidedAnswer:null};$('lessonsScreen').hidden=true;$('practiceScreen').hidden=false;await loadTutorialFixture();
 }
 async function loadTutorialFixture(){
- const definition=lessonById(tutorial.id),fixture=lessonFixture(definition,tutorial.stage==='independent');resetAimZoom();retryBaseline=null;retryHint='';tutorial.guide=null;tutorial.error=false;tutorial.collapsed=immersive;
+ const definition=lessonById(tutorial.id),fixture=lessonFixture(definition);resetAimZoom();retryBaseline=null;retryHint='';tutorial.guide=null;tutorial.error=false;tutorial.collapsed=immersive;
  state.scenario=fixture.id;state.holeSeed=fixture.seed;state.seed=fixture.drawSeed;state.landscape='woodland';state.encounter=`lesson-${tutorial.id}-${tutorial.stage}`;state.pattern=basic();state.aim=fitTarget({x:0,y:scene().aimY},state.pattern);hasAim=false;dirty();
  working=true;updateLabels();
  try{const key=`${fixture.id}:${fixture.seed}:${fixture.drawSeed}`;let prepared=tutorialCache.get(key);
-  if(!prepared){const s=scene(),p={...state.pattern},zs=samples(4000,fixture.drawSeed),referenceAim=fitTarget(s.type==='tee'?{x:0,y:250}:s.pin,p),reference=evaluate(referenceAim,patternAtTarget(referenceAim,p),s,DEFAULT_COSTS,zs);
+  if(!prepared){const s=scene(),p={...state.pattern},zs=samples(4000,fixture.drawSeed),referenceAim=fitTarget(definition.reference||(s.type==='tee'?{x:0,y:250}:s.pin),p),reference=evaluate(referenceAim,patternAtTarget(referenceAim,p),s,DEFAULT_COSTS,zs);
    prepared={...await optimizeTargets(referenceAim,p,s,DEFAULT_COSTS,zs,()=>wait(0)),reference};tutorialCache.set(key,prepared);}
   if(!Number.isFinite(prepared.result.expected))throw new Error('No usable lesson target');tutorial.guide=prepared;
  }catch(error){console.error(error);tutorial.error=true;toast('Could not prepare this lesson. Leave it and try again.');}
@@ -189,43 +190,44 @@ function tutorialAnswer(){return{expected:result.expected,regret:Math.max(0,resu
 async function advanceTutorial(){
  if(working||!tutorial?.guide)return;const definition=lessonById(tutorial.id);
  if(tutorial.stage==='intro'){if(tutorial.index<definition.intro.length-1){tutorial.index++;updateLabels();}else{tutorial.stage='guided';tutorial.collapsed=immersive;hasAim=false;dirty();}}
- else if(tutorial.stage==='guided'&&result){tutorial.guidedAnswer=tutorialAnswer();tutorial.stage='independent';await loadTutorialFixture();}
- else if(tutorial.stage==='independent'&&result){tutorial.independentAnswer=tutorialAnswer();finishTutorial();}
+ else if(tutorial.stage==='guided'&&result){tutorial.guidedAnswer=tutorialAnswer();finishTutorial();}
 }
 async function backTutorial(){
  if(working||!tutorial)return;
  if(tutorial.stage==='intro'){tutorial.index=Math.max(0,tutorial.index-1);updateLabels();}
- else if(tutorial.stage==='guided'){tutorial.stage='intro';tutorial.index=lessonById(tutorial.id).intro.length-1;hasAim=false;dirty();}
- else{tutorial.stage='guided';tutorial.independentAnswer=null;await loadTutorialFixture();}
+ else if(tutorial.stage==='guided'){leaveFullscreen();tutorial.collapsed=false;tutorial.stage='intro';tutorial.index=lessonById(tutorial.id).intro.length-1;hasAim=false;dirty();}
 }
 function finishTutorial(){
- leaveFullscreen();const definition=lessonById(tutorial.id),answer=tutorial.independentAnswer;lessonCompleted=[...new Set([...lessonCompleted,tutorial.id])];
+ leaveFullscreen();const definition=lessonById(tutorial.id);lessonCompleted=[...new Set([...lessonCompleted,tutorial.id])];
  try{localStorage.setItem(LESSON_KEY,JSON.stringify({version:CURRICULUM_VERSION,completed:lessonCompleted}));lessonStorageOK=true;}catch{lessonStorageOK=false;}
  $('lessonStorage').textContent=lessonStorageOK?'Completion is saved in this browser.':'Completed for this visit, but browser saving is unavailable.';
  lessonScreenOpen=true;$('practiceScreen').hidden=true;$('lessonsScreen').hidden=false;$('lessonCatalog').hidden=true;$('tutorialRecap').hidden=false;
  $('tutorialRecapTitle').textContent='Lesson complete: '+definition.title;
- $('tutorialRecapText').textContent=`You followed the suggested target, then made your own choice on a different fixed example. Your independent choice: ${RATING_LABELS[answer.kind].toLowerCase()}. It cost ${Number.isFinite(answer.regret)?answer.regret.toFixed(2):'an unbounded amount of'} extra modeled strokes against the best sampled target. ${answer.kind==='balanced'?'You found a similar balance of proximity and risk.':'Review the shot explanation or repeat the lesson to test another idea.'}`;
+ $('tutorialRecapText').textContent='You followed the target and saw how its whole shot pattern handled this hole. Keep this idea in mind when you play a learning round or practice on your own.';
  $('tutorialRecapPrinciple').textContent='Remember: '+definition.principle;$('tutorialRepeat').dataset.lesson=tutorial.id;$('tutorialCard').hidden=true;updateLabels();$('lessonsScreen').scrollIntoView({behavior:'auto'});$('tutorialCatalog').focus?.();
 }
 function updateTutorialControls(){
  for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu'])$(id).disabled=working||!!tutorialReturn;$('lessonsMenu').disabled=working;
  $('appRoot').classList.toggle('tutorial-mode',!!tutorial&&!lessonScreenOpen);
  $('tutorialCard').hidden=!tutorial||lessonScreenOpen;
+ $('appRoot').classList.toggle('tutorial-explaining',!!tutorial&&!lessonScreenOpen&&tutorial.stage==='intro');
  if(tutorialReturn){for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','progressMenu'])$(id).disabled=true;}
  if(!tutorial||lessonScreenOpen)return;
  const definition=lessonById(tutorial.id),intro=tutorial.stage==='intro',guided=tutorial.stage==='guided',exposure=definition.id==='green'?'bunker':'water';
  for(const id of ['basicHandicap','driverLimit','driverLimitReset','teeTab','approachTab','mixedTab'])$(id).disabled=true;
  if(intro||!tutorial.guide){for(const id of ['aimX','aimY','simulate'])$(id).disabled=true;}
  $('tutorialBody').hidden=tutorial.collapsed;$('tutorialCollapse').textContent=tutorial.collapsed?'Show instructions':'Hide instructions';$('tutorialCollapse').setAttribute('aria-expanded',!tutorial.collapsed);
- $('tutorialStep').textContent=`${definition.title} · ${intro?`Explain ${tutorial.index+1} / ${definition.intro.length}`:guided?'Guided practice':'Independent practice'}`;
- $('tutorialTitle').textContent=intro?definition.intro[tutorial.index].title:guided?(result?'Success: you followed the target idea':'Follow the highlighted target'):(result?'Review your independent decision':'Now choose without a hint');
- $('tutorialText').textContent=intro?definition.intro[tutorial.index].text:guided?definition.idea:result?'Read the outcomes and calculated tradeoff below. Then finish the lesson, or go back to revisit the guided example.':'Use what you learned on this different example. Choose direction and intended carry, commit, then read the explanation. There is no suggested target until after your decision.';
+ $('tutorialStep').textContent=`${definition.title} · ${intro?`Explain ${tutorial.index+1} / ${definition.intro.length}`:'Guided practice'}`;
+ $('tutorialTitle').textContent=intro?definition.intro[tutorial.index].title:(result?'Success: you followed the target idea':'Follow the highlighted target');
+ $('tutorialIllustration').hidden=!intro;if(intro)$('tutorialIllustration').innerHTML=tutorialGraphic(definition.intro[tutorial.index].topic,scene(),tutorial.guide?.aim);
+ $('tutorialText').textContent=intro?definition.intro[tutorial.index].text:definition.idea;
  $('tutorialTarget').textContent=guided&&tutorial.guide?`Set carry to ${Math.round(tutorial.guide.pattern.carry)} yd, then aim ${sided(tutorial.guide.aim.x)}. Use the highlighted area as your guide.`:'';
  $('tutorialMessage').textContent=tutorial.error?'Could not prepare this lesson. Leave it and try again.':!tutorial.guide?'Preparing this fixed example…':guided&&result?`You followed the target strategy. Some simulated shots can still find trouble; success is about the choice, not a guaranteed safe ball. ${exposure==='bunker'?'Bunker':'Water'} exposure for your target: ${(result.counts[exposure]/result.n*100).toFixed(1)}%, compared with ${(tutorial.guide.reference.counts[exposure]/tutorial.guide.reference.n*100).toFixed(1)}% at the example’s ${scene().type==='tee'?'longer target':'flag target'}.`:guided&&hasAim?(nearLessonTarget(state.aim,tutorial.guide.aim)?'You are in the suggested area. Commit to try it.':'Move closer to the highlighted target, using both aim and carry controls.') :'';
- $('tutorialNext').disabled=working||!tutorial.guide||(!intro&&!result);$('tutorialNext').textContent=intro?(tutorial.index===definition.intro.length-1?'Try the guided example':'Next'):guided?'Try without a hint':'Finish lesson';
+ if(guided&&result&&definition.id==='distance')$('tutorialMessage').textContent=`The shorter 190 yd choice is safer, but leaves a longer approach. Your longer choice trades a little safety for an easier next shot. Here it saves about ${Math.max(0,tutorial.guide.reference.expected-result.expected).toFixed(2)} modeled strokes per shot (${Math.round(Math.max(0,tutorial.guide.reference.expected-result.expected)*100)} per 100 shots). This is an example, not a promise about your score.`;
+ $('tutorialNext').disabled=working||!tutorial.guide||(!intro&&!result);$('tutorialNext').textContent=intro?(tutorial.index===definition.intro.length-1?'Try the guided example':'Next'):'Finish lesson';
  $('tutorialBack').disabled=working||intro&&tutorial.index===0;$('tutorialExit').disabled=working;$('tutorialCollapse').disabled=working;
  if(guided&&result){$('results').hidden=true;$('feedbackToggle').hidden=true;}
- if(result){$('tryAgain').hidden=false;$('tryAgain').innerHTML=guided?'Try without a hint':'Finish lesson';}
+ if(result){$('tryAgain').hidden=false;$('tryAgain').innerHTML='Finish lesson';}
  $('retryThisHole').hidden=true;$('newShots').hidden=true;
 }
 $('lessonsMenu').addEventListener('click',openLessons);$('closeLessons').addEventListener('click',closeLessons);
@@ -361,6 +363,7 @@ function ringPoints(cx,cy,rx,ry,n=64){return Array.from({length:n},(_,i)=>[cx+Ma
 function line(a,b,attrs=''){const x=project(a),y=project(b);return `<line x1="${x.x}" y1="${x.y}" x2="${y.x}" y2="${y.y}" ${attrs}/>`;}
 function textAt(x,y,label,attrs=''){const p=project({x,y});return `<text x="${p.x}" y="${p.y}" ${attrs}>${label}</text>`;}
 function drawCourse(){
+ const focus=kind=>!!tutorial&&!lessonScreenOpen&&tutorial.stage==='guided'&&lessonById(tutorial.id).focus.includes(kind);
  const s=scene(),p=state.pattern,map=state.view==='map'||phase==='zooming',theme=landscape();
  let html=`<defs><linearGradient id="sky" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="-150" y2="235"':'y2="1"'}><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="235" y2="580"':'y2="1"'}><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
  if(map){const c=analysisCamera();html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="${theme.ground}"/><rect width="960" height="580" fill="${theme.ground}"/>`;for(let x=-140;x<=160;x+=20)html+=line({x,y:c.minY-20},{x,y:c.maxY+20},'stroke="#b4c69c" stroke-width="1"');for(let y=Math.floor(c.minY/10)*10;y<c.maxY+20;y+=10)html+=line({x:-140,y},{x:160,y},'stroke="#b4c69c" stroke-width="1"');}
@@ -378,9 +381,10 @@ function drawCourse(){
  if(map){const c=analysisCamera();for(let y=Math.ceil(c.minY/10)*10;y<c.maxY;y+=10){const at=project({x:c.centerX-450/c.scale,y});html+=`<text x="30" y="${at.y}" fill="#87977a" font-size="9" font-family="Arial">${y} yd</text>`;}}
  // Teaching overlays keep exact hazard edges visible without revealing shot patterns.
  html+='<g id="hazardEdges" fill="none" stroke-linejoin="round">';
+ for(const h of s.hazards.filter(h=>focus(h.kind)&&['water','trees'].includes(h.kind)))html+=`<polygon data-tutorial-focus="${h.kind}" points="${polygon(h.poly)}" stroke="${h.kind==='water'?'#24cfe1':'#294f31'}" stroke-width="6"/>`;
  // Water already has a shoreline in the relief renderer; a second bright outline looks artificial.
- for(const h of s.hazards.filter(h=>h.kind==='bunker'))html+=`<polygon points="${polygon(h.poly)}" stroke="#fff1c7" stroke-width="${map?1:3}"/><polygon points="${polygon(h.poly)}" stroke="#99703d" stroke-width="1.3"/>`;
- for(const bx of s.bounds)html+=line({x:bx,y:25},{x:bx,y:s.maxY},'stroke="#c15a4f" stroke-width="2" stroke-dasharray="8 7" opacity=".75"');
+ for(const h of s.hazards.filter(h=>h.kind==='bunker'))html+=`<polygon points="${polygon(h.poly)}" stroke="${focus('bunker')?'#c68d31':'#fff1c7'}" stroke-width="${focus('bunker')?7:map?1:3}" data-tutorial-focus="${focus('bunker')?'bunker':''}"/><polygon points="${polygon(h.poly)}" stroke="#99703d" stroke-width="1.3"/>`;
+ for(const bx of s.bounds)html+=line({x:bx,y:25},{x:bx,y:s.maxY},`stroke="#c15a4f" stroke-width="${focus('ob')?6:2}" stroke-dasharray="8 7" opacity=".75"`);
  html+='</g>';
  const callouts=hazardCallouts(s,state.landscape);
  const terrainHazards=s.hazards.filter(h=>['water','bunker'].includes(h.kind));
