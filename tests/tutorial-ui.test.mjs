@@ -24,3 +24,13 @@ test('guided lesson teaches costs, requires its target, uses read-only illustrat
  await $('closeLessons').fire('click');assert.deepEqual(JSON.parse(dom.storage.get(ROUND_KEY)),originalRound);const restored=JSON.parse(dom.storage.get('golfaim101-v2'));assert.equal(restored.basicHandicap,originalState.basicHandicap);assert.deepEqual(restored.memberBag,originalState.memberBag);assert.ok($('results').hidden);assert.ok($('tutorialCard').hidden);assert.equal($('practiceRoundMenu').disabled,false);assert.equal($('assessmentMenu').disabled,false);assert.equal($('freePracticeMenu').disabled,false);
  await $('lessonsMenu').fire('click');assert.match($('lessonStatus1').textContent,/Completed/);await $('closeLessons').fire('click');
 });
+test('lesson menus allow switching modes from explanations and a paused assessment catalog',async()=>{
+ const menuIds=['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','progressMenu'];
+ await $('lessonsMenu').fire('click');for(const id of menuIds)assert.equal($(id).disabled,false,id+' at catalog');
+ await $('lessonStart1').fire('click');for(const id of menuIds)assert.equal($(id).disabled,false,id+' during explanation');
+ await $('freePracticeMenu').fire('click');assert.ok($('tutorialCard').hidden);assert.ok($('lessonsScreen').hidden);assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).basicHandicap,'20');assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).practiceMode,'free');
+ await $('startAssessment').fire('click');assert.equal(JSON.parse(dom.storage.get(ROUND_KEY)).kind,'assessment');assert.equal($('basicMode').disabled,true);
+ await $('lessonsMenu').fire('click');for(const id of menuIds)assert.equal($(id).disabled,false,id+' in catalog over assessment');
+ await $('basicMode').fire('click');assert.ok($('lessonsScreen').hidden);assert.equal(JSON.parse(dom.storage.get(ROUND_KEY)),null);assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).practiceMode,'free');
+ await $('startAssessment').fire('click');await $('lessonsMenu').fire('click');await $('advancedMode').fire('click');assert.ok(!$('shotEditor').hidden);await $('saveEditor').fire('click');assert.ok($('shotEditor').hidden);assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).mode,'advanced');assert.equal(JSON.parse(dom.storage.get(ROUND_KEY)),null);
+});

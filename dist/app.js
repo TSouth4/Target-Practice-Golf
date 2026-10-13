@@ -207,11 +207,11 @@ function finishTutorial(){
  $('tutorialRecapPrinciple').textContent='Remember: '+definition.principle;$('tutorialRepeat').dataset.lesson=tutorial.id;$('tutorialCard').hidden=true;updateLabels();$('lessonsScreen').scrollIntoView({behavior:'auto'});$('tutorialCatalog').focus?.();
 }
 function updateTutorialControls(){
- for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu'])$(id).disabled=working||!!tutorialReturn;$('lessonsMenu').disabled=working;
+ for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu'])$(id).disabled=working;$('lessonsMenu').disabled=working;
  $('appRoot').classList.toggle('tutorial-mode',!!tutorial&&!lessonScreenOpen);
  $('tutorialCard').hidden=!tutorial||lessonScreenOpen;
  $('appRoot').classList.toggle('tutorial-explaining',!!tutorial&&!lessonScreenOpen&&tutorial.stage==='intro');
- if(tutorialReturn){for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','progressMenu'])$(id).disabled=true;}
+ if(tutorialReturn){for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','progressMenu'])$(id).disabled=working;}
  if(!tutorial||lessonScreenOpen)return;
  const definition=lessonById(tutorial.id),intro=tutorial.stage==='intro',guided=tutorial.stage==='guided',exposure=definition.id==='green'?'bunker':'water';
  for(const id of ['basicHandicap','driverLimit','driverLimitReset','teeTab','approachTab','mixedTab'])$(id).disabled=true;
@@ -325,7 +325,7 @@ document.addEventListener?.('keydown',event=>{if(event.key==='Escape'&&immersive
 globalThis.addEventListener?.('resize',()=>{if(immersive)updateLabels();});
 function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionVerdict').setAttribute('aria-expanded',false);progressMessage='';landingCamera=null;syncTargetDistance();phase='choose';traceShots=[];transition=null;result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;save();updateLabels();drawCourse();}
 function setScenario(id,holeSeed=0){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=nextLandscape(state.landscape,holeSeed);state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
-function setMode(mode){if(working||round?.kind==='assessment'&&round.status==='active')return;if(tutorialReturn)closeLessons();round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
+function setMode(mode,allowAssessmentExit=false){if(working||(!tutorialReturn&&!allowAssessmentExit&&round?.kind==='assessment'&&round.status==='active'))return;if(tutorialReturn)closeLessons();round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
  if(tutorialReturn)closeLessons(); if(working)return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
@@ -343,7 +343,7 @@ function renderEditor(keepInput=null){
  $('editorStatus').textContent=editorInvalid.size?'Check your entries before saving. Carry: 50–330 yd; roll: 0–40 yd. Other settings must be within their control limits.':'Save applies all club edits and starts a fresh target choice. Back discards these edits.';
 }
 function closeEditor(){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;$('practiceScreen').hidden=false;updateControls();$('practiceScreen').scrollIntoView({behavior:'auto'});}
-function saveEditor(){if(!editorDraft||editorInvalid.size)return;state.memberBag=cleanMemberBag(editorDraft,basic());closeEditor();setMode('advanced');toast('My shot saved. Choose a target to see how it plays.');}
+function saveEditor(){if(!editorDraft||editorInvalid.size)return;state.memberBag=cleanMemberBag(editorDraft,basic());closeEditor();setMode('advanced',true);toast('My shot saved. Choose a target to see how it plays.');}
 function editorPoint(svg,e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const ct=svg.getScreenCTM();return ct?p.matrixTransform(ct.inverse()):null;}
 function dragEditor(id,e){if(!editorDraft||!editorDrag||editorInvalid.size)return;const at=editorPoint($(id),e);if(!at)return;let p=editorPattern();p=editorDrag==='height'?{...p,height:Math.round(clamp((166-at.y)/2.4,5,50))}:moveFlightHandle(p,editorDrag,(at.x-300)/FLIGHT_PIXEL);changeDraft(p);renderEditor();}
 function practiceFilter(filter){if(working)return;state.practiceFilter=filter;if(filter!=='mixed'&&scene().type!==filter){state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,filter,state.seed,state.recent),state.seed);}else{save();updateLabels();}}

@@ -1,4 +1,4 @@
-# Publish v13.2.0 in the existing Work project
+# Publish v13.2.1 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -35,3 +35,7 @@ Validation for 13.1.0: syntax checks and all 149 automated tests passed. Two fin
 For 13.2.0, check Lesson 1 slide 5 and Lesson 2 slide 1: gold patterns are centered at the flag and blue patterns at the recommended target, with calculated water rates. Lesson 2 slide 2 is a dartboard analogy without a drop marker. Lesson 3 has two distinct historical-reference examples (100/150, then 50/100/150/200), with a source link. Lesson 4 now has three explanation slides: wider long-iron spread, wedge/long-iron targets on the same green, and short side/fat side. Verify Next reaches guided practice after the third slide and Back from fullscreen opens the explanation normally. Deploy the full matching dist, including the benchmark, curriculum and graphics modules.
 
 Validation for 13.2.0: syntax checks and all 151 automated tests passed. Five focused curriculum/graphics tests passed again after final wording, rounding and source-caption changes. All four full lesson flows passed Chromium at 1440 px and 390 px; illustrations were visually reviewed, target enforcement and recap/review/completion worked, and regular round/settings/history were preserved. Lesson 4 fullscreen and return to the explanation passed at 390 × 900 and 844 × 390. Pattern tests verify actual flag/recommended centers, symmetric contours and matching full-sample water rates; distance tests verify the reference values and near-equal first two increments. Physical-device and Safari/Firefox testing remains outstanding.
+
+For 13.2.1, open Menu from the lesson catalog, explanation, guided shot or recap. All six mode/navigation options must be available after the lesson has prepared. Select a mode and verify it exits Lessons and restores the previous player profile. Include a catalog opened over a paused assessment; Customize my Shot → Save must enter member practice, while editor Back keeps the restored session.
+
+Validation for 13.2.1: syntax checks and six focused regression tests passed (lesson flow/navigation, five-shot learning rounds, ten-shot assessments, current custom settings and legacy personal-club migration). Chromium passed all six menu routes from both the lesson catalog over a paused assessment and a lesson explanation, at 1440 px and 390 px (24 transitions). It verified enabled menu items, destination screens, tutorial exit, restored 20-handicap settings and successful custom-club saving. No browser errors occurred.

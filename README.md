@@ -1,4 +1,6 @@
-# Lesson target comparisons (13.2.0)
+# Lesson target comparisons (13.2.1)
+
+The lesson menu now allows direct switching to Learning round, Assessment, Unlimited practice, Customize my Shot, the free profile and My progress. Switching restores the previous practice profile before entering the selected screen. The lesson catalog also permits switching when an assessment was paused. Saving custom clubs after that switch starts member practice; Back from the editor keeps the restored session.
 
 Menu → Lessons keeps four fixed lessons with read-only explanations, a guided target and a recap. Explanation slides hide Commit and course controls; independent practice stays in the other game modes. Lessons restore the prior practice settings/round/review and do not affect normal progress. Existing completed lesson IDs remain completed.
 
