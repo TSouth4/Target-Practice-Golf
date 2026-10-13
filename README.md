@@ -1,6 +1,12 @@
+# Custom shot and menu refinement (15.1.0)
+
+The menu has one **Create your custom shot** item. Save and Reset remain on that page. The preview now looks directly down the target line, with aligned launch/target positions, a golfer at address and a smooth two-part flight arc. The explanation asks golfers to match their usual flight and finish so practice can teach an appropriate aim adjustment.
+
+The menu works from the editor, progress, lesson screens, assessment, learning rounds and course scorecards. Switching pages discards unsaved shot edits while preserving the saved bag. Navigation remains temporarily locked during shot/lesson processing. Leaving an assessment does not reveal its hidden individual feedback.
+
 # Simple shot profile (15.0.0)
 
-Menu → Edit my shot, or the shortcut beside the player controls, opens one flight illustration with a golfer at address. Drag the red apex left/right to change the start and bend while keeping the finish; drag it up/down for illustrative height. Drag the blue finish left/right while keeping the start line. Plain captions describe the result. Reset shot shape restores straight flight without erasing distances or dispersion settings.
+Menu → Create your custom shot, or the shortcut beside the player controls, opens one flight illustration with a golfer at address. Drag the red apex left/right to change the start and bend while keeping the finish; drag it up/down for illustrative height. Drag the blue finish left/right while keeping the start line. Plain captions describe the result. Reset shot shape restores straight flight without erasing distances or dispersion settings.
 
 The usual shape applies across all ten clubs by default. Club distances and detailed settings remain optional in a folded section. Save & play activates the saved profile; Cancel changes discards the draft. The selected standard/custom profile survives reload. New learning rounds, assessments and par-3 courses use the selected profile. A paused round keeps its original club snapshot, even if the saved profile is edited afterward.
 
@@ -210,7 +216,7 @@ Choose direction on the standing-eye POV and depth along that heading on the ter
 
 ## Member preview
 
-Menu → Edit my shot opens a single flight illustration. The red apex adjusts start, bend and illustrative height; the blue finish changes the endpoint while preserving the start. Keyboard arrow controls and optional sliders provide alternatives. See [SHOT-PROFILE.md](SHOT-PROFILE.md) for the mean-flight equations and limits.
+Menu → Create your custom shot opens a single flight illustration. The red apex adjusts start, bend and illustrative height; the blue finish changes the endpoint while preserving the start. Keyboard arrow controls and optional sliders provide alternatives. See [SHOT-PROFILE.md](SHOT-PROFILE.md) for the mean-flight equations and limits.
 
 Each of ten clubs stores carry, rollout, core σ on both axes, shaped start and curve, usual miss bias, lateral/distance correlation, height and an occasional big-miss mixture. The default editor applies the usual shape across clubs, scaling lateral shape with carry. Opening detailed settings or choosing another club switches to individual-club editing. Cancel discards the entire draft; Save applies it and starts a fresh target choice. Empty or out-of-range numerical entries block Save and club changes. Saved older Advanced lab settings migrate into the matching club. Reload preserves the selected profile and member bag. Free settings and member scoring costs remain separate.
 

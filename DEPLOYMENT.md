@@ -1,4 +1,4 @@
-# Publish v15.0.0 in the existing Work project
+# Publish v15.1.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -51,3 +51,7 @@ Validation for 14.0.0: syntax checks and all 158 automated tests passed on the f
 For 15.0.0, deploy the entire matching dist, including shot-editor.js, rounds.js and course.js. Check Edit my shot on desktop and phone: red apex moves horizontally and vertically, blue finish moves horizontally while keeping the start, Reset restores straight flight, and Save & play applies the shape across clubs. Detailed club settings should initially be folded. Verify keyboard arrows, Cancel, reload, and new learning/assessment/course profiles. A resumed course must retain its original custom bag after the saved profile changes.
 
 Validation for 15.0.0: syntax checks and all 161 automated tests passed. Chromium passed mouse controls at 1440 px and touch controls at 390 px and 320 px, including shared club shape, reset, save/reload, learning-round and course snapshots, and no browser errors or horizontal overflow. A separate browser check verified keyboard apex direction/height and finish control. Screenshots were visually reviewed. Physical-device and Safari/Firefox testing remain outstanding.
+
+For 15.1.0, deploy the complete matching dist. The dropdown must contain only one custom-shot item, Create your custom shot. Open the menu from the editor, progress, lessons, assessment intro/active test, learning round, par-3 course and scorecard; each destination should replace the previous screen. Leaving the editor through the menu discards drafts. Check the aligned down-the-line preview, smoother flight arc, beginner explanation, Save and Reset, plus mouse/touch/keyboard controls.
+
+Validation for 15.1.0: syntax checks and all 162 automated tests passed. Chromium verified all eight menu destinations from nine screens at both 1440 px and 390 px (144 transitions): editor, progress, lesson catalog/explanation, learning round, assessment intro/active test, course and scorecard. It checked replaced screens, enabled destinations, discarded drafts, removed duplicate item and no browser errors. Flight editing, reset, save/reload and new-game profile snapshots passed mouse checks at 1440 px and touch checks at 390/320 px. Revised screenshots were visually reviewed. Physical-device and Safari/Firefox testing remain outstanding.
