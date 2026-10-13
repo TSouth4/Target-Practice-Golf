@@ -1,3 +1,11 @@
+# Scenic environments (13.3.0)
+
+Mountain valley, Lakeside and Oceanfront join the automatic environment mix, alongside woodland, Pacific Coast and desert. Mountain scenery includes layered peaks, snow caps and evergreen silhouettes. Lake scenery includes distant wooded hills and calm-water reflections; ocean scenery includes an open sea horizon, dunes and small sails. Each setting has its own sky, water, turf and vegetation palette, with its name below the hole heading.
+
+This is a visual update: mountains do not change carry, elevation, terrain physics or scoring. Lakeside/ocean settings are selected only when the generated hole already has water along its side. Existing playable water polygons, relief, callouts and penalties remain scored by the same model; distant background water lies outside the playable scene. No new water footprints or drop rules are introduced. New scenery appears in regular practice and rounds; fixed lessons retain woodland. Retry retains the setting, and round slots now store it so a reload preserves the same scenery.
+
+Validation and deployment checks are recorded in DEPLOYMENT.md.
+
 # Lesson target comparisons (13.2.1)
 
 The lesson menu now allows direct switching to Learning round, Assessment, Unlimited practice, Customize my Shot, the free profile and My progress. Switching restores the previous practice profile before entering the selected screen. The lesson catalog also permits switching when an assessment was paused. Saving custom clubs after that switch starts member practice; Back from the editor keeps the restored session.

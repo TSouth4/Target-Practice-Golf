@@ -8,7 +8,7 @@ test('five-shot learning round supports retry without replacing the original rec
  await commit();const first=session().answers[0];await $('retryThisHole').fire('click');await commit(10);
  assert.equal(session().answers.length,1);assert.deepEqual(session().answers[0],first);
  await $('tryAgain').fire('click');assert.equal(session().index,1);
- const old=dom;dom=setupDOM();$=dom.$;for(const [key,value]of old.storage)dom.storage.set(key,value);await import('../dist/app.js?rounds-resume');assert.equal(session().index,1);assert.equal(session().answers.length,1);
+ const oldStyle=JSON.parse(dom.storage.get('golfaim101-v2')).landscape;assert.equal(session().schedule[session().index].landscape,oldStyle);const old=dom;dom=setupDOM();$=dom.$;for(const [key,value]of old.storage)dom.storage.set(key,value);await import('../dist/app.js?rounds-resume');assert.equal(session().index,1);assert.equal(session().answers.length,1);assert.equal(JSON.parse(dom.storage.get('golfaim101-v2')).landscape,oldStyle);
  for(let i=1;i<5;i++){await commit();await $('tryAgain').fire('click');}
  assert.equal(session().status,'complete');assert.equal(session().answers.length,5);assert.ok(!$('roundReport').hidden);assert.ok($('practiceScreen').hidden);
 });

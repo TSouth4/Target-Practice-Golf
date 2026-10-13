@@ -1,4 +1,4 @@
-# Publish v13.2.1 in the existing Work project
+# Publish v13.3.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -39,3 +39,7 @@ Validation for 13.2.0: syntax checks and all 151 automated tests passed. Five fo
 For 13.2.1, open Menu from the lesson catalog, explanation, guided shot or recap. All six mode/navigation options must be available after the lesson has prepared. Select a mode and verify it exits Lessons and restores the previous player profile. Include a catalog opened over a paused assessment; Customize my Shot → Save must enter member practice, while editor Back keeps the restored session.
 
 Validation for 13.2.1: syntax checks and six focused regression tests passed (lesson flow/navigation, five-shot learning rounds, ten-shot assessments, current custom settings and legacy personal-club migration). Chromium passed all six menu routes from both the lesson catalog over a paused assessment and a lesson explanation, at 1440 px and 390 px (24 transitions). It verified enabled menu items, destination screens, tutorial exit, restored 20-handicap settings and successful custom-club saving. No browser errors occurred.
+
+For 13.3.0, publish the entire matching dist, including landscape.js, practice.js, app.js and HTML/CSS. Mountain valley, Lakeside and Oceanfront join the random mix; lake/ocean are offered only on layouts with scored side water. Check backgrounds, readable environment names, hazard callouts, fullscreen, normal shot/review/retry, and restoration after visiting Lessons. Mountain scenery adds no elevation or physics changes. Background water is scenery; playable water is the existing scored geometry. No environment dropdown is added. New round slots store their visual setting for reload consistency.
+
+Validation for 13.3.0: syntax checks and all 153 automated tests passed. Tests verify unchanged shot outcomes across all six scenery styles, lake/ocean eligibility only with existing side water, scored water at the selected hazard, deterministic selection without immediate repeats, unchanged elevations/geometry and round environment persistence after reload. Chromium passed each of the three new settings at 1440 px and 390 px, checking normal/fullscreen rendering, no page overflow or premature patterns, reload, shot review, retry and restoration after Lessons. Screenshots were visually inspected; a final phone fullscreen check verified the environment label contrast after adjustment. Physical-device and Safari/Firefox checks remain outstanding.
