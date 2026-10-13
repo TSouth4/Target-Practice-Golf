@@ -16,6 +16,12 @@ test('selected demonstrations support their specific advice with the full fixed 
   assert.ok(!nearLessonTarget(aim,b.aim),'reference target must not accidentally satisfy the guided instruction');
   if(lesson.id==='distance'){assert.ok(b.pattern.carry>235);assert.ok(r.counts.water<b.result.counts.water);continue;}
   const kind=lesson.id==='green'?'bunker':'water';assert.ok((r.counts[kind]-b.result.counts[kind])/zs.length>.05,lesson.id+' exposure reduction');
-  if(lesson.id==='distance')assert.ok(b.pattern.carry<220);
  }
+});
+test('distance examples use actual fairway references and distinguish wedges from longer approaches',async()=>{
+ const {DISTANCE_EXAMPLES}=await import('../dist/curriculum.js');const {baselineStrokes}=await import('../dist/strokes-baseline.js');
+ for(const d of DISTANCE_EXAMPLES)assert.equal(d.strokes,baselineStrokes('fairway',d.yards));
+ const [a,b,c,d]=DISTANCE_EXAMPLES;assert.ok(Math.abs((b.strokes-a.strokes)-(c.strokes-b.strokes))<.01);assert.ok(d.strokes-c.strokes>.24);
+ assert.match(CURRICULUM[2].intro[0].text,/14.5 per 100/);assert.match(CURRICULUM[2].intro[1].text,/0.25/);assert.match(CURRICULUM[2].intro[1].text,/almost the same/);
+ assert.equal(CURRICULUM[3].intro.at(-1).topic,'short-side');assert.ok(CURRICULUM[1].intro[1].topic!=='water');
 });
