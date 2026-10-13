@@ -33,3 +33,9 @@ Running score uses completed holes only. The current hole's pending OB strokes r
 ## Before expansion/public use
 
 Test the three-hole experience with golfers before expanding to 18. Independently verify the benchmark transcription and review/tune the authored outcome shapes with a golf coach. A personal finishing model needs real short-game/putting data. Later full-length courses need actual second-shot geometry/state and additional hazard rules; this pilot does not imply those features are ready.
+
+## Round display and ending a round
+
+The displayed running total is completed-hole strokes minus completed-hole par (3 per hole), formatted as Even par or a signed difference. An unfinished hole and its pending re-tee do not count until its finish is recorded. The hole result and scorecard use the same relative-to-par format. Raw stroke totals remain in saved data for reconciliation.
+
+Quit clears the saved course and active round and returns to practice. Restart generates a new randomized course using the currently selected profile and starts at hole 1. These controls are available while playing and from the scorecard. Navigation to another mode continues to preserve the course for resumption.

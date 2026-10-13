@@ -1,3 +1,9 @@
+# Par-3 score and round controls (15.2.0)
+
+Par-3 scores are presented relative to par: Even par, +2 or -1. The top-right course summary shows the current hole, running total to par and number of completed holes. It remains visible in full screen. An unfinished hole, including a pending OB re-tee, does not enter the total until completed.
+
+Quit and Restart are available beside the score and on the scorecard. Quit ends the saved course and returns to practice. Restart starts a fresh randomized three-hole round with the current selected profile, reset to hole 1 and even par. Switching modes through the menu still preserves a course for later resumption; Quit explicitly ends it.
+
 # Custom shot and menu refinement (15.1.0)
 
 The menu has one **Create your custom shot** item. Save and Reset remain on that page. The preview now looks directly down the target line, with aligned launch/target positions, a golfer at address and a smooth two-part flight arc. The explanation asks golfers to match their usual flight and finish so practice can teach an appropriate aim adjustment.

@@ -28,6 +28,7 @@ export function createCourse(seed,profile,landscape='woodland'){
  return{id:`course-${seed}`,kind:'course',version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};
 }
 export function courseTotal(c){const strokes=c.answers.reduce((n,a)=>n+a.holeScore,0),par=c.answers.length*3;return{strokes,par,relative:strokes-par,holes:c.answers.length};}
+export function scoreToPar(relative){return relative===0?'Even par':relative>0?'+'+relative:String(relative);}
 export function scoreName(score){return({1:'Hole in one',2:'Birdie',3:'Par',4:'Bogey',5:'Double bogey',6:'Triple bogey'})[score]||`${score-3} over par`;}
 export function recordCourseShot(c,points,s,decision,aim,pattern){
  if(c.review||c.status!=='active')return c.review;

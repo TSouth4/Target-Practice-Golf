@@ -1,4 +1,4 @@
-# Publish v15.1.0 in the existing Work project
+# Publish v15.2.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -55,3 +55,7 @@ Validation for 15.0.0: syntax checks and all 161 automated tests passed. Chromiu
 For 15.1.0, deploy the complete matching dist. The dropdown must contain only one custom-shot item, Create your custom shot. Open the menu from the editor, progress, lessons, assessment intro/active test, learning round, par-3 course and scorecard; each destination should replace the previous screen. Leaving the editor through the menu discards drafts. Check the aligned down-the-line preview, smoother flight arc, beginner explanation, Save and Reset, plus mouse/touch/keyboard controls.
 
 Validation for 15.1.0: syntax checks and all 162 automated tests passed. Chromium verified all eight menu destinations from nine screens at both 1440 px and 390 px (144 transitions): editor, progress, lesson catalog/explanation, learning round, assessment intro/active test, course and scorecard. It checked replaced screens, enabled destinations, discarded drafts, removed duplicate item and no browser errors. Flight editing, reset, save/reload and new-game profile snapshots passed mouse checks at 1440 px and touch checks at 390/320 px. Revised screenshots were visually reviewed. Physical-device and Safari/Firefox testing remain outstanding.
+
+For 15.2.0, publish the entire matching dist. In Par-3 course, check the top-right current-hole/total-to-par display in normal and full-screen views. Scores should read Even par, +2 or -1 and use completed-hole par, not the full course par before completion. Both course view and scorecard offer Quit and Restart: Quit returns to practice and removes the resumable course; Restart creates a fresh randomized round at hole 1 with no answers and even par. Check controls after a simulated result, not only before the first shot, and verify green-yardage labels do not cover them on a phone.
+
+Validation for 15.2.0: syntax checks and all 163 automated tests passed. Chromium completed three-hole rounds at 1440×900, 390×900 and 844×390, preserving the selected-ball reveal, saved review, scorecard and resume behavior. Fullscreen checks verified Quit, Restart and the score were not covered after a hole result. Direct restart/quit controls, scorecard controls, even-par reset, cleared storage after quit and reload passed at 1440×900, 390×900, 320×740 and 844×390. Screenshots were visually reviewed, and the phone yardage-label overlap was corrected and rechecked. Physical-device and Safari/Firefox testing remain outstanding.
