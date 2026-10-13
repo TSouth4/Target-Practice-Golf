@@ -1,3 +1,13 @@
+# Three-hole par-3 course (14.0.0)
+
+Menu → Par-3 course introduces a three-hole pilot with one environment, a running score and a scorecard. Choose a tee target, see the full pattern, then follow one selected ball as the others fade. The camera switches to bird’s-eye with just that endpoint; the simulated finish and hole score appear afterward. Target quality stays separate from the score. Longer coaching is available under “Why this target rating?”.
+
+Water adds a penalty and uses the existing modeled drop. OB requires a re-tee with stroke-and-distance counted; it cannot produce a fake short-game finish. The selected ball, simulated finish, pending re-tee and score are saved before animation. Reload resumes them without rerolling. You can leave for another mode and use Resume par-3 course to return. Course attempts stay outside normal learning/assessment progress; the scorecard retains each hole's first target grade.
+
+Remaining strokes are sampled as whole-number outcomes from explicitly authored distributions calibrated to the historical Tour distance/lie mean. They are illustrative rather than measured score frequencies or personal handicap predictions. The later shot counts are narrated, not physically played. Read [COURSE-MODEL.md](COURSE-MODEL.md) for probabilities, limits, penalty handling and save behavior. This is the agreed three-hole test before an 18-hole expansion; wind and firmness remain later work.
+
+Validation is recorded in DEPLOYMENT.md.
+
 # Scenic environments (13.3.0)
 
 Mountain valley, Lakeside and Oceanfront join the automatic environment mix, alongside woodland, Pacific Coast and desert. Mountain scenery includes layered peaks, snow caps and evergreen silhouettes. Lake scenery includes distant wooded hills and calm-water reflections; ocean scenery includes an open sea horizon, dunes and small sails. Each setting has its own sky, water, turf and vegetation palette, with its name below the hole heading.

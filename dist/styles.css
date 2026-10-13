@@ -180,3 +180,22 @@ button:disabled{cursor:not-allowed}
 
 .environment-name{margin:5px 0 0;color:var(--muted,#65755c);font-size:.8rem;letter-spacing:.04em}
 .immersive-mode .environment-name{color:#65755c}
+
+.course-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;font-size:.85rem;border-bottom:1px solid #ced8c3;margin-bottom:12px}
+.course-outcome{padding:20px;margin-top:16px;background:#fafbf5;border:1px solid #cbd9bc;border-radius:10px}.course-outcome h3{font-size:1.6rem;margin:8px 0}.course-outcome p{line-height:1.6}.course-decision{margin:14px 0;padding:14px;background:#e9efdf;border-radius:8px}.course-outcome .primary{width:100%}
+.course-mode .scenario-nav,.course-mode .course-panel>.legend,.course-mode .trace-legend{display:none}
+.course-selecting #courseDiscarded{animation:course-fade .8s forwards}
+@keyframes course-fade{to{opacity:0}}
+.immersive-mode #courseBar{position:absolute;z-index:3;left:12px;top:125px;background:#fafbf5e8;padding:6px 10px;border-radius:6px;max-width:calc(100% - 90px);font-size:11px}
+.immersive-mode #courseOutcome{position:absolute;z-index:4;right:85px;top:160px;bottom:100px;width:min(450px,calc(100% - 340px));overflow:auto;margin:0;background:#fafbf5f5;box-shadow:0 4px 22px #0004}
+.immersive-mode.feedback-collapsed #courseOutcome{display:none}
+@media(max-width:760px){.course-bar{font-size:11px}.course-outcome{padding:14px}.immersive-mode #courseOutcome{left:12px;right:64px;top:250px;bottom:100px;width:auto}}
+@media(max-height:500px) and (orientation:landscape){.immersive-mode #courseBar{top:44px;font-size:10px}.immersive-mode #courseOutcome{top:80px;left:180px;right:80px;bottom:85px;width:auto}}
+@media(prefers-reduced-motion:reduce){.course-selecting #courseDiscarded{animation:none;opacity:0}}
+
+.course-ball-review .simulate-row,.course-ball-review #aimHelp,.course-ball-review #aimDepthWrap{display:none!important}
+.course-ball-review .course-with-depth{grid-template-columns:1fr}
+.course-decision summary{cursor:pointer;margin-top:10px;font-size:.85rem}.course-decision details p{font-size:.85rem}
+.immersive-mode #courseOutcome{bottom:auto;max-height:calc(100vh - 260px)}
+@media(max-width:760px){.immersive-mode #courseOutcome{top:auto;bottom:16px;left:12px;right:12px;max-height:45vh}}
+@media(max-height:500px) and (orientation:landscape){.immersive-mode #courseOutcome{top:80px;bottom:auto;max-height:calc(100vh - 96px)}}
