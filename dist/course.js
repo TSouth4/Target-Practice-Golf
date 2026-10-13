@@ -1,3 +1,4 @@
+import {validPlayerProfile} from './shot-editor.js';
 import {SCENARIOS,random,outcome,remaining,DEFAULT_COSTS} from './model.js';
 import {generateScenario} from './practice.js';
 import {baselineStrokes} from './strokes-baseline.js';
@@ -55,7 +56,7 @@ export function readCourse(raw){
   const finish=f=>f&&integer(f.strokes,0,8)&&integer(f.putts,0,4)&&integer(f.offGreen,0,8)&&f.putts+f.offGreen===f.strokes&&Number.isFinite(f.distance)&&f.distance>=0&&Number.isFinite(f.reference)&&f.reference>=0&&['green','fairway','rough','bunker','trees'].includes(f.kind);
   const validAttempts=arr=>Array.isArray(arr)&&arr.length>0&&arr.length<1000&&arr.every(attempt)&&arr.slice(0,-1).every(a=>a.selected.kind==='ob');
   if(c?.kind!=='course'||c.version!==COURSE_VERSION||!['active','complete'].includes(c.status)||!integer(c.seed,1)||typeof c.id!=='string'||!c.id.length||c.id.length>60)return null;
-  if(!c.profile||!['0','5','10','20'].includes(c.profile.handicap)||!Number.isFinite(c.profile.limit)||c.profile.limit<180||c.profile.limit>330)return null;
+  if(!validPlayerProfile(c.profile))return null;
   if(!Array.isArray(c.schedule)||c.schedule.length!==3||!integer(c.index,0,2)||c.schedule.some(s=>!['tucked','water','split'].includes(s.id)||!integer(s.holeSeed,1)||!integer(s.drawSeed,1)||!integer(s.finishSeed,1)||!['woodland','coast','desert','mountain'].includes(s.landscape))||new Set(c.schedule.map(s=>s.landscape)).size!==1)return null;
   if(!Array.isArray(c.answers)||c.answers.length>3||c.answers.some((a,i)=>a.index!==i||a.par!==3||!integer(a.holeScore,1)||!validAttempts(a.attempts)||!finish(a.finish)||!shot(a.selected)||a.teeShots!==a.attempts.length||a.penalties!==a.attempts.reduce((n,t)=>n+t.penalty,0)||a.holeScore!==a.teeShots+a.penalties+a.finish.strokes||a.score!==a.attempts[0].decision.score||a.kind!==a.attempts[0].decision.kind||a.regret!==a.attempts[0].decision.regret))return null;
   if(!c.current||!integer(c.current.strokes)||!Array.isArray(c.current.attempts)||c.current.attempts.length>=1000||c.current.attempts.some(a=>!attempt(a)))return null;

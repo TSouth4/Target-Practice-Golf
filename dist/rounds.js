@@ -1,3 +1,4 @@
+import {validPlayerProfile} from './shot-editor.js';
 import {readCourse} from './course.js';
 import {random,SCENARIOS} from './model.js';
 import {generateScenario} from './practice.js';
@@ -26,7 +27,7 @@ export function readRound(raw){
   if(!Number.isInteger(r.seed)||r.seed<1||r.seed>2147483646||typeof r.id!=='string'||r.id.length<1||r.id.length>60)return null;
   const count=r.kind==='assessment'?10:5;
   if(!Array.isArray(r.schedule)||r.schedule.length!==count||!Number.isInteger(r.index)||r.index<0||r.index>=count||!Array.isArray(r.answers)||r.answers.length>count)return null;
-  if(!r.profile||!['0','5','10','20'].includes(r.profile.handicap)||!Number.isFinite(r.profile.limit)||r.profile.limit<180||r.profile.limit>330)return null;
+  if(!validPlayerProfile(r.profile))return null;
   if(r.schedule.some(s=>!SCENARIOS.some(b=>b.id===s.id)||!Number.isInteger(s.holeSeed)||s.holeSeed<=0||!Number.isInteger(s.drawSeed)||s.drawSeed<=0))return null;
   if(r.answers.some((a,i)=>!a||a.index!==i||!['balanced','aggressive','conservative','refine'].includes(a.kind)||!Number.isFinite(a.score)||a.score<0||a.score>100||!(a.regret===null||Number.isFinite(a.regret)&&a.regret>=0)||!Number.isFinite(a.dx)||!Number.isFinite(a.dy)))return null;
   if(r.answers.length<r.index||r.answers.length>r.index+1||r.status==='complete'&&r.answers.length!==count)return null;

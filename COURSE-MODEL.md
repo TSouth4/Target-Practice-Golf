@@ -4,7 +4,7 @@ Menu → Par-3 course starts a seeded three-hole round. Menu → Resume par-3 co
 
 ## Layout and player
 
-The course uses three seeded approach families (tucked flag, front water and split bunkers), displayed as par 3s with flag distances up to 175 yd. Their scoring geometry and club/dispersion rules are unchanged. The straight-shot handicap profile and driver-distance setting are fixed throughout the round. One environment is kept for all holes, selected from woodland, Pacific Coast, desert and mountain. These mixed families do not all support side water, so lakeside/oceanfront are not offered for this pilot. Wind and firmness are not added.
+The course uses three seeded approach families (tucked flag, front water and split bunkers), displayed as par 3s with flag distances up to 175 yd. Their scoring geometry and club/dispersion rules are unchanged. The selected standard handicap profile or custom club-bag snapshot, and driver-distance setting, are fixed throughout the round. Editing the saved custom profile later affects new games, not this paused round. Custom flight settings affect the tee shot; the simulated short game still uses the same historical Tour reference rather than a personal handicap model. One environment is kept for all holes, selected from woodland, Pacific Coast, desert and mountain. These mixed families do not all support side water, so lakeside/oceanfront are not offered for this pilot. Wind and firmness are not added.
 
 ## One selected shot
 

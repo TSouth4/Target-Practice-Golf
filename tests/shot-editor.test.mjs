@@ -1,16 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {SCENARIOS,basicPattern,shotAt,patternAtTarget,fitTarget,samples,evaluate,optimizeTargets,DEFAULT_COSTS} from '../dist/model.js';
-import {defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,flightSVG,heightSVG} from '../dist/shot-editor.js';
+import {defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,moveApex,applyFlightToBag,resetFlight,validPlayerProfile,flightSVG,heightSVG} from '../dist/shot-editor.js';
 import {trainingBag,reachLimit} from '../dist/bag.js';
 import {nextScenario} from '../dist/practice.js';
 const base=basicPattern(5,SCENARIOS[0]);
-test('flight editor anchors define the simulated start and finish, including push draws and center-start fades',()=>{
+test('flight editor anchors define the simulated start and finish, including push draws, with finish moves preserving the start',()=>{
  const p=editingPattern(defaultMemberBag(base)[0]),pushDraw=moveFlightHandle(p,'mid',5),h=flightHandles(pushDraw);
  assert.ok(pushDraw.start>0);assert.equal(pushDraw.curve,-20);assert.ok(Math.abs(h.mid-5)<1e-9);assert.ok(Math.abs(h.end)<1e-9);
  const shot=shotAt({x:0,y:p.stock},{...pushDraw,sdSide:0,sdLong:0,bias:0,bigPct:0},{z1:0,z2:0,u:1,sign:1});assert.ok(Math.abs(shot.x-h.end)<1e-9);
  const fade={...p,start:0,curve:24};assert.equal(flightHandles(fade).mid,6);assert.equal(flightHandles(fade).end,24);
- const moved=moveFlightHandle(fade,'end',20);assert.ok(Math.abs(flightHandles(moved).mid-6)<1e-9);assert.ok(Math.abs(flightHandles(moved).end-20)<1e-9);
+ const moved=moveFlightHandle(fade,'end',20);assert.equal(moved.start,fade.start);assert.ok(Math.abs(flightHandles(moved).mid-5)<1e-9);assert.ok(Math.abs(flightHandles(moved).end-20)<1e-9);
  for(const key of ['mid','end'])for(const lateral of [-1000,1000]){const clamped=moveFlightHandle(p,key,lateral);assert.ok(Math.abs(clamped.start)<=10);assert.ok(Math.abs(clamped.curve)<=50);assert.ok(Object.values(flightHandles(clamped)).every(Number.isFinite));}
  assert.ok(flightSVG(pushDraw).includes('data-handle="mid"'));assert.ok(heightSVG({...p,height:40}).includes('cy="70"'));
 });
@@ -32,4 +32,16 @@ test('the sampled comparison obeys the same personal bag, reach, shapes and miss
 test('filtered scenario selection avoids repeat families until the eligible bank is exhausted, with deterministic variety',()=>{
  for(const filter of ['tee','approach','mixed']){let id=filter==='approach'?'water':'cedar',recent=[id];const seen=new Set([id]);for(let i=0;i<40;i++){const seed=137+i*7919,next=nextScenario(id,filter,seed,recent);assert.equal(next,nextScenario(id,filter,seed,recent));assert.notEqual(next,id);const type=SCENARIOS.find(s=>s.id===next).type;if(filter!=='mixed')assert.equal(type,filter);else assert.notEqual(type,SCENARIOS.find(s=>s.id===id).type);seen.add(next);recent=[...recent,next].slice(-6);id=next;}assert.equal(seen.size,filter==='mixed'?SCENARIOS.length:SCENARIOS.filter(s=>s.type===filter).length);}
  const variety=new Set(Array.from({length:30},(_,seed)=>nextScenario('cedar','tee',seed,[])));assert.equal(variety.size,SCENARIOS.filter(s=>s.type==='tee').length-1);
+});
+test('simple apex and finish controls reproduce the requested shots, with vertical height independent of endpoint',()=>{
+ const p=editingPattern(defaultMemberBag(base)[0]),pushDraw=moveApex(p,5,130);assert.equal(pushDraw.height,40);assert.ok(pushDraw.start>0&&pushDraw.curve<0);assert.ok(Math.abs(flightHandles(pushDraw).end)<1e-9);
+ const draw=moveFlightHandle(p,'end',-10);assert.equal(draw.start,0);assert.equal(draw.curve,-10);const landed=shotAt({x:0,y:p.carry},{...draw,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1});assert.ok(Math.abs(landed.landing.x+10)<1e-9);
+ const higher=moveApex(draw,flightHandles(draw).mid,100);assert.ok(Math.abs(higher.start-draw.start)<1e-9);assert.ok(Math.abs(flightHandles(higher).end+10)<1e-9);assert.equal(higher.height,50);
+ const biased={...p,start:3,curve:-12,bias:4};assert.ok(Math.abs(flightHandles(biased).end-shotAt({x:0,y:p.carry},{...biased,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1}).landing.x)<1e-9);
+ assert.match(flightSVG(draw),/id="addressGolfer"/);assert.match(flightSVG(draw),/stroke="#d74d44"/);
+});
+test('shared flight scales bends by club carry, preserves distances and dispersion, and reset clears the whole mean shape',()=>{
+ const bag=defaultMemberBag(base),p=moveApex(editingPattern(bag[0]),4,145),changed=applyFlightToBag(bag,'Driver',p);
+ for(const c of changed){const original=bag.find(o=>o.club===c.club);assert.equal(c.stock,original.stock);assert.equal(c.roll,original.roll);assert.equal(c.sdSide,original.sdSide);assert.ok(Math.abs(flightHandles(editingPattern(c)).end)<1e-8);}
+ const reset=resetFlight(changed);for(const c of reset){assert.equal(c.start,0);assert.equal(c.curve,0);assert.equal(c.bias,0);assert.equal(c.stock,bag.find(o=>o.club===c.club).stock);}assert.ok(validPlayerProfile({handicap:'5',limit:265,shotMode:'custom',bag:changed}));assert.equal(validPlayerProfile({handicap:'5',limit:265,shotMode:'custom',bag:[]}),false);
 });

@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {setupDOM} from './dom-harness.mjs';import {ROUND_KEY} from '../dist/rounds.js';
+let dom=setupDOM(),$=dom.$;await import('../dist/app.js?custom-profile-start');const state=()=>JSON.parse(dom.storage.get('golfaim101-v2')),round=()=>JSON.parse(dom.storage.get(ROUND_KEY));
+async function shape(){await $('editShotQuick').fire('click');await $('flightEditor').fire('pointerdown',{button:0,pointerId:1,clientX:400,clientY:280});await $('flightEditor').fire('pointermove',{buttons:1,clientX:377,clientY:280});await $('flightEditor').fire('pointerup');assert.equal(Number($('start').value),0);assert.equal(Number($('curve').value),-10);await $('saveEditor').fire('click');}
+test('saved usual shape applies across clubs and newly started games, while paused rounds keep their snapshot',async()=>{
+ await shape();assert.equal(state().mode,'advanced');assert.ok(state().memberBag.every(c=>c.curve<0&&c.start===0));const savedBag=state().memberBag;
+ await $('practiceRoundMenu').fire('click');assert.equal(round().profile.shotMode,'custom');assert.deepEqual(round().profile.bag,savedBag);assert.equal(state().mode,'advanced');assert.ok(state().pattern.customBag&&state().pattern.curve<0);
+ await $('assessmentMenu').fire('click');await $('startAssessment').fire('click');assert.equal(round().profile.shotMode,'custom');assert.ok(state().pattern.curve<0);assert.equal($('editShotQuick').disabled,true);
+ await $('freePracticeMenu').fire('click');await $('courseMenu').fire('click');const paused=round();assert.equal(paused.kind,'course');assert.equal(paused.profile.shotMode,'custom');assert.deepEqual(paused.profile.bag,savedBag);assert.ok(state().pattern.curve<0);
+ await $('editShotQuick').fire('click');await $('straightFlight').fire('click');await $('saveEditor').fire('click');assert.ok(state().memberBag.every(c=>c.curve===0&&c.start===0&&c.bias===0));
+ await $('courseMenu').fire('click');assert.deepEqual(round().profile.bag,savedBag);assert.ok(state().pattern.curve<0);assert.ok(state().memberBag.every(c=>c.curve===0));
+ await $('courseScorecard').fire('click');await $('courseReplay').fire('click');assert.ok(round().profile.bag.every(c=>c.curve===0));assert.equal(state().pattern.curve,0);
+ await $('freePracticeMenu').fire('click');await shape();const before=state(),old=dom;dom=setupDOM();$=dom.$;for(const[k,v]of old.storage)dom.storage.set(k,v);await import('../dist/app.js?custom-profile-reload');assert.equal(state().mode,'advanced');assert.deepEqual(state().memberBag,before.memberBag);assert.ok(state().pattern.curve<0);assert.ok($('shotEditor').hidden);
+ await $('editShotQuick').fire('click');await $('straightFlight').fire('click');await $('cancelEditor').fire('click');assert.deepEqual(state().memberBag,before.memberBag);
+});

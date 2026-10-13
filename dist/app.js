@@ -8,7 +8,7 @@ import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js'
 import {decisionLesson,retryImpact} from './lessons.js';
 import {PROGRESS_KEY,MODEL_VERSION,readProgress,profileKey,recordAttempt,progressSummary,trendSVG} from './progress.js';
 import {DRIVER_LIMITS,reachLimit,trainingBag} from './bag.js';
-import {FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
+import {FLIGHT_PIXEL,APEX_FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,moveApex,applyFlightToBag,resetFlight,apexY,APEX_X,FINISH_X,FINISH_Y,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
 import {BRAND} from './config.js';
 import {EYE_CAMERA,reviewCamera,projectReview,aimZoomBox,isDoubleAimTap} from './camera.js';
 import {nextScenario,generateScenario,nextLandscape} from './practice.js';
@@ -42,7 +42,10 @@ let progressHistory=[],progressOpen=false,progressSelection='',progressType='all
 try{progressHistory=readProgress(localStorage.getItem(PROGRESS_KEY));}catch{progressStored=false;}
 const escapeHTML=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const RATING_LABELS={balanced:'Strong decision',aggressive:'Too aggressive',conservative:'Too conservative',refine:'Target needs refining'};
-function currentProfile(){return profileKey(state.mode,state.basicHandicap,state.pattern.driverLimit,state.memberBag,state.costs);}
+function effectiveBag(){return round?.profile.shotMode==='custom'?round.profile.bag:state.memberBag;}
+function currentProfile(){return profileKey(state.mode,state.basicHandicap,state.pattern.driverLimit,effectiveBag(),state.costs);}
+function selectedPlayerProfile(){return{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap],...(state.mode==='advanced'?{shotMode:'custom',bag:structuredClone(state.memberBag)}:{})};}
+function restorePlayerProfile(){state.mode=round.profile.shotMode==='custom'?'advanced':'basic';state.basicHandicap=round.profile.handicap;state.basicLimits[round.profile.handicap]=round.profile.limit;state.costs={...DEFAULT_COSTS};state.practiceMode='round';}
 function recordDecision(){
  if(tutorial||isCourse())return;
  if(!Number.isFinite(best.result.expected)){progressMessage='No progress entry: this run has no usable target comparison.';return;}
@@ -79,14 +82,15 @@ function basic(){return {...basicPattern(state.basicHandicap,scene(),state.basic
 function elevation(){return state.elevated?scene().elevationM:0;}
 function landscape(){return LANDSCAPES[state.landscape];}
 function num(v,a,b,fallback){return Number.isFinite(Number(v))?clamp(Number(v),a,b):fallback;}
-try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.scenario=saved.scenario;state.practiceMode=saved.practiceMode==='free'?'free':'round';if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;const savedCosts=saved.memberCosts||saved.advanced?.costs;state.memberCosts=savedCosts?.baseline===DEFAULT_COSTS.baseline?savedCosts:null;if(savedCosts&&savedCosts.baseline!==DEFAULT_COSTS.baseline)state.previousMemberCosts=savedCosts;else if(saved.previousMemberCosts)state.previousMemberCosts=saved.previousMemberCosts;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
-// Start each visit with the free straight-flight lesson; member setup remains saved.
+try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.scenario=saved.scenario;state.practiceMode=saved.practiceMode==='free'?'free':'round';if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.mode=saved.mode==='advanced'?'advanced':'basic';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;const savedCosts=saved.memberCosts||saved.advanced?.costs;state.memberCosts=savedCosts?.baseline===DEFAULT_COSTS.baseline?savedCosts:null;if(savedCosts&&savedCosts.baseline!==DEFAULT_COSTS.baseline)state.previousMemberCosts=savedCosts;else if(saved.previousMemberCosts)state.previousMemberCosts=saved.previousMemberCosts;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
+// Restore the chosen shot mode; legacy saves without a mode keep the standard profile.
 state.pattern=basic();state.aim=fitTarget({x:0,y:scene().aimY},state.pattern);
 const initialBag=defaultMemberBag(basic());
 if(!state.memberBag&&state.advanced?.pattern){const old=initialBag.find(c=>c.club===state.advanced.club);if(old)Object.assign(old,state.advanced.pattern,{stock:state.advanced.pattern.carry+state.advanced.pattern.roll,club:old.club});}
 state.memberBag=state.memberBag?cleanMemberBag(state.memberBag,basic()):cleanMemberBag(initialBag,basic());
+if(state.mode==='advanced'){state.pattern=member();state.costs=memberCosts();state.aim=fitTarget({x:0,y:scene().aimY},state.pattern);}
 state.recent=state.recent.length?state.recent:[state.scenario];
-function member(){return{...basic(),customBag:state.memberBag,shotType:scene().type};}
+function member(){return{...basic(),customBag:effectiveBag(),shotType:scene().type};}
 function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.querySelectorAll('[data-cost]'))out[el.dataset.cost]=num(state.memberCosts?.[el.dataset.cost],Number(el.min),Number(el.max),DEFAULT_COSTS[el.dataset.cost]);return out;}
 function save(){if(tutorialReturn){try{localStorage.setItem(storeKey,JSON.stringify(tutorialReturn.state));localStorage.setItem(ROUND_KEY,JSON.stringify(tutorialReturn.round));}catch{}return;}if(round?.status==='active'&&!isCourse()&&!round.answers.length&&state.mode==='basic')round.profile={handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]};try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));if(isCourse()){localStorage.setItem(COURSE_KEY,JSON.stringify(round));courseStorageOK=true;}}catch{if(isCourse())courseStorageOK=false;}}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
@@ -124,7 +128,7 @@ function updateLabels(){
  for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=working;
  const advanced=state.mode==='advanced';
  $('basicBar').hidden=false;$('handicapField').hidden=advanced;$('aimDepthWrap').hidden=false;
- $('shotModeNote').textContent=advanced?'My shot · member preview · automatic club for depth':'Straight flight · automatic club for your depth';
+ $('shotModeNote').textContent=advanced?'My shot · '+flightDescription(p):'Straight flight · automatic club for your depth';
  $('costEditor').hidden=!advanced;
  $('legend').hidden=!result;$('reviewViews').hidden=!result;$('tryAgain').hidden=!result;$('retryThisHole').hidden=!result;
  $('traceLegend').hidden=!result&&phase!=='shooting'&&phase!=='zooming';
@@ -150,7 +154,7 @@ function updateLabels(){
  updateCourseFrame(aimZoom&&zoomAllowed?aimZoom:{x:0,y:0,width:960,height:580});
  $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
  $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Choose left/right on the course. Double-tap or double-click to zoom in / out. Use the carry bar beside the course. Sliders work too. The pattern stays hidden until you commit.';
- for(const id of ['basicMode','advancedMode','courseMenu'])$(id).disabled=working;const savedCourse=isCourse()?round:storedCourse();$('courseMenu').innerHTML=savedCourse?.status==='active'?'Resume par-3 course <span>3-hole pilot · score saved</span>':'Par-3 course <span>3-hole pilot · simulated finish</span>';
+ for(const id of ['basicMode','advancedMode','courseMenu','useMyShotMenu','editShotQuick'])$(id).disabled=working;const savedCourse=isCourse()?round:storedCourse();$('courseMenu').innerHTML=savedCourse?.status==='active'?'Resume par-3 course <span>3-hole pilot · score saved</span>':'Par-3 course <span>3-hole pilot · simulated finish</span>';
  $('menuToggle').disabled=working||!!editorDraft||progressOpen;$('progressMenu').disabled=working||!!editorDraft||progressOpen;
  $('aimControls').hidden=!!result;$('scenarioBriefWrap').hidden=!!result;$('appRoot').classList.toggle('review-mode',!!result);
  for(const [id,on] of [['stepChoose',!hasAim],['stepCommit',hasAim&&!result],['stepCompare',!!result]])$(id).classList.toggle('current',on);
@@ -215,7 +219,7 @@ function updateTutorialControls(){
  $('appRoot').classList.toggle('tutorial-mode',!!tutorial&&!lessonScreenOpen);
  $('tutorialCard').hidden=!tutorial||lessonScreenOpen;
  $('appRoot').classList.toggle('tutorial-explaining',!!tutorial&&!lessonScreenOpen&&tutorial.stage==='intro');
- if(tutorialReturn){for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','progressMenu'])$(id).disabled=working;}
+ if(tutorialReturn){for(const id of ['practiceRoundMenu','assessmentMenu','freePracticeMenu','advancedMode','basicMode','useMyShotMenu','editShotQuick','progressMenu'])$(id).disabled=working;}
  if(!tutorial||lessonScreenOpen)return;
  const definition=lessonById(tutorial.id),intro=tutorial.stage==='intro',guided=tutorial.stage==='guided',exposure=definition.id==='green'?'bunker':'water';
  for(const id of ['basicHandicap','driverLimit','driverLimitReset','teeTab','approachTab','mixedTab'])$(id).disabled=true;
@@ -251,7 +255,7 @@ function courseFinishText(review){
 function updateCourseControls(){
  const on=isCourse();$('courseBar').hidden=!on;$('courseOutcome').hidden=!on||!round?.review||working||roundView||progressOpen||lessonScreenOpen;$('appRoot').classList.toggle('course-mode',on);$('appRoot').classList.toggle('course-selecting',on&&phase==='course-selecting');$('appRoot').classList.toggle('course-ball-review',on&&!!round.review&&!working);
  if(!on)return;const total=courseTotal(round),r=round.review;
- $('courseStatus').textContent=`Par-3 round · Hole ${round.index+1} / 3 · ${total.holes?`${total.strokes} strokes (${total.relative>0?'+':''}${total.relative||'E'}) through ${total.holes}`:'No completed holes'}${r&&!r.retee?'':` · Next stroke ${round.current.strokes+1}`}${courseStorageOK?'':' · Saving unavailable in this browser'}`;
+ $('courseStatus').textContent=`Par-3 round · Hole ${round.index+1} / 3 · ${total.holes?`${total.strokes} strokes (${total.relative>0?'+':''}${total.relative||'E'}) through ${total.holes}`:'No completed holes'}${r&&!r.retee?'':` · Next stroke ${round.current.strokes+1}`}${round.profile.shotMode==='custom'?' · Saved custom profile':''}${courseStorageOK?'':' · Saving unavailable in this browser'}`;
  $('roundStatus').hidden=true;$('results').hidden=true;for(const id of ['basicHandicap','driverLimit','driverLimitReset','teeTab','approachTab','mixedTab'])$(id).disabled=true;
  $('practiceIntro').textContent='Play three par-3 holes. One shot is selected from your pattern, then the remaining shots are simulated. Target quality and hole score stay separate.';
  for(const id of ['tryAgain','retryThisHole','newShots','roundContinue'])$(id).hidden=true;
@@ -259,7 +263,7 @@ function updateCourseControls(){
  if(r){$('cloudBadge').textContent=phase==='course-pattern'?'Your whole pattern':phase==='course-selecting'?'Highlighted ball: your selected outcome':'Selected ball only · simulated finish';$('courseOutcomeTitle').textContent=r.retee?'OB — re-tee required':`${scoreName(r.strokes)} · ${r.strokes} strokes`; $('courseFinish').textContent=courseFinishText(r);$('courseDecision').textContent=`Target quality: ${r.decision.score} / 100 · ${r.decision.label}.`;$('courseDecisionReason').textContent=r.decision.reason;$('courseLearning').textContent=r.decision.action+' A lucky or unlucky ball does not change the quality of your target.';$('courseRunning').textContent=`Running score: ${total.strokes} strokes · ${total.relative>0?'+':''}${total.relative||'Even par'} through ${total.holes} completed ${total.holes===1?'hole':'holes'}.`;$('courseNext').textContent=r.retee?`Re-tee · shot ${r.strokes+1}`:round.status==='complete'?'View scorecard':'Next hole';$('courseNext').disabled=working;}
  $('courseScorecard').disabled=working;$('courseMenu').disabled=working;$('feedbackToggle').hidden=!immersive||!r||working;
 }
-function showCourseReport(){leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;$('courseReport').hidden=false;$('roundReport').hidden=true;$('startAssessment').hidden=true;$('startLearningRound').hidden=true;$('closeRound').hidden=false;const total=courseTotal(round);$('roundTitle').textContent=round.status==='complete'?'Your par-3 scorecard':'Par-3 scorecard';$('roundDescription').textContent=`${landscape().name} · three holes · par 9. ${total.holes} completed. ${COURSE_FINISH_LABEL}; not a personal scoring prediction.`;$('courseTotal').textContent=`${total.strokes} strokes · ${total.relative>0?'+':''}${total.relative||'Even par'} against completed-hole par`;$('courseScoreRows').innerHTML=round.answers.map(a=>`<tr><th scope="row">${a.index+1}</th><td>3</td><td>${a.holeScore} · ${escapeHTML(scoreName(a.holeScore))}</td><td>${a.score} / 100</td></tr>`).join('');$('courseReplay').hidden=round.status!=='complete';$('closeRound').textContent=round.status==='complete'?'Back to practice':'Back to hole';updateLabels();save();$('roundScreen').scrollIntoView({behavior:'auto'});}
+function showCourseReport(){leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;$('courseReport').hidden=false;$('roundReport').hidden=true;$('startAssessment').hidden=true;$('startLearningRound').hidden=true;$('closeRound').hidden=false;const total=courseTotal(round);$('roundTitle').textContent=round.status==='complete'?'Your par-3 scorecard':'Par-3 scorecard';$('roundDescription').textContent=`${landscape().name} · three holes · par 9. ${total.holes} completed. ${round.profile.shotMode==='custom'?'Custom profile saved at round start. ':''}${COURSE_FINISH_LABEL}; not a personal scoring prediction.`;$('courseTotal').textContent=`${total.strokes} strokes · ${total.relative>0?'+':''}${total.relative||'Even par'} against completed-hole par`;$('courseScoreRows').innerHTML=round.answers.map(a=>`<tr><th scope="row">${a.index+1}</th><td>3</td><td>${a.holeScore} · ${escapeHTML(scoreName(a.holeScore))}</td><td>${a.score} / 100</td></tr>`).join('');$('courseReplay').hidden=false;$('courseReplay').textContent=round.status==='complete'?'Play another three-hole course':'Start a new course with my current profile';$('closeRound').textContent=round.status==='complete'?'Back to practice':'Back to hole';updateLabels();save();$('roundScreen').scrollIntoView({behavior:'auto'});}
 $('courseNext').addEventListener('click',()=>{if(working||!isCourse()||!round.review)return;if(round.status==='complete'){showCourseReport();return;}advanceCourse(round);hasAim=false;dirty();loadRoundSlot();});
 $('courseScorecard').addEventListener('click',()=>{if(isCourse()&&!working)showCourseReport();});$('courseReplay').addEventListener('click',()=>startRound('course'));
 
@@ -270,7 +274,7 @@ function updateRoundControls(){
  $('roundStatus').hidden=!active;$('roundStatus').textContent=active?`${assessment?'Assessment':'Learning round'} · ${round.index+1} / ${round.schedule.length}${roundResumed?' · Resumed':''}${roundRecorded()?' · Decision recorded':''}${assessment?' · Feedback at the end':''}`:'';
  if(active){for(const id of ['teeTab','approachTab','mixedTab'])$(id).disabled=true;}
  if(locked){for(const id of ['basicHandicap','driverLimit','driverLimitReset'])$(id).disabled=true;}
- if(assessment){for(const id of ['basicMode','advancedMode','progressMenu'])$(id).disabled=true;}
+ if(assessment){for(const id of ['basicMode','advancedMode','useMyShotMenu','editShotQuick','progressMenu'])$(id).disabled=true;}
  $('roundContinue').hidden=!active||!roundRecorded()||!!result||roundView;$('roundContinue').disabled=working;
  $('roundContinue').textContent=round?.index===round?.schedule.length-1?(round.kind==='assessment'?'View assessment report':'View round summary'):'Next scenario';
  if(assessment&&roundRecorded()){$('simulate').hidden=true;$('aimX').disabled=true;$('aimY').disabled=true;$('mobileActionTarget').textContent='Decision recorded · feedback will appear in your report';}
@@ -285,21 +289,21 @@ function refreshRoundProfile(){
 }
 function startRound(kind){
  if(working)return;if(tutorialReturn)closeLessons();roundResumed=false;leaveFullscreen();closeMenu();roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;
- state.mode='basic';state.practiceMode='round';state.costs={...DEFAULT_COSTS};state.practiceFilter='mixed';
+ const profile=selectedPlayerProfile();state.practiceMode='round';state.costs={...DEFAULT_COSTS};state.practiceFilter='mixed';
  const seed=(globalThis.crypto?.getRandomValues?.(new Uint32Array(1))[0]||Math.floor(Math.random()*2147483645))%2147483645+1;
- round=kind==='course'?createCourse(seed,{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]},['woodland','coast','desert','mountain'][Math.floor(random(seed^0x4937)()*4)]):createRound(kind,seed,{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap]});round.id=makeId();loadRoundSlot();
+ round=kind==='course'?createCourse(seed,profile,['woodland','coast','desert','mountain'][Math.floor(random(seed^0x4937)()*4)]):createRound(kind,seed,profile);round.id=makeId();loadRoundSlot();
 }
 function showRoundScreen(intro=false){
  if(tutorialReturn)closeLessons();if(isCourse()&&!intro){showCourseReport();return;}$('courseReport').hidden=true;$('closeRound').textContent='Back to practice';leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;
  $('roundEyebrow').textContent=intro?'BASELINE ASSESSMENT':'FIRST-ATTEMPT RECAP';$('roundTitle').textContent=intro?'Assessment Test':round.kind==='assessment'?'Your assessment report':'Your five-shot round';
  $('closeRound').hidden=!intro&&round?.kind==='assessment';$('roundReport').hidden=intro;$('startAssessment').hidden=!intro;$('startLearningRound').hidden=intro;
- $('roundDescription').textContent=intro?'Choose targets on 10 new scenarios using your straight-shot handicap profile. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round.':'First attempts only. Retries helped you experiment and did not change this recap.';
+ $('roundDescription').textContent=intro?`Choose targets on 10 new scenarios using ${state.mode==='advanced'?'your saved custom shot profile':'your straight-shot handicap profile'}. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round.`:'First attempts only. Retries helped you experiment and did not change this recap.';
  if(!intro){const summary=roundSummary(round);$('roundPerShot').textContent=summary.average===null?'Unavailable':'+'+summary.average.toFixed(2);$('roundPer100').textContent=summary.per100===null?'Unavailable':'+'+summary.per100.toFixed(1);$('roundScore').textContent=summary.score===null?'—':summary.score.toFixed(1)+' / 100';
  const narrative=roundNarrative(summary);$('roundTendencies').textContent=narrative.tendencies;$('roundDirections').textContent=narrative.directions;
  if(round.version==='rounds-v1-model-v3')$('roundDirections').textContent=$('roundDirections').textContent.replaceAll('intended carry','forward target depth').replaceAll('carry-target','target-position');
  $('roundLimits').textContent='The per-100 number scales this round’s average modeled cost against the best sampled targets. It is not measured real-world strokes gained or a prediction of your next 100 shots. Costs use a historical PGA TOUR distance-and-lie reference with your selected shot pattern, not measured recovery skill for your handicap. This small round suggests practice opportunities, not established habits. If a comparison is unbounded, a finite total is unavailable.';
  if(round.version!==ROUND_VERSION)$('roundLimits').textContent='Previous-model report: scoring assumptions have changed. Keep this report separate from new-model results. '+$('roundLimits').textContent;
- if(round.kind==='assessment')$('roundDescription').textContent=`Your 10 first-attempt decisions, using the ${round.profile.handicap} handicap straight-shot profile with a ${round.profile.limit} yd distance limit. Try a learning round to test adjustments with immediate feedback. Personal clubs and unlimited practice remain available in this private pilot.`;
+ if(round.kind==='assessment')$('roundDescription').textContent=`Your 10 first-attempt decisions, using ${round.profile.shotMode==='custom'?'your saved custom shot profile':'the '+round.profile.handicap+' handicap straight-shot profile'} with a ${round.profile.limit} yd distance limit. Try a learning round to test adjustments with immediate feedback. Personal clubs and unlimited practice remain available in this private pilot.`;
  }
  $('roundScreen').scrollIntoView({behavior:'auto'});$('closeRound').focus?.();save();
 }
@@ -313,7 +317,7 @@ function nextRoundSlot(){
  if(round.index===round.schedule.length-1){round.status='complete';showRoundScreen();return;}
  round.index++;loadRoundSlot();
 }
-$('courseMenu').addEventListener('click',()=>{if(working)return;if(tutorialReturn)closeLessons();const saved=isCourse()?round:storedCourse();if(saved?.status!=='active'){startRound('course');return;}round=saved;roundView=false;progressOpen=false;leaveFullscreen();closeMenu();$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;state.mode='basic';state.practiceMode='round';state.basicHandicap=round.profile.handicap;state.basicLimits[state.basicHandicap]=round.profile.limit;state.costs={...DEFAULT_COSTS};sceneKey=null;loadRoundSlot();});
+$('courseMenu').addEventListener('click',()=>{if(working)return;if(tutorialReturn)closeLessons();const saved=isCourse()?round:storedCourse();if(saved?.status!=='active'){startRound('course');return;}round=saved;roundView=false;progressOpen=false;leaveFullscreen();closeMenu();$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;restorePlayerProfile();sceneKey=null;loadRoundSlot();});
 $('practiceRoundMenu').addEventListener('click',()=>startRound('practice'));
 $('assessmentMenu').addEventListener('click',()=>{if(!working)showRoundScreen(true);});
 $('startAssessment').addEventListener('click',()=>startRound('assessment'));
@@ -355,24 +359,24 @@ function setScenario(id,holeSeed=0,setting=null){if(working)return;resetAimZoom(
 function setMode(mode,allowAssessmentExit=false){if(working||(!tutorialReturn&&!allowAssessmentExit&&round?.kind==='assessment'&&round.status==='active'))return;if(tutorialReturn)closeLessons();round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
- if(tutorialReturn)closeLessons(); if(working)return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub=editorDraft.some(c=>c.club===state.pattern.club)?state.pattern.club:'Driver';editorDrag=null;editorInvalid.clear();
+ if(tutorialReturn)closeLessons(); if(working)return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();editorDraft=structuredClone(state.memberBag);editorClub='Driver';$('applyAllClubs').checked=true;$('clubSettings').open=false;editorDrag=null;editorInvalid.clear();
  $('practiceScreen').hidden=true;$('shotEditor').hidden=false;renderEditor();updateLabels();$('shotEditor').scrollIntoView({behavior:'auto'});
 }
 function editorPattern(){return editingPattern(editorDraft.find(c=>c.club===editorClub));}
-function changeDraft(p){const i=editorDraft.findIndex(c=>c.club===editorClub);editorDraft[i]={...p,stock:p.carry+p.roll,club:editorClub};delete editorDraft[i].carry;}
+function changeDraft(p,shape=false){if(shape&&$('applyAllClubs').checked){editorDraft=applyFlightToBag(editorDraft,editorClub,p);return;}const i=editorDraft.findIndex(c=>c.club===editorClub);editorDraft[i]={...p,stock:p.carry+p.roll,club:editorClub};delete editorDraft[i].carry;}
 function renderEditor(keepInput=null){
  const p=editorPattern();$('club').innerHTML=editorDraft.map(c=>`<option>${c.club}</option>`).join('');$('club').value=editorClub;
  for(const key of KEYS)if(!editorInvalid.has(key)&&key!==keepInput)$(key).value=key==='bigDirection'?p[key]:Number(p[key].toFixed(2));
  $('startOut').textContent=sided(p.start,'°');$('curveOut').textContent=sided(p.curve);$('heightOut').textContent=Math.round(p.height)+' yd';$('biasOut').textContent=sided(p.bias);$('bigPctOut').textContent=p.bigPct+'%';$('rhoOut').textContent=p.rho.toFixed(1);
  $('dispersionText').textContent=`σ is one standard deviation. 80% of core shots span approximately ${(2*1.282*p.sdSide).toFixed(0)} yd left/right and ${(2*1.282*p.sdLong).toFixed(0)} yd short/long at stock distance.`;
- $('flightEditor').innerHTML=flightSVG(p);$('heightEditor').innerHTML=heightSVG(p);$('flightDescription').textContent=flightDescription(p);
+ $('flightEditor').innerHTML=flightSVG(p);$('heightEditor').innerHTML=heightSVG(p);$('flightDescription').textContent=flightDescription(p);$('shapeScope').textContent=$('applyAllClubs').checked?'Use this usual shape across your clubs.':'Editing '+editorClub+' only.';
  $('saveEditor').disabled=editorInvalid.size>0;$('club').disabled=editorInvalid.size>0;
- $('editorStatus').textContent=editorInvalid.size?'Check your entries before saving. Carry: 50–330 yd; roll: 0–40 yd. Other settings must be within their control limits.':'Save applies all club edits and starts a fresh target choice. Back discards these edits.';
+ $('editorStatus').textContent=editorInvalid.size?'Check your entries before saving. Carry: 50–330 yd; roll: 0–40 yd. Other settings must be within their control limits.':'Save uses this shot profile in new games. Cancel keeps your previous settings.';
 }
 function closeEditor(){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;$('practiceScreen').hidden=false;updateControls();$('practiceScreen').scrollIntoView({behavior:'auto'});}
 function saveEditor(){if(!editorDraft||editorInvalid.size)return;state.memberBag=cleanMemberBag(editorDraft,basic());closeEditor();setMode('advanced',true);toast('My shot saved. Choose a target to see how it plays.');}
 function editorPoint(svg,e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const ct=svg.getScreenCTM();return ct?p.matrixTransform(ct.inverse()):null;}
-function dragEditor(id,e){if(!editorDraft||!editorDrag||editorInvalid.size)return;const at=editorPoint($(id),e);if(!at)return;let p=editorPattern();p=editorDrag==='height'?{...p,height:Math.round(clamp((166-at.y)/2.4,5,50))}:moveFlightHandle(p,editorDrag,(at.x-300)/FLIGHT_PIXEL);changeDraft(p);renderEditor();}
+function dragEditor(id,e){if(!editorDraft||!editorDrag||editorInvalid.size)return;const at=editorPoint($(id),e);if(!at)return;let p=editorPattern();p=editorDrag==='mid'&&id==='flightEditor'?moveApex(p,(at.x-APEX_X)/APEX_FLIGHT_PIXEL,at.y):editorDrag==='height'?{...p,height:Math.round(clamp((166-at.y)/2.4,5,50))}:moveFlightHandle(p,editorDrag,(at.x-(editorDrag==='end'?FINISH_X:APEX_X))/FLIGHT_PIXEL);changeDraft(p,true);renderEditor();}
 function practiceFilter(filter){if(working)return;state.practiceFilter=filter;if(filter!=='mixed'&&scene().type!==filter){state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,filter,state.seed,state.recent),state.seed);}else{save();updateLabels();}}
 function comparisonCamera(comparison=best){
  const patterns=[[state.aim,state.pattern],[comparison?.aim||state.aim,comparison?.pattern||state.pattern]],points=[];
@@ -523,16 +527,20 @@ async function run(newSeed=false){
 for(const key of KEYS)$(key).addEventListener('input',()=>{
  if(!editorDraft)return;const el=$(key),v=key==='bigDirection'?el.value:Number(el.value);
  if(key!=='bigDirection'&&(el.value===''||!Number.isFinite(v)||v<Number(el.min)||v>Number(el.max))){editorInvalid.add(key);renderEditor();return;}
- editorInvalid.delete(key);const p=editorPattern();p[key]=key==='bigDirection'?(['left','right','both'].includes(v)?v:'both'):v;changeDraft(p);renderEditor(key);
+ editorInvalid.delete(key);const p=editorPattern();p[key]=key==='bigDirection'?(['left','right','both'].includes(v)?v:'both'):v;changeDraft(p,['start','curve','height'].includes(key));renderEditor(key);
 });
-$('club').addEventListener('change',()=>{if(!editorDraft||editorInvalid.size)return;if(editorDraft.some(c=>c.club===$('club').value))editorClub=$('club').value;renderEditor();});
+$('club').addEventListener('change',()=>{if(!editorDraft||editorInvalid.size)return;if(editorDraft.some(c=>c.club===$('club').value)){editorClub=$('club').value;$('applyAllClubs').checked=false;}renderEditor();});
 for(const id of ['flightEditor','heightEditor']){
- $(id).addEventListener('pointerdown',e=>{if(!editorDraft||editorInvalid.size||e.button!==undefined&&e.button!==0)return;const at=editorPoint($(id),e);if(!at)return;const p=editorPattern(),q=flightHandles(p),handles=id==='heightEditor'?[{key:'height',x:300,y:166-p.height*2.4}]:[{key:'mid',x:300+FLIGHT_PIXEL*q.mid,y:215},{key:'end',x:300+FLIGHT_PIXEL*q.end,y:60}];const h=handles.find(h=>Math.hypot(h.x-at.x,h.y-at.y)<=(e.pointerType==='touch'?48:32));if(!h)return;editorDrag=h.key;$(id).setPointerCapture?.(e.pointerId);e.preventDefault?.();dragEditor(id,e);});
+ $(id).addEventListener('pointerdown',e=>{if(!editorDraft||editorInvalid.size||e.isPrimary===false||e.button!==undefined&&e.button!==0)return;const at=editorPoint($(id),e);if(!at)return;const p=editorPattern(),q=flightHandles(p),handles=id==='heightEditor'?[{key:'height',x:300,y:166-p.height*2.4}]:[{key:'mid',x:APEX_X+APEX_FLIGHT_PIXEL*q.mid,y:apexY(p)},{key:'end',x:FINISH_X+FLIGHT_PIXEL*q.end,y:FINISH_Y}];const h=handles.sort((a,b)=>Math.hypot(a.x-at.x,a.y-at.y)-Math.hypot(b.x-at.x,b.y-at.y)).find(h=>Math.hypot(h.x-at.x,h.y-at.y)<=(e.pointerType==='touch'?48:32));if(!h)return;editorDrag=h.key;$(id).setPointerCapture?.(e.pointerId);e.preventDefault?.();dragEditor(id,e);});
  $(id).addEventListener('pointermove',e=>{if(editorDrag&&(e.buttons===1||e.pointerType==='touch'))dragEditor(id,e);});
  for(const type of ['pointerup','pointercancel','lostpointercapture'])$(id).addEventListener(type,()=>{editorDrag=null;});
 }
-$('straightFlight').addEventListener('click',()=>{if(!editorDraft)return;changeDraft({...editorPattern(),start:0,curve:0});editorInvalid.delete('start');editorInvalid.delete('curve');renderEditor();});
+$('straightFlight').addEventListener('click',()=>{if(!editorDraft)return;editorDraft=resetFlight(editorDraft,$('applyAllClubs').checked?null:editorClub);for(const key of ['start','curve','bias','height'])editorInvalid.delete(key);renderEditor();});
 $('reset').addEventListener('click',()=>{if(!editorDraft)return;const defaults=defaultMemberBag(basic()).find(c=>c.club===editorClub);editorDraft[editorDraft.findIndex(c=>c.club===editorClub)]=defaults;editorInvalid.clear();renderEditor();});
+$('applyAllClubs').addEventListener('change',()=>{if(editorDraft)renderEditor();});
+$('clubSettings').addEventListener('toggle',()=>{if(editorDraft&&$('clubSettings').open){$('applyAllClubs').checked=false;renderEditor();}});
+$('editShotQuick').addEventListener('click',openEditor);$('useMyShotMenu').addEventListener('click',()=>setMode('advanced'));
+$('flightEditor').addEventListener('keydown',e=>{if(!editorDraft||editorInvalid.size)return;const key=e.target.closest?.('[data-handle]')?.dataset.handle;if(!key||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||key==='end'&&['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();let p=editorPattern(),q=flightHandles(p);if(e.key==='ArrowLeft'||e.key==='ArrowRight')p=moveFlightHandle(p,key,q[key]+(e.key==='ArrowRight'?1:-1));else if(key==='mid')p={...p,height:clamp(p.height+(e.key==='ArrowUp'?1:-1),5,50)};changeDraft(p,true);renderEditor();$('flightEditor').querySelector?.(`[data-handle="${key}"]`)?.focus();});
 $('cancelEditor').addEventListener('click',closeEditor);$('saveEditor').addEventListener('click',saveEditor);
 $('menuToggle').addEventListener('click',()=>{if(working||editorDraft||progressOpen)return;$('practiceMenu').hidden=!$('practiceMenu').hidden;$('menuToggle').setAttribute('aria-expanded',!$('practiceMenu').hidden);});
 for(const el of document.querySelectorAll('[data-cost]'))el.addEventListener('input',()=>{if(working||isCourse()&&round.review||result||state.mode!=='advanced'||el.value===''||!Number.isFinite(Number(el.value)))return;state.costs[el.dataset.cost]=clamp(Number(el.value),Number(el.min),Number(el.max));state.memberCosts={...state.costs};dirty();});
@@ -576,7 +584,7 @@ $('progressProfile').addEventListener('change',()=>{progressSelection=$('progres
 $('progressType').addEventListener('change',()=>{progressType=['all','tee','approach'].includes($('progressType').value)?$('progressType').value:'all';renderProgress();});
 $('brandName').textContent=BRAND.name;$('brandFooter').textContent=BRAND.name;document.title=BRAND.title;
 if(round?.status==='active'){
- state.mode='basic';state.basicHandicap=round.profile.handicap;state.basicLimits[round.profile.handicap]=round.profile.limit;state.costs={...DEFAULT_COSTS};state.practiceMode='round';loadRoundSlot();
+ restorePlayerProfile();loadRoundSlot();
 }else if(round?.status==='complete'){showRoundScreen();}
 else if(state.practiceMode!=='free'){startRound('practice');}
 updateControls();drawCourse();save();

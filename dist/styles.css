@@ -199,3 +199,12 @@ button:disabled{cursor:not-allowed}
 .immersive-mode #courseOutcome{bottom:auto;max-height:calc(100vh - 260px)}
 @media(max-width:760px){.immersive-mode #courseOutcome{top:auto;bottom:16px;left:12px;right:12px;max-height:45vh}}
 @media(max-height:500px) and (orientation:landscape){.immersive-mode #courseOutcome{top:80px;bottom:auto;max-height:calc(100vh - 96px)}}
+
+.simple-flight-card{max-width:860px;margin:18px auto;background:#fbfcf6;border:1px solid #d2ddc6;border-radius:12px;padding:20px}
+.simple-flight-card #flightEditor{display:block;width:100%;height:auto;touch-action:none;user-select:none;border-radius:10px}
+.flight-instructions{font-size:.9rem;line-height:1.7;color:#506349;margin:10px 0 15px}
+.apply-shape{display:flex;align-items:center;gap:9px;font-size:.85rem;margin-top:12px}.apply-shape input{width:18px;height:18px}
+#flightEditor [data-handle]{cursor:grab}#flightEditor [data-handle]:focus{outline:none}#flightEditor [data-handle]:focus circle{stroke:#244333;stroke-width:5}
+#editShotQuick{white-space:nowrap;font-size:.8rem}.shot-editor .editor-footer{max-width:860px;margin:12px auto}.shot-editor>.editor-details{max-width:860px;margin:14px auto}
+@media(max-width:760px){.simple-flight-card{padding:12px;margin:12px 0}.simple-flight-card h2{font-size:20px}.flight-instructions{font-size:12px;line-height:1.6}.shot-editor .editor-footer .micro{max-width:50%}.shot-editor .editor-footer .primary{min-width:130px}.simple-flight-card .flight-description{font-size:12px}}
+.simple-flight-card .flight-description{text-transform:none}
