@@ -1,3 +1,17 @@
+# Guided lessons (13.0.0)
+
+Menu → Lessons now offers four selected, repeatable examples: What trouble costs, Give danger more room, Distance versus safety, and Choosing an approach target. Each introduces the principle, highlights a tested target, requires a choice within 4 yd of that target, then presents a different fixed example with no hint. Guided success confirms following the strategy; it does not guarantee safe simulated outcomes. Instructions can be hidden/reopened, with Back and Leave controls. In full-screen lessons they start collapsed so the course target remains accessible. The independent choice receives normal calculated coaching and a recap, with a button to review that decision.
+
+Validation: 149 regression tests passed, followed by focused checks for the final recap controls. All four complete lessons passed desktop and phone browser checks, including independent hints, recap review, saved completion and restoration of prior round/profile and live shot results. Existing learning/assessment rounds passed. Portrait and landscape full-screen checks completed a guided task by clicking the actual highlighted course target. Physical-device and Safari/Firefox testing remain outstanding.
+
+Lessons use a fixed 5-handicap straight-shot training profile, 265 yd driver-total limit, calm conditions, woodland scenery and shared deterministic 4,000-shot samples. They do not adapt their advice to a personal bag or handicap. The guided targets are computed from the same model and draws used by the shot review. Tests verify their specific water/sand exposure reduction. The layback lesson's independent wider tee rewards useful distance, avoiding a lesson that always says to lay up.
+
+OB/lost-ball cards explain stroke-and-distance and a third shot from the tee. Water cards distinguish common relief from this simulator's designated drop. Sand costs are distance-specific Tour-reference comparisons (about 0.13 extra at 20 yd and 0.45 at 60 yd), not automatic penalty strokes or a universal personal surcharge.
+
+Completion is stored locally and versioned separately. It means participation, not mastery. Guided and independent lesson attempts stay out of normal progress trends and round totals. Opening lessons preserves the prior practice state and unfinished round; leaving restores the prior profile, personal clubs and any live shot review. Reload during a lesson returns to the saved practice session rather than leaving tutorial settings in normal play. Only completed lesson IDs persist, not unfinished tutorial steps or recaps.
+
+The distance bar now emphasizes intended carry without the exact-looking total or numerical rollout estimate. A softer planning cue remains; actual rollout modeling is still the existing fixed club estimate with water contact, not newly randomized firmness physics. Left/right aim adjustments now preserve the selected carry, fixing the control interaction that made following a suggested carry/side target difficult.
+
 # Landing and rollout markers (12.10.0)
 
 After choosing a target, a small hollow marker and short dotted line show the planned straight-line finish after rollout, before curve and misses. The carry target remains the gold ring. The distance bar includes a compact marker key; zero-roll approaches use one location. The planning aid does not reveal dispersion, a center-flight curve, hazard outcomes or an ideal target.

@@ -1,4 +1,4 @@
-# Publish v12.10.0 in the existing Work project
+# Publish v13.0.0 in the existing Work project
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
@@ -27,3 +27,5 @@ After a normal practice shot, tap the rating to open the lesson. Confirm the com
 Deploy the new `dist/benchmark-broadie.js` and `dist/strokes-baseline.js` together with the complete matching dist folder. Costs now use the historical Tour distance-and-lie reference. Check that the model explanation links its sources, the lesson identifies the reference and any endpoint limits, old completed reports remain labeled separately, and an unfinished old-model round restarts. Personal club settings remain saved; old custom cost settings reset for the changed meanings.
 
 Include the new `dist/rollout.js` with the complete matching dist folder. Before commitment, select a tee target and check the carry ring, planned finish dot and short rollout line in normal/zoom/full-screen views. A zero-roll approach should show Carry = total with no separate finish preview. Normal review shows center landing/finish, stopping at water contact. Retry removes review markers; the assessment keeps center markers and individual coaching hidden.
+
+Include `dist/curriculum.js` with the entire matching dist folder. Check Menu → Lessons, all four lesson cards, explanation steps, highlighted guided target, success after following it, an unhinted independent example, recap/review/repeat and saved completion after reload. During a lesson the profile is fixed; leaving must restore the previous round and personal settings. Lesson attempts must not enter normal progress history. Check that the distance bar has intended carry without an exact-looking total, and that changing left/right aim preserves carry. Preserve the existing private project and owner-only access.
