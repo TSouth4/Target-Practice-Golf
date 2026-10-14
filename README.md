@@ -1,3 +1,11 @@
+# Cleaner play screen (16.5.0)
+
+The play screen now leads with Choose your target, compact handicap/difficulty selectors, par/distance/shot type, and the course. Green front/flag/back distances share a course overlay with a wind arrow, speed and Soft/Normal/Firm ground. Arrow direction still shows where the wind blows; the complete direction description is available to screen readers and on hover. Hazard and OB distances remain on the course. Duplicate green yardage callouts and the repeated scenario banner are hidden.
+
+Normal mode uses a horizontal Intended carry slider immediately below the course and a full-width Commit & shoot action. Full screen retains the vertical carry bar. Shot-profile details, practice filters, additional aim controls and feedback follow the main action. Colors and the shot/scoring model are unchanged. The optional standalone Introduction remains available.
+
+Validation: all 173 automated tests and syntax checks passed. Browser checks covered desktop, 320/390-pixel phones and landscape, horizontal/vertical carry controls, wind/ground placement, shot feedback and retry, par-3 controls/scorecard/selected-ball continuity, and guided lessons in full screen.
+
 # Guided Introduction (16.4.0)
 
 The Introduction is now optional and opens on its own screen. The practice home offers **Recommended: Start Quick Introduction** until completion. Leaving early keeps the recommendation available; completing hides it in this browser. Menu → Introduction always replays it. Earlier completed introductions remain recognised. Saved practice settings, paused rounds, results and progress screens return when leaving. No introduction attempts enter statistics.
