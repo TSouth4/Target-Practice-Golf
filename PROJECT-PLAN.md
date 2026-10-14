@@ -77,9 +77,26 @@ Consider an iPhone/Android app when user feedback establishes a concrete need, s
 
 **Next task:** Owner playtest the lessons and baseline advice. Owner playtest the new wind/firmness settings and golfer/coach review the estimates and advice. Refine those results before expanding conditions or combining the launch candidate. Expand the current three-hole par-3 pilot after review; later full courses should generate the whole hole once and advance from the actual shot result. Simulated short game/putting will need a suitable player model rather than assuming the Tour reference predicts personal scores. Prepare free/paid limits, accounts, cross-device history and payments before the full launch. The agreed sequence is a small test pilot → refinement → one full launch ready for both free and paid members.
 
-## Future engagement — par-3 leaderboards
+## Future priority — daily and weekend par-3 challenges
 
-Tyler requested daily and all-time leaderboards for par-3 scores. Plan this after accounts, reliable round history and the course pilot are ready. Daily competition should offer the same seeded course and conditions to each participant. Separate comparable results by handicap/profile rules, difficulty and course length. Public scores will need server validation and clear rules for retries; current browser-only scores are practice results.
+Tyler requested daily challenges, weekend tournaments, and daily/all-time leaderboards as a way to attract golfers and give them a reason to return. This is a priority future engagement candidate after accounts, reliable member history and trusted course results are ready. It is not a newly committed launch requirement or scheduled release.
+
+- Offer a shared seeded course and conditions for everyone in an event, with clearly stated opening/closing times and timezone.
+- Define fair divisions or restrictions for handicap/custom profiles, difficulty and course length. Keep results from incompatible models/rules separate.
+- Establish attempt limits, practice/retry rules, tie handling and whether first or best eligible scores count. Validate eligible results on the server; current browser-local scores are practice results.
+- Show golf score and decision quality together so the learning purpose stays visible alongside competition. Consider shareable results and personal bests as optional ways to encourage invitations and return visits.
+- Evaluate a simple daily challenge first, then weekend events and longer-term leaderboards. Use pilot feedback and participation/return-use evidence to choose scope. Entry fees and prizes are not part of the current proposal.
+
+## Future candidate — handicap progress and GHIN connection
+
+Tyler wants to explore whether members' real-world Handicap Index changes are associated with how often and how they practise in the app. Start after accounts and reliable, profile-specific member history are available.
+
+- Offer voluntary, dated Handicap Index entries as an initial option; label self-reported data clearly and keep it distinct from the handicap simulation profile selected for play.
+- Investigate approved USGA/GHIN access, user authorization, permitted uses, provider agreements and potential fees before committing to an integration. A GHIN number alone does not establish access or permission. No provider access or commercial terms have been verified.
+- With informed consent, compare handicap trends with practice frequency, completed lessons, assessments and rounds over meaningful periods. Account for other influences such as golf participation and coaching; observed correlations do not establish that the app caused improvement.
+- Plan privacy, account linking/unlinking, retention/deletion and appropriate aggregate reporting before collecting linked records. Do not make public handicap-improvement claims without adequate evidence.
+
+Suggested sequence: member accounts/history → daily challenges → weekend events; investigate GHIN feasibility alongside this work, with voluntary tracking as a possible first step. Neither GHIN access nor competitive events should block the agreed pilot → refinement → combined free-and-paid launch. Real-course recreation and uploaded-hole conversion remain exploratory ideas, not additions requested in this roadmap update.
 
 ## Launch planning reference
 
