@@ -33,6 +33,7 @@ export const SCENARIOS = [
    {kind:'trees',label:'Back recovery',poly:[[-57,197],[42,197],[42,215],[-57,215]]}],labels:[{x:-30,y:159,text:'SAND'},{x:46,y:178,text:'OB'}]}
  ,...EXTRA_HOLES
 ];
+SCENARIOS.push(...[{id:'shore-tee',source:'cedar',name:'Along the shoreline'},{id:'shore-green',source:'tucked',name:'Shoreline green'}].map(def=>({...structuredClone(SCENARIOS.find(s=>s.id===def.source)),...def,shoreline:true})));
 export const DEFAULT_COSTS = {baseline:BASELINE_ID,rough:0,bunker:0,trees:0,waterExtra:0,base150:2.945,longSlope:0,puttBase:0};
 // These are deliberately illustrative, not empirical handicap-conditioned data.
 const PRESETS = {
@@ -92,7 +93,12 @@ export function shotAt(aim,p,z,s=null){
 }
 export function outcome(end,s){
  // Water contact is tested at carry and along a fixed roll segment, not airborne flight.
- for(const h of s.hazards.filter(h=>h.kind==='water')){const finish=segmentPolyEntry(end.landing,end,h.poly);if(finish)return {kind:'water',drop:h.drop,finish};}
+ for(const h of s.hazards.filter(h=>h.kind==='water')){const finish=segmentPolyEntry(end.landing,end,h.poly);if(finish){
+   if(h.reliefBank){const bank=h.reliefBank,y=clamp(finish.y,bank[0][1],bank.at(-1)[1]),i=Math.max(1,bank.findIndex(p=>p[1]>=y)),a=bank[i-1],b=bank[i],x=a[0]+(b[0]-a[0])*(y-a[1])/(b[1]-a[1]);
+    for(const offset of [2,1]){const drop={x:x-h.reliefSide*offset,y},kind=lie(drop,s);if(['fairway','rough','trees'].includes(kind))return{kind:'water',drop,dropKind:kind,finish};}
+   }
+   return {kind:'water',drop:h.drop,finish};
+  }}
  if(lie(end,s)==='ob')return {kind:'ob'};
  return {kind:lie(end,s)};
 }
@@ -101,9 +107,9 @@ export function evaluate(aim,p,s,c,zs,collect=false){
  const costs=collect?{nextShot:0,rough:0,bunker:0,trees:0,water:0,ob:0}:null;
  let baselineClamped=0;
  for(const z of zs){const end=shotAt(aim,p,z,s),o=outcome(end,s);counts[o.kind]++;
-  const v=o.kind==='ob'?null:o.kind==='water'?2+c.waterExtra+remaining(o.drop,s,c,'rough'):1+remaining(end,s,c,o.kind);
+  const v=o.kind==='ob'?null:o.kind==='water'?2+c.waterExtra+remaining(o.drop,s,c,o.dropKind||'rough'):1+remaining(end,s,c,o.kind);
   if(costs&&v!==null){
-   const position=o.kind==='water'?o.drop:end,kind=o.kind==='water'?'rough':o.kind;
+   const position=o.kind==='water'?o.drop:end,kind=o.kind==='water'?o.dropKind||'rough':o.kind;
    if(baselineLookup(kind,Math.hypot(position.x-s.pin.x,position.y-s.pin.y)).clamped)baselineClamped++;
    const base=remaining(o.kind==='water'?o.drop:end,s,c,o.kind==='green'?'green':'fairway');
    costs.nextShot+=base;

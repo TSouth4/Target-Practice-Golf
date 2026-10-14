@@ -52,6 +52,7 @@ export function drawPlant(p,project,theme){
 // Only offer shoreline settings where the authored water already runs beside the hole.
 // The environment renderer never creates or changes a playable hazard footprint.
 export function shorelineWater(s){
+ if(s?.shoreline)return s.hazards.find(h=>h.kind==='water');
  return s?.hazards.find(h=>{if(h.kind!=='water')return false;const ys=h.poly.map(p=>p[1]),y=(Math.min(...ys)+Math.max(...ys))/2,[left,right]=fairwaySection(s,y),center=(left+right)/2,xs=h.poly.map(p=>p[0]);return Math.max(...ys)-Math.min(...ys)>=20&&(Math.max(...xs)<center-5||Math.min(...xs)>center+5);});
 }
 export function drawBackdrop(style,s){

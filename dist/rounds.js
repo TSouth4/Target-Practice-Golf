@@ -11,8 +11,8 @@ export function createRound(kind,seed,profile){
  profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
  const rng=random(seed),count=kind==='assessment'?10:5,approaches=['water','tucked','bowl','split','creek-par3','par5-open','par5-carry'],schedule=[];
  for(let i=0;i<count;i++){
-  const pool=i%2?approaches:groups[Math.floor(i/2)%groups.length],id=pool[Math.floor(rng()*pool.length)];
-  if(i%2)approaches.splice(approaches.indexOf(id),1);
+  const pool=i===1?['shore-green']:i%2?approaches:groups[Math.floor(i/2)%groups.length],id=pool[Math.floor(rng()*pool.length)];
+  if(i%2&&approaches.includes(id))approaches.splice(approaches.indexOf(id),1);
   let holeSeed=Math.floor(rng()*2147483645)+1;
   // A wide tee slot complements the short and tight tee slots in each learning round.
   if(id==='cedar'||id==='creek-tee'&&i===4)while(holeSeed%3!==0)holeSeed++;

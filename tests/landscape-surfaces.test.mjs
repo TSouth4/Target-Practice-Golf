@@ -40,7 +40,7 @@ test('swapping dense and open recovery costs changes the sensible target side on
 test('shoreline environments are offered only with existing side water and backgrounds do not change scoring',async()=>{
  const {shorelineWater,drawBackdrop}=await import('../dist/landscape.js'),{nextLandscape}=await import('../dist/practice.js');let lake=0,ocean=0,mountain=0,eligible=0;
  for(const base of SCENARIOS)for(let seed=1;seed<=25;seed++){const s=generateScenario(base,seed),before=JSON.stringify(s),shore=shorelineWater(s),style=nextLandscape('woodland',seed,s);if(shore)eligible++;if(style==='lake')lake++;if(style==='ocean')ocean++;if(style==='mountain')mountain++;
-  if(['lake','ocean'].includes(style)){assert.ok(shore,base.id);assert.ok(s.hazards.includes(shore));const center={x:shore.poly.reduce((n,p)=>n+p[0]/shore.poly.length,0),y:shore.poly.reduce((n,p)=>n+p[1]/shore.poly.length,0)};assert.equal(lie(center,s),'water');}
+  if(['lake','ocean'].includes(style)){assert.ok(shore,base.id);assert.ok(s.hazards.includes(shore));const row=shore.poly[Math.floor((shore.poly.length-2)/2)],center=s.shoreline?{x:(row[0]+shore.poly.at(-1)[0])/2,y:row[1]}:{x:shore.poly.reduce((n,p)=>n+p[0]/shore.poly.length,0),y:shore.poly.reduce((n,p)=>n+p[1]/shore.poly.length,0)};assert.equal(lie(center,s),'water');}
   for(const style of ['mountain','lake','ocean']){assert.match(drawBackdrop(style,s),new RegExp('data-environment="'+style+'"'));assert.ok(!/NaN|undefined/.test(drawBackdrop(style,s)));}assert.equal(JSON.stringify(s),before);
  }
  assert.ok(eligible>0&&lake>0&&ocean>0&&mountain>0);

@@ -123,7 +123,7 @@ function updateLabels(){
  $('aimBadge').textContent=hasAim?`◎ ${result?'Committed carry':'Your carry'} · ${Math.round(p.carry)} yd · ${sided(state.aim.x)}`:'◎ Pick direction, then depth';
  if(round?.kind==='assessment'&&roundRecorded())$('aimBadge').textContent='◎ Decision recorded · next scenario when ready';
  $('sampleStatus').textContent=`4,000 shots · seed ${state.seed}`;
- $('cloudBadge').textContent=result?'Dots: outcome colors · solid: yours · dashed: comparison':phase==='assessment-review'?`${traceShots.length} example flights · report at the end`:phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
+ $('cloudBadge').textContent=result?'Outlines: carry core · dots: final positions':phase==='assessment-review'?`${traceShots.length} example flights · report at the end`:phase==='shooting'?`${traceShots.length} example flights · colored by outcome`:phase==='zooming'?'Zooming to your landing area…':'Pattern hidden until you commit';
  $('holeMeta').textContent=`PAR ${s.par} · ${s.secondShot?'SECOND SHOT · ':''}${s.length} YD${s.type==='approach'?' TO FLAG':''}`;
  $('scenarioDiagnostics').textContent=`Scenario ${s.id} · layout seed ${state.holeSeed} · shot seed ${state.seed} · ${s.generatorVersion||'authored baseline'} · ${s.woodlandVersion||''}`;
  $('greenYardageList').hidden=!!result;$('greenYardageList').innerHTML=greenYardages(s).map(item=>`<span><small>${item.label}</small><strong>${Math.round(item.distance)} yd</strong></span>`).join('');
@@ -396,7 +396,7 @@ function dragEditor(id,e){if(!editorDraft||!editorDrag||editorInvalid.size)retur
 function practiceFilter(filter){if(working)return;state.practiceFilter=filter;if(filter!=='mixed'&&scene().type!==filter){state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,filter,state.seed,state.recent),state.seed);}else{save();updateLabels();}}
 function comparisonCamera(comparison=best){
  const patterns=[[state.aim,state.pattern],[comparison?.aim||state.aim,comparison?.pattern||state.pattern]],points=[];
- const means=patterns.map(([aim,p])=>{points.push(aim);for(let i=0;i<64;i++){const t=i/64*Math.PI*2;points.push(shotAt(aim,{...p,bigPct:0},{z1:1.794*Math.cos(t),z2:1.794*Math.sin(t),u:1,sign:1},scene()));}const mean=shotAt(aim,{...p,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1},scene());points.push(mean);return mean;});
+ const means=patterns.map(([aim,p])=>{points.push(aim);for(let i=0;i<64;i++){const t=i/64*Math.PI*2;const z={z1:1.794*Math.cos(t),z2:1.794*Math.sin(t),u:1,sign:1};points.push(shotAt(aim,{...p,bigPct:0},z,scene()),shotAt(aim,{...p,bigPct:0},z).landing);}const mean=shotAt(aim,{...p,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1},scene());points.push(mean);return mean;});
  return reviewCamera(means[0],means[1],state.pattern,{points});
 }
 function analysisCamera(){return transition?transition.camera:(landingCamera??=comparisonCamera());}
@@ -460,8 +460,8 @@ function drawCourse(){
  if(course&&result&&showPattern)html+='<g id="courseDiscarded">';
  if(result&&showPattern){const path=tracerTrajectory({x:center.finish.x,y:center.finish.y,landing:center.landing},state.aim,p,48).slice(0,-1).map((world,i)=>{const at=project(world);return`${i?'L':'M'}${at.x.toFixed(1)} ${at.y.toFixed(1)} `;}).join('');
  html+=`<path d="${path}" fill="none" stroke="#fffced" stroke-width="2" opacity=".78"/>`+line(center.landing,center.finish,'stroke="#fffced" stroke-width="2" stroke-dasharray="4 4" opacity=".8"');
- // Joint 80% core contour, including correlation and the mean flight transform.
- for(const [aim,color,id] of [[best.aim,'#5195cc','idealContour'],[state.aim,'#e5ab53','yourContour']]){let contour=[];for(let i=0;i<64;i++){const t=i/64*Math.PI*2,pt=shotAt(aim,{...patternAtTarget(aim,p),bigPct:0},{z1:1.794*Math.cos(t),z2:1.794*Math.sin(t),u:1,sign:1},s);contour.push([pt.x,pt.y]);}html+=`<polygon id="${id}" points="${polygon(contour)}" fill="${color}" fill-opacity=".12" stroke="${color}" stroke-dasharray="${id==='idealContour'?'7 4':'none'}" stroke-width="2.5"/>`;}
+ // Smooth carry core: wind and shape, before surface-dependent rollout.
+ for(const [aim,color,id] of [[best.aim,'#5195cc','idealContour'],[state.aim,'#e5ab53','yourContour']]){let contour=[];for(let i=0;i<64;i++){const t=i/64*Math.PI*2,pt=shotAt(aim,{...patternAtTarget(aim,p),bigPct:0},{z1:1.794*Math.cos(t),z2:1.794*Math.sin(t),u:1,sign:1});contour.push([pt.landing.x,pt.landing.y]);}html+=`<polygon id="${id}" points="${polygon(contour)}" fill="${color}" fill-opacity=".08" stroke="${color}" stroke-dasharray="${id==='idealContour'?'7 4':'none'}" stroke-width="2.5"><title>80% carry core before rollout; dots show final outcomes</title></polygon>`;}
  html+='<g id="idealCloud">';for(let i=0;i<best.result.points.length;i+=16){const shot=best.result.points[i],at=project(shot);html+=`<circle data-outcome="${shot.kind}" cx="${at.x.toFixed(2)}" cy="${at.y.toFixed(2)}" r="2" fill="none" stroke="${TRACER_COLORS[shot.kind]}" stroke-width="1.2" opacity=".6"/>`;}html+='</g>';
  html+='<g id="shotCloud">';for(let i=0;i<result.points.length;i+=8){const shot=result.points[i],at=project(shot);html+=`<circle data-outcome="${shot.kind}" cx="${at.x.toFixed(2)}" cy="${at.y.toFixed(2)}" r="${shot.big?3.5:2.5}" fill="${TRACER_COLORS[shot.kind]}" stroke="#29422e" stroke-width=".65" opacity=".95"/>`;}html+='</g>';
   const b=project(best.aim);html+=line(zero,best.aim,'stroke="#5195cc" stroke-width="1.5" stroke-dasharray="3 6" opacity=".65"');html+=`<g transform="translate(${b.x},${b.y})"><path d="M0-10L8 0 0 10-8 0Z" fill="#27608a" stroke="#acd6f3" stroke-width="2"/></g>`;

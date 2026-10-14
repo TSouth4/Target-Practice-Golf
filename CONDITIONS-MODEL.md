@@ -24,7 +24,7 @@ These coefficients are deliberately illustrative, bounded training estimates. Th
 
 Easy preserves the old stock-roll behavior exactly. For Medium/Hard, soft/normal/firm ground multiplies stock roll by 0.35 / 1 / 1.6. A stock-zero-roll approach gains rollout only on firm ground: min(8, intended carry × 0.03) / the bounded height factor. Thus firmness can matter near a green without adding approach roll to the Easy baseline.
 
-Roll from rough is 35% of the resulting roll on fairway/green. A landing in water, OB, sand or recovery vegetation has no roll. A rolling ball entering sand or recovery vegetation stops at its first contact. Existing water-contact rules stop the ball at entry and apply the authored drop/penalty. Finishing surface and rollout are shared by scoring, course results, center-flight markers and review contours. The rollout direction follows the aim heading. Surface friction changes during a fairway-to-green roll, slope, bounce and landing-angle physics are not modeled.
+Roll from rough is 35% of the resulting roll on fairway/green. A landing in water, OB, sand or recovery vegetation has no roll. A rolling ball entering sand or recovery vegetation stops at its first contact. Existing water-contact rules stop the ball at entry and apply the authored drop/penalty. Finishing surface and rollout are shared by scoring, course results and center-flight markers. Review outlines show carry landings before rollout, while outcome dots show actual final positions. The rollout direction follows the aim heading. Surface friction changes during a fairway-to-green roll, slope, bounce and landing-angle physics are not modeled.
 
 ## Sessions and comparisons
 
@@ -37,3 +37,5 @@ Short-game/putting reference costs and course finishing distributions remain the
 ## Feedback
 
 Feedback describes the approximate center-flight wind shift after commitment, explains soft/firm roll and identifies that the target remained fixed. The existing hazard/proximity/club tradeoff analysis uses the resulting condition-aware outcomes. Assessment feedback remains deferred to the final report; course target coaching remains separate from the selected-ball score.
+
+Dedicated shoreline families model relief beside the bank at the landing/rolling water-contact depth, using a nearby general-area point and its actual fairway/rough/recovery lie. Their authored bank strip excludes bunkers that block that relief. Older families keep their authored drops. This approximation does not reconstruct the last airborne crossing point or simulate the full official relief procedure; coach review remains required for penalty advice.

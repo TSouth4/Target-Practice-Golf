@@ -39,7 +39,7 @@ export function recordCourseShot(c,points,s,decision,aim,pattern){
  // Keep the original carry landing for flight animation. Evaluation already stops
  // water rollout at its contact point, and outcome supplies the authored relief.
  let finish=null,penalty=0;
- if(selected.kind==='water'){const drop=o.drop;if(!drop)throw new Error('Water outcome has no relief location');penalty=1;finish=simulateFinish('rough',Math.hypot(drop.x-s.pin.x,drop.y-s.pin.y),seed^0x783abc,remaining(drop,s,DEFAULT_COSTS,'rough'));finish.drop={...drop};}
+ if(selected.kind==='water'){const drop=o.drop;if(!drop)throw new Error('Water outcome has no relief location');penalty=1;finish=simulateFinish(o.dropKind||'rough',Math.hypot(drop.x-s.pin.x,drop.y-s.pin.y),seed^0x783abc,remaining(drop,s,DEFAULT_COSTS,o.dropKind||'rough'));finish.drop={...drop};}
  else if(selected.kind!=='ob')finish=simulateFinish(selected.kind,Math.hypot(selected.x-s.pin.x,selected.y-s.pin.y),seed^0x783abc,remaining(selected,s,DEFAULT_COSTS,selected.kind));
  const attempt={selected,decision,aim:{...aim},pattern:structuredClone(pattern),penalty:selected.kind==='ob'?1:penalty};c.current.attempts.push(attempt);
  if(selected.kind==='ob')c.current.strokes+=2;

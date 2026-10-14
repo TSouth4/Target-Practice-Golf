@@ -28,7 +28,7 @@ test('a long mixed session visits every architecture without exact layout repeti
   const signature=createHash('sha256').update(JSON.stringify({fairway:s.fairway,green:s.green,pin:s.pin,hazards:s.hazards})).digest('hex');
   assert.ok(!seen.has(signature));seen.add(signature);families.add(next);id=next;recent=[...recent,id].slice(-6);
  }
- assert.equal(families.size,14);assert.equal(seen.size,240);
+ assert.equal(families.size,SCENARIOS.length);assert.equal(seen.size,240);
 });
 
 test('sharp dogleg aiming, club reach, and comparison search use the same expanded lateral range',async()=>{
