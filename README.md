@@ -1,3 +1,15 @@
+# Introduction and phone refinements (16.6.0)
+
+Introduction target two is now in the far-left center portion of the same green, rather than a short layup. The model verifies its expected cost is higher than the balanced target. The five following slides have distinct illustrations: carry/rollout, sampled dispersion dots, the three calculated target costs, reading distances/trouble/wind, and the Read–Choose–Commit–Review habit.
+
+Reaching the final slide now saves completion immediately; no additional exit action is required to remove the home recommendation. Finishing, starting a learning round and entering lessons still work, and menu replay remains available. Completion remains browser-local and tied to the site address; another origin/device or cleared/blocked storage cannot inherit it. The final slide confirms whether saving succeeded. Leaving before the final slide does not count as completion.
+
+Practice type is a Tee/Approach/Mixed dropdown beside Handicap and Difficulty on desktop; phones use two fields plus a full-width third field. The old tab row is hidden. Fixed learning rounds, assessments, courses and lessons lock this setting consistently with the former tabs.
+
+On phones in normal mode, front/flag/back and wind/ground sit above the course instead of covering it. Compact on-course distance labels replace hazard tiles; tapping or keyboard-activating them explains the hazard range/side via the status toast, without setting an aim. Labels disappear during calculation/flights/zoom and return for review. Desktop hazard callouts and full-screen vertical carry remain. No physics or scoring coefficients changed.
+
+Validation: 174 automated tests passed, including far-left target cost, distinct topic illustrations, completion persistence and practice-dropdown restrictions. Syntax checks passed. Browser walkthroughs passed at desktop/390/320 widths; mobile checks verified tap details without changing aim, labels hidden during flights and restored in review, no horizontal overflow, plus portrait/landscape par-3 and lesson controls. Final label size/spacing adjustments were checked again in phone browsers.
+
 # Cleaner play screen (16.5.0)
 
 The play screen now leads with Choose your target, compact handicap/difficulty selectors, par/distance/shot type, and the course. Green front/flag/back distances share a course overlay with a wind arrow, speed and Soft/Normal/Firm ground. Arrow direction still shows where the wind blows; the complete direction description is available to screen readers and on hover. Hazard and OB distances remain on the course. Duplicate green yardage callouts and the repeated scenario banner are hidden.
