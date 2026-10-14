@@ -1,0 +1,11 @@
+export const INTRO_KEY='target-practice-introduction-v1';
+export const INTRO_VERSION='introduction-v1';
+export function hasSeenIntroduction(raw){try{const s=JSON.parse(raw);return s?.version===INTRO_VERSION&&['completed','skipped'].includes(s.status);}catch{return false;}}
+export const INTRO_STEPS=[
+ {title:'Practise better decisions',text:'Learn the basics of course management, recognise what matters before a shot, and build the habit of choosing better targets. This short introduction shows you how to use the app.'},
+ {title:'Choose direction and intended carry',text:'Carry is how far you intend the ball to travel before landing. It gives us a useful starting point because rollout depends heavily on the ground and landing surface. Wind and imperfect contact can still change your actual carry.',task:'Choose a direction on the course or with Aim left / right. Set Intended carry beside the course. Then choose Next.'},
+ {title:'Read the hole before seeing your pattern',text:'The view stays uncluttered so you can practise using the distances, visible trouble and conditions you would consider on a real course.',task:'Look at the green yardages and bunkers. Your pattern stays hidden until you choose Commit & shoot below the course.'},
+ {title:'Commit and see the possibilities',text:'We simulate 4,000 possible shots from the selected shot profile. Together, they show a range of outcomes—not one guaranteed or average shot. The smooth outline shows the main carry pattern before rollout; the dots show final positions after rollout. Some misses fall outside the outline.'},
+ {title:'Understand your decision score',text:'We grade your target choice, rather than one lucky or unlucky result. Too much aggression brings costly trouble into play. Too much caution can leave an unnecessarily difficult next shot. A strong decision balances those costs. The blue target is the best sampled comparison, rather than a guaranteed perfect answer.'},
+ {title:'Adjust, compare and build the habit',text:'Try another target and see what changes. Use these experiments to train your eyes and judgement: recognise your likely misses, weigh the danger, and choose a sensible target before every shot.',task:'Choose Adjust & compare, change your direction or intended carry, then commit again. The hole and sampled misses stay the same for a fair comparison.'}
+];

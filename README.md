@@ -1,3 +1,9 @@
+# Introduction (16.2.0)
+
+The first visit after this update opens a six-step Introduction: the purpose of practice, choosing direction and intended carry, reading the hole, committing and understanding 4,000 possible outcomes, judging decision quality, and adjusting/comparing to build a habit. It uses one fixed, calm 145-yard example and requires a first shot and a changed-target retry before offering a five-shot round, the golf lessons or Finish introduction.
+
+Skip introduction is available throughout; Menu → Introduction replays it anytime. Completion or skipping is remembered in this browser under a separate key. Previous users see it once because there was no earlier introduction marker. Tutorial shots do not enter progress or round statistics. Saved settings, existing rounds, course scores, reports and progress screens are restored when leaving. Member accounts/cross-device completion are future work.
+
 # Smooth carry guides and shoreline holes (16.1.0)
 
 Review outlines now show the smooth 80% carry core, including wind and usual shape, before surface-dependent rollout. Dots continue to show scored final positions after rollout and hazard stopping. The legend distinguishes these meanings; scoring and stopping rules are preserved. Review framing includes both carry guides and final-position guides so the carry outline is not clipped.

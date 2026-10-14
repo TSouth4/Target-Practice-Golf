@@ -3,6 +3,8 @@ import {readFileSync} from 'node:fs';
 export function setupDOM({reducedMotion=true,practiceMode='free'}={}){
  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),elements=new Map(),costs=[],storage=new Map();
  // Existing flow regressions explicitly use unrestricted practice; round behavior has separate checks.
+ // Existing flow checks represent returning users; introduction tests remove this key.
+ storage.set('target-practice-introduction-v1',JSON.stringify({version:'introduction-v1',status:'skipped'}));
  storage.set('golfaim101-v2',JSON.stringify({scenario:'cedar',practiceMode}));
  class Element{
   constructor(attrs={}){this.attrs=attrs;this.id=attrs.id;this.value=attrs.value||'';this.min=attrs.min||'';this.max=attrs.max||'';this.hidden='hidden'in attrs;this.innerHTML='';this.textContent='';this.style={};this.dataset=attrs['data-cost']?{cost:attrs['data-cost']}:{};this.listeners={};this.classList={toggle(){}};}

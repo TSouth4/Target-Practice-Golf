@@ -1,3 +1,4 @@
+import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,hasSeenIntroduction} from './introduction.js';
 import {CALM,CONDITIONS_VERSION,conditionsFor,conditionsLabel,conditionsFeedback} from './conditions.js';
 import {createCourse,readCourse,recordCourseShot,advanceCourse,courseTotal,scoreName,scoreToPar,COURSE_FINISH_LABEL,COURSE_KEY} from './course.js';
 import {tutorialGraphic} from './tutorial-graphics.js';
@@ -21,6 +22,7 @@ const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bi
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
 let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',practiceMode:'round',difficulty:'easy',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let introduction=null,introductionSeen=false,introductionSaved=true;try{introductionSeen=hasSeenIntroduction(localStorage.getItem(INTRO_KEY));}catch{introductionSaved=false;}
 let tutorial=null,tutorialReturn=null,lessonScreenOpen=false,lessonCompleted=[],lessonStorageOK=true;const tutorialCache=new Map();try{lessonCompleted=readLessonCompletion(localStorage.getItem(LESSON_KEY));}catch{lessonStorageOK=false;}
 let round=null,roundView=false,roundResumed=false;try{round=readRound(localStorage.getItem(ROUND_KEY));roundResumed=round?.status==='active';}catch{}
 let result=null,best=null,oneShot=null,working=false,hasAim=false,toastTimer,phase='choose',traceShots=[],transition=null;
@@ -48,7 +50,7 @@ function currentProfile(){return profileKey(state.mode,state.basicHandicap,state
 function selectedPlayerProfile(){return{handicap:state.basicHandicap,limit:state.basicLimits[state.basicHandicap]||DRIVER_LIMITS[state.basicHandicap],...(state.difficulty!=='easy'?{difficulty:state.difficulty,conditionsVersion:CONDITIONS_VERSION}:{}),...(state.mode==='advanced'?{shotMode:'custom',bag:structuredClone(state.memberBag)}:{})};}
 function restorePlayerProfile(){state.difficulty=round.profile.difficulty||'easy';state.mode=round.profile.shotMode==='custom'?'advanced':'basic';state.basicHandicap=round.profile.handicap;state.basicLimits[round.profile.handicap]=round.profile.limit;state.costs={...DEFAULT_COSTS};state.practiceMode='round';}
 function recordDecision(){
- if(tutorial||isCourse())return;
+ if(introduction||tutorial||isCourse())return;
  if(!Number.isFinite(best.result.expected)){progressMessage='No progress entry: this run has no usable target comparison.';return;}
  const assessed=decisionFeedback(state.aim,state.pattern,result,best,scene());
  const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit · ${state.pattern.conditions?.difficulty||'easy'}`:`My clubs · ${state.pattern.conditions?.difficulty||'easy'}`,type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected,state.aim,best.aim),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty,conditions:structuredClone(state.pattern.conditions||CALM)};
@@ -166,11 +168,42 @@ function updateLabels(){
  for(const el of document.querySelectorAll('[data-cost]'))el.disabled=working||!!result;
  updateFullscreenControls();
  updateRoundControls();
- updateTutorialControls();updateCourseControls();
+ updateTutorialControls();updateCourseControls();updateIntroductionControls();
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
+function openIntroduction(){
+ if(working)return;if(introduction)closeIntroduction('skipped');else if(tutorialReturn)closeLessons();if(editorDraft)prepareNavigation();leaveFullscreen();closeMenu();
+ tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
+ $('roundScreen').hidden=true;$('progressScreen').hidden=true;$('lessonsScreen').hidden=true;$('practiceScreen').hidden=false;
+ introduction={step:0,compared:false};round=null;roundView=false;progressOpen=false;state.mode='basic';state.practiceMode='free';state.basicHandicap='5';state.basicLimits['5']=265;state.difficulty='easy';state.costs={...DEFAULT_COSTS};
+ sceneKey=null;setScenario('split',2,'woodland');scene().name='Introduction practice hole';scene().par=3;scene().length=Math.round(Math.hypot(scene().pin.x,scene().pin.y));state.seed=91371;hasAim=false;dirty();$('introductionCard').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();
+}
+function closeIntroduction(status='skipped'){
+ if(working||!introduction)return;introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status}));introductionSaved=true;}catch{introductionSaved=false;}
+ introduction=null;closeLessons();$('introductionCard').hidden=true;if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
+}
+function updateIntroductionControls(){
+ $('introductionMenu').disabled=working;$('introductionCard').hidden=!introduction;$('appRoot').classList.toggle('introduction-mode',!!introduction);
+ if(!introduction)return;const i=introduction.step,step=INTRO_STEPS[i];$('introductionStep').textContent=`Introduction · ${i+1} / 6`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;$('introductionTask').textContent=i===4?`Your first target earned ${introduction.firstScore} / 100. Read the feedback below the course, then choose Next.`:i===5&&introduction.compared?'You tried a different target using the same misses. Keep practising that habit in a five-shot round or explore the golf lessons.':step.task||(i===0?'Choose Next to try a fixed practice hole.':'Look at the pattern and feedback below the course, then choose Next.');
+ $('introductionNext').hidden=i===2||i===5;$('introductionNext').disabled=working||i===1&&!hasAim;$('introductionBack').hidden=i===0||i>=3;$('introductionBack').disabled=working;$('introductionSkip').disabled=working;
+ $('introductionAdjust').hidden=i!==5||!result||introduction.compared;$('introductionAdjust').disabled=working;
+ for(const id of ['introductionFinish','introductionRound','introductionLessons']){$(id).hidden=i!==5||!introduction.compared;$(id).disabled=working;}
+ for(const id of ['basicHandicap','driverLimit','driverLimitReset','difficulty','teeTab','approachTab','mixedTab'])$(id).disabled=true;
+ if(i===0||i===3||i===4){$('aimX').disabled=true;$('aimY').disabled=true;}
+ $('simulate').disabled=working||!hasAim||![2,5].includes(i);$('tryAgain').hidden=true;$('newShots').hidden=true;
+ $('retryThisHole').hidden=true;
+ $('practiceIntro').textContent='Introduction · fixed calm example · your practice settings and statistics are preserved.';
+}
+$('introductionMenu').addEventListener('click',openIntroduction);
+$('introductionNext').addEventListener('click',()=>{if(working||!introduction||introduction.step===1&&!hasAim)return;introduction.step++;updateLabels();$('introductionCard').scrollIntoView({behavior:'auto'});});
+$('introductionBack').addEventListener('click',()=>{if(working||!introduction||introduction.step<1||introduction.step>2)return;introduction.step--;updateLabels();});
+$('introductionSkip').addEventListener('click',()=>closeIntroduction('skipped'));
+$('introductionAdjust').addEventListener('click',retryShot);
+$('introductionFinish').addEventListener('click',()=>{if(introduction?.compared)closeIntroduction('completed');});
+$('introductionRound').addEventListener('click',()=>{if(!introduction?.compared)return;closeIntroduction('completed');startRound('practice');});
+$('introductionLessons').addEventListener('click',()=>{if(!introduction?.compared)return;closeIntroduction('completed');openLessons();});
 function openLessons(){
- if(working)return;if(editorDraft)prepareNavigation(false);
+ if(working)return;if(introduction)closeIntroduction('skipped');if(editorDraft)prepareNavigation(false);
  if(!tutorialReturn)tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
  leaveFullscreen();closeMenu();tutorial=null;lessonScreenOpen=true;$('tutorialCard').hidden=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('lessonsScreen').hidden=false;$('lessonCatalog').hidden=false;$('tutorialRecap').hidden=true;
  CURRICULUM.forEach((lesson,i)=>{$('lessonStatus'+(i+1)).textContent=lessonCompleted.includes(lesson.id)?'Completed · repeat any time':'Not completed';$('lessonStart'+(i+1)).textContent=lessonCompleted.includes(lesson.id)?'Repeat lesson':'Start lesson';});
@@ -369,7 +402,7 @@ function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionV
 function setScenario(id,holeSeed=0,setting=null){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=Object.hasOwn(LANDSCAPES,setting)?setting:nextLandscape(state.landscape,holeSeed,scene());state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode,allowAssessmentExit=false){if(!prepareNavigation())return;round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function prepareNavigation(exitLessons=true){
- if(working)return false;if(exitLessons&&tutorialReturn)closeLessons();
+ if(working)return false;if(introduction)closeIntroduction(introduction.compared?'completed':'skipped');if(exitLessons&&tutorialReturn)closeLessons();
  if(editorDraft){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;}
  progressOpen=false;roundView=false;$('progressScreen').hidden=true;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();return true;
 }
@@ -512,7 +545,7 @@ async function zoomToLanding(camera){
  await new Promise(resolve=>{let started;function frame(now){started??=now;const t=Math.min(1,(now-started)/650);transition.progress=t*t*(3-2*t);drawCourse();if(t<1)requestAnimationFrame(frame);else resolve();}requestAnimationFrame(frame);});
 }
 async function run(newSeed=false){
- if(working||!hasAim||isCourse()&&round.review||round?.kind==='assessment'&&roundRecorded()||tutorial?.stage==='intro')return;if(tutorial?.stage==='guided'&&(!tutorial.guide||!nearLessonTarget(state.aim,tutorial.guide.aim))){toast('Aim near the highlighted target using both controls, then commit.');updateLabels();return;}if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
+ if(working||!hasAim||isCourse()&&round.review||round?.kind==='assessment'&&roundRecorded()||tutorial?.stage==='intro'||introduction&&![2,5].includes(introduction.step))return;if(tutorial?.stage==='guided'&&(!tutorial.guide||!nearLessonTarget(state.aim,tutorial.guide.aim))){toast('Aim near the highlighted target using both controls, then commit.');updateLabels();return;}if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
  resetAimZoom();working=true;phase='calculating';result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;
  $('newShots').disabled=true;$('simulate').innerHTML='Calculating 4,000 shots…';updateLabels();drawCourse();
  const snapshot=JSON.stringify(state);await wait(30);
@@ -536,10 +569,10 @@ async function run(newSeed=false){
   traceShots=tracerSample(r.points);phase='shooting';$('simulate').innerHTML='Shots in flight…';updateLabels();drawCourse();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await wait(2200);
   await zoomToLanding(comparisonCamera(comparison));
-  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';if(tutorial)tutorial.collapsed=false;recordRoundDecision(r,comparison);recordDecision();showResult();save();
+  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';if(tutorial)tutorial.collapsed=false;if(introduction){if(introduction.step===2){introduction.step=3;introduction.firstAim={...state.aim};introduction.firstScore=decisionScore(r.expected,comparison.result.expected,state.aim,comparison.aim);}else if(introduction.step===5&&Math.hypot(state.aim.x-introduction.firstAim.x,state.aim.y-introduction.firstAim.y)>=1)introduction.compared=true;}recordRoundDecision(r,comparison);recordDecision();showResult();save();
  }
  catch(error){console.error(error);phase='choose';traceShots=[];transition=null;drawCourse();toast('Simulation failed. Reset the pattern and try again.');}
- finally{working=false;$('newShots').disabled=false;updateLabels();}
+ finally{working=false;$('newShots').disabled=false;updateLabels();if(introduction)$('introductionCard').scrollIntoView({behavior:'auto'});}
 }
 for(const key of KEYS)$(key).addEventListener('input',()=>{
  if(!editorDraft)return;const el=$(key),v=key==='bigDirection'?el.value:Number(el.value);
@@ -585,8 +618,9 @@ for(const [id,filter] of [['teeTab','tee'],['approachTab','approach'],['mixedTab
 for(const [id,view] of [['povBtn','pov'],['mapBtn','map']])$(id).addEventListener('click',()=>{if(!result||working)return;state.view=view;save();updateLabels();drawCourse();});
 $('simulate').addEventListener('click',()=>run());$('newShots').addEventListener('click',()=>run(true));
 $('useBest').addEventListener('click',()=>{if(best&&!working){state.aim={...best.aim};hasAim=true;syncTargetDistance();updateControls();dirty();}});
-$('tryAgain').addEventListener('click',()=>{if(working||!result)return;if(tutorial){advanceTutorial();return;}if(round){if(round.status==='complete')showRoundScreen();else nextRoundSlot();return;}state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
-$('retryThisHole').addEventListener('click',()=>{if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={conditions:structuredClone(state.pattern.conditions||null),encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected,state.aim,best.aim):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();});
+$('tryAgain').addEventListener('click',()=>{if(working||!result||introduction)return;if(tutorial){advanceTutorial();return;}if(round){if(round.status==='complete')showRoundScreen();else nextRoundSlot();return;}state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
+function retryShot(){if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={conditions:structuredClone(state.pattern.conditions||null),encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected,state.aim,best.aim):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();}
+$('retryThisHole').addEventListener('click',retryShot);
 $('difficulty').addEventListener('change',()=>{if(working||result||tutorialReturn||round?.answers.length||round?.current?.attempts.length)return;state.difficulty=['easy','medium','hard'].includes($('difficulty').value)?$('difficulty').value:'easy';retryBaseline=null;retryHint='';if(refreshRoundProfile())return;state.pattern=state.mode==='basic'?basic():member();dirty();});
 $('basicHandicap').addEventListener('change',()=>{if(working||isCourse()&&round.review||result||state.mode!=='basic'||round?.answers.length||isCourse())return;state.basicHandicap=$('basicHandicap').value;if(refreshRoundProfile())return;state.pattern=basic();syncTargetDistance();updateControls();dirty();});
 $('terrainToggle').addEventListener('click',()=>{if(working||isCourse()&&round.review||result)return;resetAimZoom();state.elevated=!state.elevated;save();updateLabels();drawCourse();});
@@ -606,3 +640,4 @@ if(round?.status==='active'){
 }else if(round?.status==='complete'){showRoundScreen();}
 else if(state.practiceMode!=='free'){startRound('practice');}
 updateControls();drawCourse();save();
+if(!introductionSeen)openIntroduction();
