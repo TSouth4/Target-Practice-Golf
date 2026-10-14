@@ -1,3 +1,13 @@
+# Par-3 setup and Introduction purpose (16.7.0)
+
+New par-3 rounds and restarts open a setup dialog to choose Easy, Medium or Hard. Confirming creates the round with that difficulty snapshot; cancelling preserves the current round or report. Resuming skips setup and restores the saved profile/conditions. The active course hides Difficulty and Practice type, and difficulty cannot change even before the first shot. Wind/ground may vary from hole to hole within the chosen difficulty. The setup dialog supports keyboard focus, Escape/cancel and narrow/landscape screens.
+
+The Introduction recommendation appears only on the practice home when incomplete, not during courses, learning rounds, assessments, lessons, reports, progress, the editor or setup. First-time visitors now begin on that practice home; existing saved rounds continue to resume. Introduction remains available in Menu.
+
+A new first slide explains the purpose: learn course management, recognise important information and build a good target-selection habit. The walkthrough has nine slides including the existing three guided target choices. Its reading-the-hole illustration now has a visible sand bunker with a pointer and a contrasting flag on the green. Completion remains recorded on the final slide in this browser.
+
+Validation: all 175 automated tests and JavaScript syntax checks passed. New coverage verifies pre-round selection, fixed course difficulty even before shot one, cancellation, restart/resume snapshots and home-only recommendation. Browser checks passed at desktop, 390/320-pixel phones and landscape for setup/cancel/reload, course controls and the nine-slide walkthrough.
+
 # Introduction and phone refinements (16.6.0)
 
 Introduction target two is now in the far-left center portion of the same green, rather than a short layup. The model verifies its expected cost is higher than the balanced target. The five following slides have distinct illustrations: carry/rollout, sampled dispersion dots, the three calculated target costs, reading distances/trouble/wind, and the Read–Choose–Commit–Review habit.

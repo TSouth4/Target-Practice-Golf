@@ -1,4 +1,4 @@
-import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,hasSeenIntroduction,prepareIntroduction,introductionGraphic} from './introduction.js';
+import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,INTRO_PURPOSE,hasSeenIntroduction,prepareIntroduction,introductionGraphic} from './introduction.js';
 import {CALM,CONDITIONS_VERSION,conditionsFor,conditionsLabel,conditionsFeedback} from './conditions.js';
 import {createCourse,readCourse,recordCourseShot,advanceCourse,courseTotal,scoreName,scoreToPar,COURSE_FINISH_LABEL,COURSE_KEY} from './course.js';
 import {tutorialGraphic} from './tutorial-graphics.js';
@@ -21,7 +21,8 @@ const $=id=>document.getElementById(id);
 const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bigPct','bigDirection','bigShift','bigShort','rho'];
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
-let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',practiceMode:'round',difficulty:'easy',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',practiceMode:'free',difficulty:'easy',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let courseSetupOpen=false,courseSetupFocus=null;
 let introduction=null,introductionSeen=false,introductionSaved=true;try{introductionSeen=hasSeenIntroduction(localStorage.getItem(INTRO_KEY));}catch{introductionSaved=false;}
 let tutorial=null,tutorialReturn=null,lessonScreenOpen=false,lessonCompleted=[],lessonStorageOK=true;const tutorialCache=new Map();try{lessonCompleted=readLessonCompletion(localStorage.getItem(LESSON_KEY));}catch{lessonStorageOK=false;}
 let round=null,roundView=false,roundResumed=false;try{round=readRound(localStorage.getItem(ROUND_KEY));roundResumed=round?.status==='active';}catch{}
@@ -118,7 +119,7 @@ function updateControls(){
 }
 function updateLabels(){
  const p=state.pattern,s=scene();
- const weather=p.conditions||CALM;$('difficulty').value=tutorialReturn?'easy':state.difficulty;$('difficulty').disabled=working||!!result||!!tutorialReturn||!!round?.answers.length||!!round?.current?.attempts.length;
+ const weather=p.conditions||CALM;$('difficulty').value=tutorialReturn?'easy':state.difficulty;$('difficulty').disabled=isCourse()||working||!!result||!!tutorialReturn||!!round?.answers.length||!!round?.current?.attempts.length;
  $('conditionsText').textContent=conditionsLabel(weather);$('conditionsBar').title=conditionsLabel(weather);$('conditionsCompact').innerHTML=`<strong>${weather.windX||weather.windY?Math.round(Math.hypot(weather.windX,weather.windY))+' mph':'Calm'}</strong><small>${weather.firmness==='soft'?'Soft':weather.firmness==='firm'?'Firm':'Normal'} ground</small>`;$('commitHint').hidden=!!result||working||isCourse()&&!!round.review||round?.kind==='assessment'&&roundRecorded();$('conditionsArrow').style.transform=`rotate(${Math.atan2(weather.windX,weather.windY)*180/Math.PI}deg)`;$('conditionsArrow').hidden=!weather.windX&&!weather.windY;$('conditionsBar').hidden=!!tutorialReturn;
  $('aimXOut').textContent=sided(state.aim.x);$('aimYOut').textContent=`${Math.round(p.carry)} yd`;$('rollEstimate').textContent=p.conditions?.difficulty&&p.conditions.difficulty!=='easy'?`${p.conditions.firmness==='firm'?'Firm · more roll':p.conditions.firmness==='soft'?'Soft · less roll':'Normal ground'}`:p.roll?'Roll estimated':'No roll modeled';$('aimY').setAttribute('aria-valuetext',`${Math.round(p.carry)} yards intended carry; rollout is uncertain`);
  $('rolloutKey').hidden=!hasAim&&!result;$('rolloutKey').textContent=p.conditions?.difficulty!=='easy'&&p.conditions?(result?(centerFlight(state.aim,p,s).roll<.25?'Land = finish':'○ Landing · ● Finish'):'Roll depends on ground'):p.roll<.25?'Carry = total':result?(centerFlight(state.aim,p,s).roll<.25?'Land = finish':'○ Landing · ● Finish'):'◎ Carry · ○ Finish';$('rolloutKey').title=result?'White markers show the center flight landing and finish, with water contact stopping rollout.':'Planned straight-line finish after rollout, before curve and random misses. Zoom in for a closer view.';
@@ -133,7 +134,7 @@ function updateLabels(){
  $('holeName').textContent=s.name;$('environmentName').textContent=landscape().name;$('scenarioBrief').textContent=s.brief;$('sceneChip').textContent=s.tag;const woods=s.woods?.filter(w=>w.recoveryMultiplier>1);if(woods?.length)$('scenarioBrief').textContent+=' '+(woods[0].side<0?'Left':'Right')+' woods are denser and closer; the other side leaves more recovery room.';
  for(const [id,on] of [['povBtn',state.view==='pov'],['mapBtn',state.view==='map'],['teeTab',state.practiceFilter==='tee'],['approachTab',state.practiceFilter==='approach'],['mixedTab',state.practiceFilter==='mixed']]){$(id).classList.toggle('active',on);$(id).setAttribute('aria-pressed',on);}
  for(const id of ['teeTab','approachTab','mixedTab','practiceType'])$(id).disabled=working;
- $('practiceType').value=state.practiceFilter;$('practiceType').disabled=working;
+ $('difficultyField').hidden=isCourse();$('practiceTypeField').hidden=isCourse();$('practiceType').value=state.practiceFilter;$('practiceType').disabled=working;
  const advanced=state.mode==='advanced';
  $('basicBar').hidden=false;$('handicapField').hidden=advanced;$('aimDepthWrap').hidden=false;
  $('shotModeNote').textContent=advanced?'My shot · '+flightDescription(p):'Straight flight · automatic club for your depth';
@@ -176,7 +177,7 @@ function updateLabels(){
 async function openIntroduction(){
  if(working)return;if(introduction)closeIntroduction('skipped');else if(tutorialReturn)closeLessons();if(editorDraft)prepareNavigation();leaveFullscreen();closeMenu();
  tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
- introduction={step:0,selected:false,revealed:false,prepared:null};
+ introduction={step:-1,selected:false,revealed:false,prepared:null};
  for(const id of ['practiceScreen','roundScreen','progressScreen','lessonsScreen'])$(id).hidden=true;
  $('introductionScreen').hidden=false;updateLabels();$('introductionTitle').focus?.();
  working=true;updateIntroductionControls();
@@ -188,27 +189,27 @@ function closeIntroduction(status='skipped'){
  introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
- $('introductionMenu').disabled=working;$('introductionStart').hidden=introductionSeen||!!introduction;$('introductionScreen').hidden=!introduction;
- if(!introduction)return;const i=introduction.step,step=INTRO_STEPS[i];
- $('introductionStep').textContent=`Introduction · ${i+1} / ${INTRO_STEPS.length}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
+ $('introductionMenu').disabled=working;$('introductionStart').hidden=courseSetupOpen||introductionSeen||!!introduction||isCourse()||!!round||!!tutorialReturn||!!editorDraft||progressOpen||roundView||lessonScreenOpen||state.practiceMode!=='free';$('introductionScreen').hidden=!introduction;
+ if(!introduction)return;const i=introduction.step,step=i<0?INTRO_PURPOSE:INTRO_STEPS[i];
+ $('introductionStep').textContent=`Introduction · ${i+2} / ${INTRO_STEPS.length+1}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
  const t=introduction.prepared?.targets[Math.min(i,2)];
- $('introductionTask').textContent=!t?'Preparing your fixed example…':i<3?(introduction.revealed?`Pattern revealed: ${Math.round((1-t.result.counts.green/t.result.n)*100)}% finished off the green. ${i===1?'The target leaves about '+Math.round(Math.hypot(t.aim.x-introduction.prepared.scene.pin.x,t.aim.y-introduction.prepared.scene.pin.y))+' yd to the flag. ':''}Choose Next to continue.`:introduction.selected?'Target selected. Choose Show shot pattern.':'Tap the blue target on the hole, or choose Select highlighted target below.'):'Choose Next to continue.';
- $('introductionSelect').hidden=i>=3||introduction.revealed;$('introductionSelect').disabled=working||!t;
- $('introductionReveal').hidden=i>=3||introduction.revealed;$('introductionReveal').disabled=working||!introduction.selected;
- $('introductionNext').hidden=i===INTRO_STEPS.length-1;$('introductionNext').disabled=working||i<3&&!introduction.revealed;
- $('introductionBack').hidden=i===0;$('introductionBack').disabled=working;$('introductionSkip').disabled=working;
+ $('introductionTask').textContent=i<0?'Choose Next to explore three target choices on the same hole.':!t?'Preparing your fixed example…':i<3?(introduction.revealed?`Pattern revealed: ${Math.round((1-t.result.counts.green/t.result.n)*100)}% finished off the green. ${i===1?'The target leaves about '+Math.round(Math.hypot(t.aim.x-introduction.prepared.scene.pin.x,t.aim.y-introduction.prepared.scene.pin.y))+' yd to the flag. ':''}Choose Next to continue.`:introduction.selected?'Target selected. Choose Show shot pattern.':'Tap the blue target on the hole, or choose Select highlighted target below.'):'Choose Next to continue.';
+ $('introductionSelect').hidden=i<0||i>=3||introduction.revealed;$('introductionSelect').disabled=working||!t;
+ $('introductionReveal').hidden=i<0||i>=3||introduction.revealed;$('introductionReveal').disabled=working||!introduction.selected;
+ $('introductionNext').hidden=i===INTRO_STEPS.length-1;$('introductionNext').disabled=working||i>=0&&i<3&&!introduction.revealed;
+ $('introductionBack').hidden=i<0;$('introductionBack').disabled=working;$('introductionSkip').disabled=working;
  for(const id of ['introductionFinish','introductionRound','introductionLessons']){$(id).hidden=i!==INTRO_STEPS.length-1;$(id).disabled=working;}
- $('introductionDiagram').hidden=!t;if(t)$('introductionDiagram').innerHTML=introductionGraphic(introduction.prepared,i,i>=3||introduction.revealed);
- $('introductionSelection').textContent=i===7?(introductionSaved?'Introduction complete · saved in this browser. Replay any time from Menu.':'Introduction complete for this visit · browser saving is unavailable.'):t&&introduction.selected?`Selected: ${Math.round(t.pattern.carry)} yd intended carry`:'Fixed tucked-flag example · 5-handicap profile · calm conditions';
+ $('introductionDiagram').hidden=i>=0&&!t;if(i<0||t)$('introductionDiagram').innerHTML=introductionGraphic(introduction.prepared,i,i>=3||introduction.revealed);
+ $('introductionSelection').textContent=i<0?'Learn what matters. Practise the choice. Build the habit.':i===7?(introductionSaved?'Introduction complete · saved in this browser. Replay any time from Menu.':'Introduction complete for this visit · browser saving is unavailable.'):t&&introduction.selected?`Selected: ${Math.round(t.pattern.carry)} yd intended carry`:'Fixed tucked-flag example · 5-handicap profile · calm conditions';
 }
-function selectIntroductionTarget(){if(working||!introduction?.prepared||introduction.step>=3||introduction.revealed)return;introduction.selected=true;updateIntroductionControls();}
+function selectIntroductionTarget(){if(working||!introduction?.prepared||(introduction.step<0||introduction.step>=3)||introduction.revealed)return;introduction.selected=true;updateIntroductionControls();}
 $('introductionStart').addEventListener('click',openIntroduction);
 $('introductionMenu').addEventListener('click',openIntroduction);
 $('introductionSelect').addEventListener('click',selectIntroductionTarget);
 $('introductionDiagram').addEventListener('click',e=>{if(e.target.closest?.('[data-intro-target]'))selectIntroductionTarget();});
 $('introductionDiagram').addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.closest?.('[data-intro-target]')){e.preventDefault();selectIntroductionTarget();}});
 $('introductionReveal').addEventListener('click',()=>{if(working||!introduction?.selected)return;introduction.revealed=true;updateIntroductionControls();});
-function changeIntroductionStep(delta){if(working||!introduction||delta>0&&introduction.step<3&&!introduction.revealed)return;introduction.step=Math.max(0,Math.min(INTRO_STEPS.length-1,introduction.step+delta));introduction.selected=false;introduction.revealed=false;if(introduction.step===INTRO_STEPS.length-1){introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status:'completed'}));introductionSaved=true;}catch{introductionSaved=false;}}updateIntroductionControls();$('introductionScreen').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();}
+function changeIntroductionStep(delta){if(working||!introduction||delta>0&&introduction.step>=0&&introduction.step<3&&!introduction.revealed)return;introduction.step=Math.max(-1,Math.min(INTRO_STEPS.length-1,introduction.step+delta));introduction.selected=false;introduction.revealed=false;if(introduction.step===INTRO_STEPS.length-1){introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status:'completed'}));introductionSaved=true;}catch{introductionSaved=false;}}updateIntroductionControls();$('introductionScreen').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();}
 $('introductionNext').addEventListener('click',()=>changeIntroductionStep(1));
 $('introductionBack').addEventListener('click',()=>changeIntroductionStep(-1));
 $('introductionSkip').addEventListener('click',()=>closeIntroduction('skipped'));
@@ -305,7 +306,7 @@ function courseFinishText(review){
 function updateCourseControls(){
  const on=isCourse();$('courseBar').hidden=!on;$('courseOutcome').hidden=!on||!round?.review||working||roundView||progressOpen||lessonScreenOpen;$('appRoot').classList.toggle('course-mode',on);$('appRoot').classList.toggle('course-selecting',on&&phase==='course-selecting');$('appRoot').classList.toggle('course-ball-review',on&&!!round.review&&!working);
  if(!on)return;const total=courseTotal(round),r=round.review;
- $('courseStatus').textContent=`${r&&!r.retee?'Hole complete':`Next stroke ${round.current.strokes+1}`}${round.profile.shotMode==='custom'?' · Custom shot':''}${courseStorageOK?'':' · Saving unavailable'}`;
+ $('courseStatus').textContent=`${r&&!r.retee?'Hole complete':`Next stroke ${round.current.strokes+1}`} · ${round.profile.difficulty||'easy'} difficulty${round.profile.shotMode==='custom'?' · Custom shot':''}${courseStorageOK?'':' · Saving unavailable'}`;
  $('courseHole').textContent=`Hole ${round.index+1} / ${round.schedule.length}`;$('courseScoreToPar').textContent=scoreToPar(total.relative);$('courseScoredHoles').textContent=total.holes?`Through ${total.holes} ${total.holes===1?'hole':'holes'}`:'No holes scored yet';
  $('roundStatus').hidden=true;$('results').hidden=true;for(const id of ['basicHandicap','driverLimit','driverLimitReset','teeTab','approachTab','mixedTab','practiceType'])$(id).disabled=true;
  $('practiceIntro').textContent='Play three par-3 holes. One shot is selected from your pattern, then the remaining shots are simulated. Target quality and hole score stay separate.';
@@ -324,8 +325,8 @@ function quitCourse(){
  leaveFullscreen();round=null;sceneKey=null;setMode(state.mode,true);toast(cleared?'Round ended. You are back in practice.':'Round ended for this visit. Browser saving is unavailable.');
 }
 for(const id of ['courseQuit','courseQuitReport'])$(id).addEventListener('click',quitCourse);
-$('courseRestart').addEventListener('click',()=>{if(isCourse())startRound('course');});
-$('courseScorecard').addEventListener('click',()=>{if(isCourse()&&!working)showCourseReport();});$('courseReplay').addEventListener('click',()=>startRound('course'));
+$('courseRestart').addEventListener('click',()=>{if(isCourse())openCourseSetup($('courseRestart'));});
+$('courseScorecard').addEventListener('click',()=>{if(isCourse()&&!working)showCourseReport();});$('courseReplay').addEventListener('click',()=>openCourseSetup($('courseReplay')));
 
 function roundRecorded(){return !!round?.answers.some(answer=>answer.index===round.index);}
 function updateRoundControls(){
@@ -347,6 +348,15 @@ function refreshRoundProfile(){
  if(round?.status!=='active'||round.answers.length)return false;
  const profile=selectedPlayerProfile(),replacement=isCourse()?createCourse(round.seed,profile,round.schedule[0].landscape):createRound(round.kind,round.seed,profile);replacement.id=round.id;round=replacement;loadRoundSlot();return true;
 }
+function openCourseSetup(focusTarget){
+ if(working)return;leaveFullscreen();closeMenu();courseSetupOpen=true;courseSetupFocus=focusTarget;$('courseDifficulty').value=state.difficulty||'easy';$('courseSetup').hidden=false;$('mainContent').inert=true;$('appHeader').inert=true;updateIntroductionControls();$('courseDifficulty').focus?.();
+}
+function closeCourseSetup(restoreFocus=true){
+ if(!courseSetupOpen)return;courseSetupOpen=false;$('courseSetup').hidden=true;$('mainContent').inert=false;$('appHeader').inert=false;updateIntroductionControls();if(restoreFocus)(courseSetupFocus?.id==='courseMenu'?$('menuToggle'):courseSetupFocus)?.focus?.();
+}
+$('courseSetupCancel').addEventListener('click',()=>closeCourseSetup());
+$('courseSetupStart').addEventListener('click',()=>{if(working||!courseSetupOpen)return;const difficulty=$('courseDifficulty').value;closeCourseSetup(false);state.difficulty=['easy','medium','hard'].includes(difficulty)?difficulty:'easy';startRound('course');});
+$('courseSetup').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeCourseSetup();}if(e.key==='Tab'){const items=[$('courseDifficulty'),$('courseSetupCancel'),$('courseSetupStart')];if(e.shiftKey&&e.target===items[0]){e.preventDefault();items[2].focus?.();}else if(!e.shiftKey&&e.target===items[2]){e.preventDefault();items[0].focus?.();}}});
 function startRound(kind){
  if(!prepareNavigation())return;roundResumed=false;leaveFullscreen();closeMenu();roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;
  const profile=selectedPlayerProfile();state.practiceMode='round';state.costs={...DEFAULT_COSTS};state.practiceFilter='mixed';
@@ -377,7 +387,7 @@ function nextRoundSlot(){
  if(round.index===round.schedule.length-1){round.status='complete';showRoundScreen();return;}
  round.index++;loadRoundSlot();
 }
-$('courseMenu').addEventListener('click',()=>{if(!prepareNavigation())return;const saved=isCourse()?round:storedCourse();if(saved?.status!=='active'){startRound('course');return;}round=saved;roundView=false;progressOpen=false;leaveFullscreen();closeMenu();$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;restorePlayerProfile();sceneKey=null;loadRoundSlot();});
+$('courseMenu').addEventListener('click',()=>{if(!prepareNavigation())return;const saved=isCourse()?round:storedCourse();if(saved?.status!=='active'){openCourseSetup($('courseMenu'));return;}round=saved;roundView=false;progressOpen=false;leaveFullscreen();closeMenu();$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;restorePlayerProfile();sceneKey=null;loadRoundSlot();});
 $('practiceRoundMenu').addEventListener('click',()=>startRound('practice'));
 $('assessmentMenu').addEventListener('click',()=>{if(!working)showRoundScreen(true);});
 $('startAssessment').addEventListener('click',()=>startRound('assessment'));
@@ -418,7 +428,7 @@ function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionV
 function setScenario(id,holeSeed=0,setting=null){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=Object.hasOwn(LANDSCAPES,setting)?setting:nextLandscape(state.landscape,holeSeed,scene());state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode,allowAssessmentExit=false){if(!prepareNavigation())return;round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function prepareNavigation(exitLessons=true){
- if(working)return false;if(introduction)closeIntroduction(introduction.compared?'completed':'skipped');if(exitLessons&&tutorialReturn)closeLessons();
+ if(working)return false;closeCourseSetup(false);if(introduction)closeIntroduction(introduction.compared?'completed':'skipped');if(exitLessons&&tutorialReturn)closeLessons();
  if(editorDraft){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;}
  progressOpen=false;roundView=false;$('progressScreen').hidden=true;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();return true;
 }
@@ -644,7 +654,7 @@ $('useBest').addEventListener('click',()=>{if(best&&!working){state.aim={...best
 $('tryAgain').addEventListener('click',()=>{if(working||!result||introduction)return;if(tutorial){advanceTutorial();return;}if(round){if(round.status==='complete')showRoundScreen();else nextRoundSlot();return;}state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,state.practiceFilter,state.seed,state.recent),state.seed);});
 function retryShot(){if(working||!result)return;resetAimZoom();if(!retryValid()){retryBaseline={conditions:structuredClone(state.pattern.conditions||null),encounter:state.encounter,profile:currentProfile(),seed:state.seed,aim:{...state.aim},pattern:structuredClone(state.pattern),result:{expected:result.expected,penalty:result.penalty},score:Number.isFinite(best.result.expected)?decisionScore(result.expected,best.result.expected,state.aim,best.aim):null};}retryHint=decisionLesson(state.aim,state.pattern,result,best,scene(),decisionFeedback(state.aim,state.pattern,result,best,scene())).action;hasAim=false;syncTargetDistance();updateControls();dirty();$('aimX').focus?.();}
 $('retryThisHole').addEventListener('click',retryShot);
-$('difficulty').addEventListener('change',()=>{if(working||result||tutorialReturn||round?.answers.length||round?.current?.attempts.length)return;state.difficulty=['easy','medium','hard'].includes($('difficulty').value)?$('difficulty').value:'easy';retryBaseline=null;retryHint='';if(refreshRoundProfile())return;state.pattern=state.mode==='basic'?basic():member();dirty();});
+$('difficulty').addEventListener('change',()=>{if(isCourse()||working||result||tutorialReturn||round?.answers.length||round?.current?.attempts.length)return;state.difficulty=['easy','medium','hard'].includes($('difficulty').value)?$('difficulty').value:'easy';retryBaseline=null;retryHint='';if(refreshRoundProfile())return;state.pattern=state.mode==='basic'?basic():member();dirty();});
 $('basicHandicap').addEventListener('change',()=>{if(working||isCourse()&&round.review||result||state.mode!=='basic'||round?.answers.length||isCourse())return;state.basicHandicap=$('basicHandicap').value;if(refreshRoundProfile())return;state.pattern=basic();syncTargetDistance();updateControls();dirty();});
 $('terrainToggle').addEventListener('click',()=>{if(working||isCourse()&&round.review||result)return;resetAimZoom();state.elevated=!state.elevated;save();updateLabels();drawCourse();});
 $('driverLimit').addEventListener('change',()=>{if(working||isCourse()&&round.review||result||round?.answers.length||isCourse())return;state.basicLimits[state.basicHandicap]=num($('driverLimit').value,180,330,DRIVER_LIMITS[state.basicHandicap]);if(refreshRoundProfile())return;if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
