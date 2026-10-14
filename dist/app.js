@@ -1,4 +1,4 @@
-import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,hasSeenIntroduction} from './introduction.js';
+import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,hasSeenIntroduction,prepareIntroduction,introductionGraphic} from './introduction.js';
 import {CALM,CONDITIONS_VERSION,conditionsFor,conditionsLabel,conditionsFeedback} from './conditions.js';
 import {createCourse,readCourse,recordCourseShot,advanceCourse,courseTotal,scoreName,scoreToPar,COURSE_FINISH_LABEL,COURSE_KEY} from './course.js';
 import {tutorialGraphic} from './tutorial-graphics.js';
@@ -172,37 +172,48 @@ function updateLabels(){
  updateTutorialControls();updateCourseControls();updateIntroductionControls();
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
-function openIntroduction(){
+async function openIntroduction(){
  if(working)return;if(introduction)closeIntroduction('skipped');else if(tutorialReturn)closeLessons();if(editorDraft)prepareNavigation();leaveFullscreen();closeMenu();
  tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
- $('roundScreen').hidden=true;$('progressScreen').hidden=true;$('lessonsScreen').hidden=true;$('practiceScreen').hidden=false;
- introduction={step:0,compared:false};round=null;roundView=false;progressOpen=false;state.mode='basic';state.practiceMode='free';state.basicHandicap='5';state.basicLimits['5']=265;state.difficulty='easy';state.costs={...DEFAULT_COSTS};
- sceneKey=null;setScenario('split',2,'woodland');scene().name='Introduction practice hole';scene().par=3;scene().length=Math.round(Math.hypot(scene().pin.x,scene().pin.y));state.seed=91371;hasAim=false;dirty();$('introductionCard').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();
+ introduction={step:0,selected:false,revealed:false,prepared:null};
+ for(const id of ['practiceScreen','roundScreen','progressScreen','lessonsScreen'])$(id).hidden=true;
+ $('introductionScreen').hidden=false;updateLabels();$('introductionTitle').focus?.();
+ working=true;updateIntroductionControls();
+ try{introduction.prepared=await prepareIntroduction(()=>wait(0));}catch(error){console.error(error);$('introductionTask').textContent='Could not prepare this example. Return to practice and try again.';}
+ finally{working=false;updateIntroductionControls();}
 }
 function closeIntroduction(status='skipped'){
- if(working||!introduction)return;introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status}));introductionSaved=true;}catch{introductionSaved=false;}
- introduction=null;closeLessons();$('introductionCard').hidden=true;if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
+ if(working||!introduction)return;if(status==='completed'){introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status}));introductionSaved=true;}catch{introductionSaved=false;}}
+ introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
- $('introductionMenu').disabled=working;$('introductionCard').hidden=!introduction;$('appRoot').classList.toggle('introduction-mode',!!introduction);
- if(!introduction)return;const i=introduction.step,step=INTRO_STEPS[i];$('introductionStep').textContent=`Introduction · ${i+1} / 6`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;$('introductionTask').textContent=i===4?`Your first target earned ${introduction.firstScore} / 100. Read the feedback below the course, then choose Next.`:i===5&&introduction.compared?'You tried a different target using the same misses. Keep practising that habit in a five-shot round or explore the golf lessons.':step.task||(i===0?'Choose Next to try a fixed practice hole.':'Look at the pattern and feedback below the course, then choose Next.');
- $('introductionNext').hidden=i===2||i===5;$('introductionNext').disabled=working||i===1&&!hasAim;$('introductionBack').hidden=i===0||i>=3;$('introductionBack').disabled=working;$('introductionSkip').disabled=working;
- $('introductionAdjust').hidden=i!==5||!result||introduction.compared;$('introductionAdjust').disabled=working;
- for(const id of ['introductionFinish','introductionRound','introductionLessons']){$(id).hidden=i!==5||!introduction.compared;$(id).disabled=working;}
- for(const id of ['basicHandicap','driverLimit','driverLimitReset','difficulty','teeTab','approachTab','mixedTab'])$(id).disabled=true;
- if(i===0||i===3||i===4){$('aimX').disabled=true;$('aimY').disabled=true;}
- $('simulate').disabled=working||!hasAim||![2,5].includes(i);$('tryAgain').hidden=true;$('newShots').hidden=true;
- $('retryThisHole').hidden=true;
- $('practiceIntro').textContent='Introduction · fixed calm example · your practice settings and statistics are preserved.';
+ $('introductionMenu').disabled=working;$('introductionStart').hidden=introductionSeen||!!introduction;$('introductionScreen').hidden=!introduction;
+ if(!introduction)return;const i=introduction.step,step=INTRO_STEPS[i];
+ $('introductionStep').textContent=`Introduction · ${i+1} / ${INTRO_STEPS.length}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
+ const t=introduction.prepared?.targets[Math.min(i,2)];
+ $('introductionTask').textContent=!t?'Preparing your fixed example…':i<3?(introduction.revealed?`Pattern revealed: ${Math.round((1-t.result.counts.green/t.result.n)*100)}% finished off the green. ${i===1?'The target leaves about '+Math.round(Math.hypot(t.aim.x-introduction.prepared.scene.pin.x,t.aim.y-introduction.prepared.scene.pin.y))+' yd to the flag. ':''}Choose Next to continue.`:introduction.selected?'Target selected. Choose Show shot pattern.':'Tap the blue target on the hole, or choose Select highlighted target below.'):'Choose Next to continue.';
+ $('introductionSelect').hidden=i>=3||introduction.revealed;$('introductionSelect').disabled=working||!t;
+ $('introductionReveal').hidden=i>=3||introduction.revealed;$('introductionReveal').disabled=working||!introduction.selected;
+ $('introductionNext').hidden=i===INTRO_STEPS.length-1;$('introductionNext').disabled=working||i<3&&!introduction.revealed;
+ $('introductionBack').hidden=i===0;$('introductionBack').disabled=working;$('introductionSkip').disabled=working;
+ for(const id of ['introductionFinish','introductionRound','introductionLessons']){$(id).hidden=i!==INTRO_STEPS.length-1;$(id).disabled=working;}
+ $('introductionDiagram').hidden=!t;if(t)$('introductionDiagram').innerHTML=introductionGraphic(introduction.prepared,i,i>=3||introduction.revealed);
+ $('introductionSelection').textContent=t&&introduction.selected?`Selected: ${Math.round(t.pattern.carry)} yd intended carry`:'Fixed tucked-flag example · 5-handicap profile · calm conditions';
 }
+function selectIntroductionTarget(){if(working||!introduction?.prepared||introduction.step>=3||introduction.revealed)return;introduction.selected=true;updateIntroductionControls();}
+$('introductionStart').addEventListener('click',openIntroduction);
 $('introductionMenu').addEventListener('click',openIntroduction);
-$('introductionNext').addEventListener('click',()=>{if(working||!introduction||introduction.step===1&&!hasAim)return;introduction.step++;updateLabels();$('introductionCard').scrollIntoView({behavior:'auto'});});
-$('introductionBack').addEventListener('click',()=>{if(working||!introduction||introduction.step<1||introduction.step>2)return;introduction.step--;updateLabels();});
+$('introductionSelect').addEventListener('click',selectIntroductionTarget);
+$('introductionDiagram').addEventListener('click',e=>{if(e.target.closest?.('[data-intro-target]'))selectIntroductionTarget();});
+$('introductionDiagram').addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.closest?.('[data-intro-target]')){e.preventDefault();selectIntroductionTarget();}});
+$('introductionReveal').addEventListener('click',()=>{if(working||!introduction?.selected)return;introduction.revealed=true;updateIntroductionControls();});
+function changeIntroductionStep(delta){if(working||!introduction||delta>0&&introduction.step<3&&!introduction.revealed)return;introduction.step=Math.max(0,Math.min(INTRO_STEPS.length-1,introduction.step+delta));introduction.selected=false;introduction.revealed=false;updateIntroductionControls();$('introductionScreen').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();}
+$('introductionNext').addEventListener('click',()=>changeIntroductionStep(1));
+$('introductionBack').addEventListener('click',()=>changeIntroductionStep(-1));
 $('introductionSkip').addEventListener('click',()=>closeIntroduction('skipped'));
-$('introductionAdjust').addEventListener('click',retryShot);
-$('introductionFinish').addEventListener('click',()=>{if(introduction?.compared)closeIntroduction('completed');});
-$('introductionRound').addEventListener('click',()=>{if(!introduction?.compared)return;closeIntroduction('completed');startRound('practice');});
-$('introductionLessons').addEventListener('click',()=>{if(!introduction?.compared)return;closeIntroduction('completed');openLessons();});
+$('introductionFinish').addEventListener('click',()=>{if(introduction?.step===INTRO_STEPS.length-1)closeIntroduction('completed');});
+$('introductionRound').addEventListener('click',()=>{if(introduction?.step!==INTRO_STEPS.length-1)return;closeIntroduction('completed');startRound('practice');});
+$('introductionLessons').addEventListener('click',()=>{if(introduction?.step!==INTRO_STEPS.length-1)return;closeIntroduction('completed');openLessons();});
 function openLessons(){
  if(working)return;if(introduction)closeIntroduction('skipped');if(editorDraft)prepareNavigation(false);
  if(!tutorialReturn)tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
@@ -550,7 +561,7 @@ async function zoomToLanding(camera){
  await new Promise(resolve=>{let started;function frame(now){started??=now;const t=Math.min(1,(now-started)/650);transition.progress=t*t*(3-2*t);drawCourse();if(t<1)requestAnimationFrame(frame);else resolve();}requestAnimationFrame(frame);});
 }
 async function run(newSeed=false){
- if(working||!hasAim||isCourse()&&round.review||round?.kind==='assessment'&&roundRecorded()||tutorial?.stage==='intro'||introduction&&![2,5].includes(introduction.step))return;if(tutorial?.stage==='guided'&&(!tutorial.guide||!nearLessonTarget(state.aim,tutorial.guide.aim))){toast('Aim near the highlighted target using both controls, then commit.');updateLabels();return;}if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
+ if(working||!hasAim||isCourse()&&round.review||round?.kind==='assessment'&&roundRecorded()||tutorial?.stage==='intro'||introduction)return;if(tutorial?.stage==='guided'&&(!tutorial.guide||!nearLessonTarget(state.aim,tutorial.guide.aim))){toast('Aim near the highlighted target using both controls, then commit.');updateLabels();return;}if(newSeed)state.seed=(state.seed+7919)%2147483646||1;
  resetAimZoom();working=true;phase='calculating';result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;
  $('newShots').disabled=true;$('simulate').innerHTML='Calculating 4,000 shots…';updateLabels();drawCourse();
  const snapshot=JSON.stringify(state);await wait(30);
@@ -574,10 +585,10 @@ async function run(newSeed=false){
   traceShots=tracerSample(r.points);phase='shooting';$('simulate').innerHTML='Shots in flight…';updateLabels();drawCourse();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await wait(2200);
   await zoomToLanding(comparisonCamera(comparison));
-  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';if(tutorial)tutorial.collapsed=false;if(introduction){if(introduction.step===2){introduction.step=3;introduction.firstAim={...state.aim};introduction.firstScore=decisionScore(r.expected,comparison.result.expected,state.aim,comparison.aim);}else if(introduction.step===5&&Math.hypot(state.aim.x-introduction.firstAim.x,state.aim.y-introduction.firstAim.y)>=1)introduction.compared=true;}recordRoundDecision(r,comparison);recordDecision();showResult();save();
+  transition=null;traceShots=[];phase='review';result=r;best=comparison;state.view='map';if(tutorial)tutorial.collapsed=false;recordRoundDecision(r,comparison);recordDecision();showResult();save();
  }
  catch(error){console.error(error);phase='choose';traceShots=[];transition=null;drawCourse();toast('Simulation failed. Reset the pattern and try again.');}
- finally{working=false;$('newShots').disabled=false;updateLabels();if(introduction)$('introductionCard').scrollIntoView({behavior:'auto'});}
+ finally{working=false;$('newShots').disabled=false;updateLabels();}
 }
 for(const key of KEYS)$(key).addEventListener('input',()=>{
  if(!editorDraft)return;const el=$(key),v=key==='bigDirection'?el.value:Number(el.value);
@@ -645,4 +656,4 @@ if(round?.status==='active'){
 }else if(round?.status==='complete'){showRoundScreen();}
 else if(state.practiceMode!=='free'){startRound('practice');}
 updateControls();drawCourse();save();
-if(!introductionSeen)openIntroduction();
+updateIntroductionControls();

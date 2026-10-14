@@ -1,3 +1,13 @@
+# Guided Introduction (16.4.0)
+
+The Introduction is now optional and opens on its own screen. The practice home offers **Recommended: Start Quick Introduction** until completion. Leaving early keeps the recommendation available; completing hides it in this browser. Menu → Introduction always replays it. Earlier completed introductions remain recognised. Saved practice settings, paused rounds, results and progress screens return when leaving. No introduction attempts enter statistics.
+
+Eight slides begin with three clickable targets on the same fixed tucked-flag hole: flag, an intentionally excessive layback, and the best sampled target. Each requires selecting the target and revealing its pattern before Next. A keyboard-accessible target and an equivalent button both work. All choices use the same 4,000 random draws. The pictured dots are a representative subsample for readability; percentages use all 4,000. In this example, flag aiming misses the green about 49% of the time, compared with about 16% for the sampled optimum; excessive layback leaves about 66 yards. These are modeled examples, not personal performance predictions.
+
+The remaining slides cover intended carry, dispersion, decision scoring, reading the hole and forming good habits, with links to a learning round or lessons. This supersedes the automatic six-slide walkthrough described below. Website branding is unchanged.
+
+Validation: 173 automated tests passed, JavaScript syntax checks passed, and Chromium walkthrough checks passed at 1440, 390 and 320 pixels, including touch-target selection, keyboard selection, completion/reload/replay and unchanged saved state/round/statistics.
+
 # Mobile course and par-3 presentation (16.3.0)
 
 Phone hazard distances now sit inside a wider course viewport, with named water/bunker range labels and a compact boundary readout. Front/flag/back yardages share that view; the separate hazard and target-detail boxes are hidden on phones. Intended carry is an overlay at the right. Distances are geometric forward/side distances, not wind-adjusted clearance predictions.
