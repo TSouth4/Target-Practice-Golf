@@ -1,3 +1,13 @@
+# Mobile course and par-3 presentation (16.3.0)
+
+Phone hazard distances now sit inside a wider course viewport, with named water/bunker range labels and a compact boundary readout. Front/flag/back yardages share that view; the separate hazard and target-detail boxes are hidden on phones. Intended carry is an overlay at the right. Distances are geometric forward/side distances, not wind-adjusted clearance predictions.
+
+Phone full screen puts compact Exit/Zoom/View controls beside hole distance and Tee/Approach, moves green yardages upward and removes the repeated scenario banner. Easy's redundant calm/normal badge is hidden there; active wind and ground remain visible. Controls retain touch targets and accessible text. The full course fills the viewport.
+
+The par-3 whole-pattern stage now highlights the actual persisted selected ball before the other dots fade; that same ball remains highlighted through overhead zoom. Comparison clouds and center/aim markers are omitted in the course selection stage to avoid looking like a different chosen ball. Scoring and selection policy are unchanged.
+
+The scorecard uses hole columns and Yards, Par, Score and To par rows, with totals, unplayed dashes, under-par circles and over-par squares. Decision grades have their own expandable section. Introduction is included and still preserves settings/statistics.
+
 # Introduction (16.2.0)
 
 The first visit after this update opens a six-step Introduction: the purpose of practice, choosing direction and intended carry, reading the hole, committing and understanding 4,000 possible outcomes, judging decision quality, and adjusting/comparing to build a habit. It uses one fixed, calm 145-yard example and requires a first shot and a changed-target retry before offering a five-shot round, the golf lessons or Finish introduction.
