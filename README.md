@@ -1,3 +1,9 @@
+# Header logo (16.7.2)
+
+The header now uses the supplied green/lime Target Practice design in place of the target icon and plain text. A transparent image was prepared from the supplied chat image; the header viewport removes empty margins and preserves the whole arrow. The logo scales down on phones while keeping Menu available, with an accessible text name. Other site colors are unchanged. Asset: `dist/assets/target-practice-logo.png`.
+
+Validation: syntax and diff checks passed. Browser checks at 1440, 390 and 320 pixels confirmed the image loads, the header does not overflow, and Menu remains usable.
+
 # Easier-to-see course flag (16.7.1)
 
 The course flag has a taller, outlined white pole and a larger red pennant with a white edge. Phones enlarge the visual further while its base stays at the actual cup. This applies to course views throughout the app; target coordinates and scoring are unchanged. Syntax checks and eight animation/camera tests passed. Browser checks at 1440, 390 and 320 pixels confirmed the flag is visible without zoom and produced no browser errors.
