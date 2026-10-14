@@ -1,3 +1,7 @@
+# Easier-to-see course flag (16.7.1)
+
+The course flag has a taller, outlined white pole and a larger red pennant with a white edge. Phones enlarge the visual further while its base stays at the actual cup. This applies to course views throughout the app; target coordinates and scoring are unchanged. Syntax checks and eight animation/camera tests passed. Browser checks at 1440, 390 and 320 pixels confirmed the flag is visible without zoom and produced no browser errors.
+
 # Par-3 setup and Introduction purpose (16.7.0)
 
 New par-3 rounds and restarts open a setup dialog to choose Easy, Medium or Hard. Confirming creates the round with that difficulty snapshot; cancelling preserves the current round or report. Resuming skips setup and restores the saved profile/conditions. The active course hides Difficulty and Practice type, and difficulty cannot change even before the first shot. Wind/ground may vary from hole to hole within the chosen difficulty. The setup dialog supports keyboard focus, Escape/cancel and narrow/landscape screens.

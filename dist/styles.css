@@ -272,3 +272,6 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 
 /* Pre-round difficulty is chosen once, outside the active course. */
 .course-setup{position:fixed;inset:0;z-index:300;background:#193b32aa;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}.course-setup-card{width:min(100%,520px);max-height:calc(100dvh - 36px);overflow:auto;background:var(--white);padding:24px;border-radius:12px;box-shadow:0 10px 45px #0004}.course-setup-card h1{font-size:30px;margin:12px 0 16px}.course-setup-card p{font-size:14px;line-height:1.6;margin-bottom:16px}.course-setup-card label{display:block;font-size:14px;font-weight:700}.course-setup-card select{display:block;margin-top:8px;min-height:48px}.course-setup-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}.course-setup-actions button{min-height:48px;font-size:14px}.course-mode #basicBar{grid-template-columns:1fr;max-width:320px}.course-mode #basicBar label{justify-content:center}.course-mode #basicBar select{flex:0 1 auto}
+
+/* Larger contrasting flag stays anchored at the actual cup. */
+@media(max-width:760px){#courseFlag .flag-visual{transform:scale(1.65);transform-origin:0 0}}

@@ -512,8 +512,8 @@ function drawCourse(){
   }
   html+=labels;
  }
- const pin=project(s.pin),ph=map?20:clamp(2*EYE_CAMERA.focal/(s.pin.y+6),6,15);html+=`<ellipse cx="${pin.x}" cy="${pin.y}" rx="3.4" ry="1.6" fill="#4b6946"/><path d="M${pin.x} ${pin.y}v-${ph}" stroke="#fffef2" stroke-width="1.6"/><path d="M${pin.x} ${pin.y-ph}l10 3-10 4Z" fill="#f3efda"/>`;
- if(!map)html+=`<text x="${pin.x+15}" y="${pin.y-ph+4}" font-size="9" fill="#fffef4" font-family="Arial" paint-order="stroke" stroke="#3f614c" stroke-width="2">${s.length} yd pin</text>`;
+ const pin=project(s.pin),ph=map?28:clamp(3*EYE_CAMERA.focal/(s.pin.y+6),20,30);html+=`<ellipse cx="${pin.x}" cy="${pin.y}" rx="3.4" ry="1.6" fill="#4b6946"/><g id="courseFlag" transform="translate(${pin.x},${pin.y})" pointer-events="none"><g class="flag-visual"><path d="M0 0v-${ph}" stroke="#244334" stroke-width="4.5"/><path d="M0 0v-${ph}" stroke="#fffef2" stroke-width="2.5"/><path d="M0 ${-ph}l20 6-20 8Z" fill="#ed5948" stroke="#fffef2" stroke-width="2" stroke-linejoin="round"/></g></g>`;
+ if(!map)html+=`<text x="${pin.x+26}" y="${pin.y-ph-5}" font-size="9" fill="#fffef4" font-family="Arial" paint-order="stroke" stroke="#3f614c" stroke-width="2">${s.length} yd pin</text>`;
  else if(pin.y<60)html+=`<text x="480" y="65" text-anchor="middle" font-size="11" fill="#52704c" font-family="Arial">↑ Pin ${Math.round(s.pin.y-(analysisCamera().minY+analysisCamera().maxY)/2)} yd farther ahead</text>`;
  if(tutorial?.stage==='guided'&&tutorial.guide&&!result){const hint=project(tutorial.guide.aim);html+=`<g id="lessonTargetHint" data-target-x="${tutorial.guide.aim.x}" data-target-y="${tutorial.guide.aim.y}" data-target-carry="${tutorial.guide.pattern.carry}" transform="translate(${hint.x},${hint.y})"><title>Suggested lesson target</title><circle r="18" fill="#a680d640" stroke="#d8baff" stroke-width="3"/><path d="M-24 0h10M14 0h10M0-24v10M0 14v10" stroke="#d8baff" stroke-width="2"/></g>`;}
  const zero={x:0,y:0},a=project(state.aim);if(hasAim&&(!course||!round.review))html+=line(zero,state.aim,'stroke="#e7c581" stroke-width="1.8" stroke-dasharray="7 6" opacity=".85"');
