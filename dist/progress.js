@@ -1,16 +1,17 @@
+import {validConditions} from './conditions.js';
 export const PROGRESS_KEY='target-practice-progress-v1';
-export const MODEL_VERSION='decision-model-v6';
+export const MODEL_VERSION='decision-model-v7';
 export const HISTORY_LIMIT=1000;
 const KINDS=['balanced','aggressive','conservative','refine'];
 const finite=(n,min,max)=>typeof n==='number'&&Number.isFinite(n)&&n>=min&&n<=max;
 export function readProgress(raw){
  try{const data=typeof raw==='string'?JSON.parse(raw):raw;if(!Array.isArray(data))return[];
-  return data.filter(r=>r&&typeof r.id==='string'&&r.id.length<100&&typeof r.encounter==='string'&&r.encounter.length<100&&typeof r.profile==='string'&&r.profile.length<100&&typeof r.profileLabel==='string'&&r.profileLabel.length<100&&[MODEL_VERSION,'decision-model-v5','decision-model-v4','decision-model-v3','decision-model-v2','decision-model-v1'].includes(r.model)&&['tee','approach'].includes(r.type)&&KINDS.includes(r.kind)&&finite(r.score,0,100)&&finite(r.penalty,0,1)&&(r.regret===null||finite(r.regret,0,1e6))&&Number.isFinite(Date.parse(r.at))&&typeof r.retry==='boolean').slice(-HISTORY_LIMIT).map(r=>({...r,score:Math.round(r.score),profileLabel:r.model!==MODEL_VERSION&&!r.profileLabel.endsWith(' · previous model')?r.profileLabel+' · previous model':r.profileLabel}));
+  return data.filter(r=>r&&(r.conditions===undefined||validConditions(r.conditions))&&typeof r.id==='string'&&r.id.length<100&&typeof r.encounter==='string'&&r.encounter.length<100&&typeof r.profile==='string'&&r.profile.length<100&&typeof r.profileLabel==='string'&&r.profileLabel.length<100&&[MODEL_VERSION,'decision-model-v6','decision-model-v5','decision-model-v4','decision-model-v3','decision-model-v2','decision-model-v1'].includes(r.model)&&['tee','approach'].includes(r.type)&&KINDS.includes(r.kind)&&finite(r.score,0,100)&&finite(r.penalty,0,1)&&(r.regret===null||finite(r.regret,0,1e6))&&Number.isFinite(Date.parse(r.at))&&typeof r.retry==='boolean').slice(-HISTORY_LIMIT).map(r=>({...r,score:Math.round(r.score),profileLabel:r.model!==MODEL_VERSION&&!r.profileLabel.endsWith(' · previous model')?r.profileLabel+' · previous model':r.profileLabel}));
  }catch{return[];}
 }
 function canonical(value){if(Array.isArray(value))return value.map(canonical);if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])]));return value;}
-export function profileKey(mode,handicap,driverLimit,bag,costs){
- const source=JSON.stringify(canonical({model:MODEL_VERSION,mode,profile:mode==='basic'?{handicap,driverLimit}:bag,costs}));
+export function profileKey(mode,handicap,driverLimit,bag,costs,conditions=null){
+ const source=JSON.stringify(canonical({model:MODEL_VERSION,mode,profile:mode==='basic'?{handicap,driverLimit}:bag,costs,conditions}));
  let a=2166136261,b=3339675911;for(let i=0;i<source.length;i++){a=Math.imul(a^source.charCodeAt(i),16777619);b=Math.imul(b^source.charCodeAt(i),2246822519);}return`${(a>>>0).toString(16)}-${(b>>>0).toString(16)}-${source.length}`;
 }
 export function recordAttempt(history,entry){

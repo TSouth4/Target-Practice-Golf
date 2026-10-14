@@ -1,3 +1,4 @@
+import {windEffect,rolloutDistance} from './conditions.js';
 import {DRIVER_LIMITS,clubPattern,reachLimit} from './bag.js';
 import {EXTRA_HOLES} from './holes.js';
 import {BASELINE_ID,baselineStrokes,baselineLookup} from './strokes-baseline.js';
@@ -75,15 +76,18 @@ export function fairwayRemaining(d,c){
 }
 export function random(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
 export function samples(n=4000,seed=7142026){const rng=random(seed),out=[];for(let i=0;i<n;i++){const r=Math.sqrt(-2*Math.log(Math.max(1e-12,rng()))),theta=2*Math.PI*rng();out.push({z1:r*Math.cos(theta),z2:r*Math.sin(theta),u:rng(),sign:rng()<.5?-1:1});}return out;}
-export function shotAt(aim,p,z){
+export function shotAt(aim,p,z,s=null){
  const theta=Math.atan2(aim.x,aim.y),sin=Math.sin(theta),cos=Math.cos(theta);
  const big=z.u<p.bigPct/100,sign=p.bigDirection==='left'?-1:p.bigDirection==='right'?1:z.sign;
  const factor=big?2:1;
  const longitudinal=p.sdLong*(p.rho*z.z1+Math.sqrt(1-p.rho*p.rho)*z.z2)*factor-(big?p.bigShort:0);
  const carry=Math.max(1,p.carry+longitudinal);
  const offset=carry*Math.tan(p.start*Math.PI/180)+p.curve+p.bias+p.sdSide*z.z1*factor+(big?sign*p.bigShift:0);
- const end={x:sin*(carry+p.roll)+cos*offset,y:cos*(carry+p.roll)-sin*offset};
- const landing={x:sin*carry+cos*offset,y:cos*carry-sin*offset};
+ const wind=windEffect(aim,p,carry),landing={x:sin*carry+cos*offset+wind.x,y:cos*carry-sin*offset+wind.y};
+ const roll=rolloutDistance(p,s?lie(landing,s):'fairway');let end=p.conditions&&p.conditions.difficulty!=='easy'?{x:landing.x+sin*roll,y:landing.y+cos*roll}:{x:sin*(carry+p.roll)+cos*offset,y:cos*(carry+p.roll)-sin*offset};
+ if(s&&p.conditions?.difficulty&&p.conditions.difficulty!=='easy'){
+  let contact=null;for(const h of s.hazards)if(['bunker','trees'].includes(h.kind)){const entry=segmentPolyEntry(landing,end,h.poly);if(entry&&(!contact||Math.hypot(entry.x-landing.x,entry.y-landing.y)<Math.hypot(contact.x-landing.x,contact.y-landing.y)))contact=entry;}if(contact)end={x:contact.x+(end.x-contact.x)*1e-6,y:contact.y+(end.y-contact.y)*1e-6};
+ }
  return {...end,landing,big};
 }
 export function outcome(end,s){
@@ -96,7 +100,7 @@ export function evaluate(aim,p,s,c,zs,collect=false){
  const counts={fairway:0,green:0,rough:0,bunker:0,water:0,trees:0,ob:0};let subtotal=0;const points=collect?[]:null;const vals=[];
  const costs=collect?{nextShot:0,rough:0,bunker:0,trees:0,water:0,ob:0}:null;
  let baselineClamped=0;
- for(const z of zs){const end=shotAt(aim,p,z),o=outcome(end,s);counts[o.kind]++;
+ for(const z of zs){const end=shotAt(aim,p,z,s),o=outcome(end,s);counts[o.kind]++;
   const v=o.kind==='ob'?null:o.kind==='water'?2+c.waterExtra+remaining(o.drop,s,c,'rough'):1+remaining(end,s,c,o.kind);
   if(costs&&v!==null){
    const position=o.kind==='water'?o.drop:end,kind=o.kind==='water'?'rough':o.kind;
@@ -144,7 +148,7 @@ export function decisionFeedback(aim,p,r,b,s){
  const risk=q=>(q.counts.water+q.counts.ob+q.counts.bunker+q.counts.trees)/q.n;
  const extraRisk=risk(r)-risk(b.result);
  if(extraRisk>FEEDBACK_RULES.riskGap)return{kind:'aggressive',label:'Too aggressive',reason:'Your pattern reaches water, OB, sand or trees more often. Give the misses more room.'};
- const mean=a=>shotAt(a,{...patternAtTarget(a,p),sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1});
+ const mean=a=>shotAt(a,{...patternAtTarget(a,p),sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1},s);
  const distance=a=>{const q=mean(a);return Math.hypot(q.x-s.pin.x,q.y-s.pin.y);};
  if(distance(aim)>distance(b.aim)+FEEDBACK_RULES.proximityGap)return{kind:'conservative',label:'Too conservative',reason:'You give up more distance or proximity than the safety gain is worth in this model.'};
  return{kind:'refine',label:'Target needs refining',reason:'A different direction or depth lowers the modeled cost; this is not clearly a simple risk-versus-safety mistake.'};

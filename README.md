@@ -1,3 +1,11 @@
+# Wind, firmness and difficulty (16.0.0)
+
+Choose Easy, Medium or Hard beside the player settings before starting a round, or before its first recorded shot. Easy keeps the previous calm simulation. Medium adds steady 3–6 mph wind; Hard adds 8–15 mph wind. Both mix soft, normal and firm ground. Wind direction/speed and ground conditions appear above the course and remain available in full screen.
+
+Your selected target and intended carry stay fixed. Wind affects your saved usual flight after commitment, with higher shots more sensitive. Ground affects roll after landing; firm approaches can run beyond their carry landing. Feedback explains the center-flight wind movement and ground effect alongside the existing calculated target advice. Retry keeps conditions; new scenarios vary them. Assessments keep one set of conditions throughout all ten decisions. New learning rounds and courses use the selected difficulty and custom profile; recorded rounds keep their snapshots. Lessons stay calm.
+
+This first model uses illustrative training estimates. Read [CONDITIONS-MODEL.md](CONDITIONS-MODEL.md) for calculations, surface rules, save behavior and limits. Future daily/all-time par-3 leaderboards are recorded in [PROJECT-PLAN.md](PROJECT-PLAN.md).
+
 # Par-3 score and round controls (15.2.0)
 
 Par-3 scores are presented relative to par: Even par, +2 or -1. The top-right course summary shows the current hole, running total to par and number of completed holes. It remains visible in full screen. An unfinished hole, including a pending OB re-tee, does not enter the total until completed.

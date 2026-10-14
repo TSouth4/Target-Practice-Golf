@@ -4,7 +4,7 @@ const HAZARDS=[['water','water'],['ob','OB'],['bunker','bunkers'],['trees','reco
 const rate=(r,k)=>r.counts[k]/r.n;
 const pct=v=>(100*v).toFixed(1)+'%';
 const yards=v=>Math.abs(v).toFixed(0)+' yd';
-const nominal=(aim,p)=>shotAt(aim,{...patternAtTarget(aim,p),sdSide:0,sdLong:0,bigPct:0},ZERO);
+const nominal=(aim,p,s)=>shotAt(aim,{...patternAtTarget(aim,p),sdSide:0,sdLong:0,bigPct:0},ZERO,s);
 const COST_LABELS={nextShot:'Next-shot / putting cost',rough:'Rough recovery cost',bunker:'Bunker recovery cost',trees:'Tree recovery cost',water:'Water penalty / recovery cost',ob:'OB penalty / repeat cost'};
 export function tradeoffExplanation(r,q){
  if(!r.breakdown||!q.breakdown||!Number.isFinite(r.expected)||!Number.isFinite(q.expected))return null;
@@ -34,7 +34,7 @@ export function hazardExplanation(aim,b,r,s){
  return `${move}. Shots finishing in ${h.label} fall from ${pct(own)} to ${pct(best)}. The comparison balances proximity with the cost of those misses.${h.forest?' Dense woods have a higher modeled recovery cost than open woods.':''}`;
 }
 export function decisionLesson(aim,p,r,b,s,assessment){
- const q=b.result,own=nominal(aim,p),comparison=nominal(b.aim,b.pattern||p);
+ const q=b.result,own=nominal(aim,p,s),comparison=nominal(b.aim,b.pattern||p,s);
  const ownDistance=Math.hypot(own.x-s.pin.x,own.y-s.pin.y),bestDistance=Math.hypot(comparison.x-s.pin.x,comparison.y-s.pin.y);
  const extraHazards=HAZARDS.map(([kind,name])=>({kind,name,gap:rate(r,kind)-rate(q,kind)})).sort((a,b)=>b.gap-a.gap);
  const leader=extraHazards[0],hazardGap=extraHazards.reduce((sum,h)=>sum+h.gap,0),cost=r.expected-q.expected;

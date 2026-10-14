@@ -1,3 +1,4 @@
+import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
 import {readCourse} from './course.js';
 import {random,SCENARIOS} from './model.js';
@@ -7,6 +8,7 @@ export const ROUND_KEY='target-practice-round-v1';
 export const ROUND_VERSION='rounds-v4-model-v6';
 const groups=[['drivable'],['cedar'],['narrow','squeeze-par4','creek-tee'],['bend','sharp-dogleg'],['creek-tee','drivable']];
 export function createRound(kind,seed,profile){
+ profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
  const rng=random(seed),count=kind==='assessment'?10:5,approaches=['water','tucked','bowl','split','creek-par3','par5-open','par5-carry'],schedule=[];
  for(let i=0;i<count;i++){
   const pool=i%2?approaches:groups[Math.floor(i/2)%groups.length],id=pool[Math.floor(rng()*pool.length)];
@@ -20,6 +22,7 @@ export function createRound(kind,seed,profile){
   schedule.push({id,holeSeed,drawSeed:Math.floor(rng()*2147483645)+1});
  }
  for(let i=schedule.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[schedule[i],schedule[j]]=[schedule[j],schedule[i]];}
+ if(profile.difficulty&&profile.difficulty!=='easy')for(const slot of schedule)slot.conditions=conditionsFor(profile.difficulty,kind==='assessment'?seed^0x6137:slot.drawSeed^0x6137);
  return {id:`${kind}-${seed}`,version:ROUND_VERSION,kind,seed,profile,schedule,index:0,answers:[],status:'active'};
 }
 export function readRound(raw){
@@ -27,7 +30,7 @@ export function readRound(raw){
   if(!Number.isInteger(r.seed)||r.seed<1||r.seed>2147483646||typeof r.id!=='string'||r.id.length<1||r.id.length>60)return null;
   const count=r.kind==='assessment'?10:5;
   if(!Array.isArray(r.schedule)||r.schedule.length!==count||!Number.isInteger(r.index)||r.index<0||r.index>=count||!Array.isArray(r.answers)||r.answers.length>count)return null;
-  if(!validPlayerProfile(r.profile))return null;
+  if(!validPlayerProfile(r.profile)||!validConditionSchedule(r.profile,r.schedule,r.kind==='assessment'))return null;
   if(r.schedule.some(s=>!SCENARIOS.some(b=>b.id===s.id)||!Number.isInteger(s.holeSeed)||s.holeSeed<=0||!Number.isInteger(s.drawSeed)||s.drawSeed<=0))return null;
   if(r.answers.some((a,i)=>!a||a.index!==i||!['balanced','aggressive','conservative','refine'].includes(a.kind)||!Number.isFinite(a.score)||a.score<0||a.score>100||!(a.regret===null||Number.isFinite(a.regret)&&a.regret>=0)||!Number.isFinite(a.dx)||!Number.isFinite(a.dy)))return null;
   if(r.answers.length<r.index||r.answers.length>r.index+1||r.status==='complete'&&r.answers.length!==count)return null;

@@ -8,7 +8,7 @@ export function plannedRollout(aim,p){
 // Review-only center of the core flight, not the mean of all mixture outcomes.
 // Use the same water contact rule as the scored shots, so roll ends at contact.
 export function centerFlight(aim,p,s){
- const shot=shotAt(aim,{...p,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1}),o=outcome(shot,s);
+ const shot=shotAt(aim,{...p,sdSide:0,sdLong:0,bigPct:0},{z1:0,z2:0,u:1,sign:1},s),o=outcome(shot,s);
  const finish=o.finish?{...o.finish}:{x:shot.x,y:shot.y};
  return{landing:{...shot.landing},finish,kind:o.kind,roll:Math.hypot(finish.x-shot.landing.x,finish.y-shot.landing.y)};
 }

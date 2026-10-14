@@ -19,6 +19,7 @@ export function moveApex(p,lateral,y){return{...moveFlightHandle(p,'mid',lateral
 export function applyFlightToBag(bag,sourceClub,p){const carry=p.carry;return bag.map(c=>{if(c.club===sourceClub)return{...p,club:c.club,stock:p.carry+p.roll,carry:undefined};const ratio=(c.stock-c.roll)/carry;return{...c,start:p.start,curve:clamp(p.curve*ratio,-50,50),bias:clamp((p.bias||0)*ratio,-35,35),height:clamp(p.height*Math.sqrt(ratio),5,50)};});}
 export function resetFlight(bag,club=null){return bag.map(c=>!club||c.club===club?{...c,start:0,curve:0,bias:0,height:c.stock>200?32:25}:c);}
 export function validPlayerProfile(p){
+ if(p?.difficulty!==undefined&&!['easy','medium','hard'].includes(p.difficulty))return false;
  if(!p||!['0','5','10','20'].includes(p.handicap)||!Number.isFinite(p.limit)||p.limit<180||p.limit>330||p.shotMode&&!['basic','custom'].includes(p.shotMode))return false;
  if(p.shotMode!=='custom')return true;
  const names=['Driver','3 wood','Hybrid','5 iron','6 iron','7 iron','8 iron','9 iron','PW','SW'];

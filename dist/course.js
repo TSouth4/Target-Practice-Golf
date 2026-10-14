@@ -1,3 +1,4 @@
+import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
 import {SCENARIOS,random,outcome,remaining,DEFAULT_COSTS} from './model.js';
 import {generateScenario} from './practice.js';
@@ -23,8 +24,10 @@ export function simulateFinish(kind,yards,seed,reference=null){
  return{strokes,putts,offGreen:kind==='green'?0:strokes-putts,kind,distance:yards,reference:d.mean};
 }
 export function createCourse(seed,profile,landscape='woodland'){
+ profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
  const rng=random(seed),families=['tucked','water','split'],schedule=[];
  for(const id of families){let holeSeed=Math.floor(rng()*2147483000)+1;for(let n=0;n<512;n++){const s=generateScenario(SCENARIOS.find(s=>s.id===id),holeSeed);if(Math.hypot(s.pin.x,s.pin.y)<=175)break;holeSeed++;}schedule.push({id,holeSeed,drawSeed:Math.floor(rng()*2147483000)+1,finishSeed:Math.floor(rng()*2147483000)+1,landscape});}
+ if(profile.difficulty&&profile.difficulty!=='easy')for(const slot of schedule)slot.conditions=conditionsFor(profile.difficulty,slot.drawSeed^0x6137);
  return{id:`course-${seed}`,kind:'course',version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};
 }
 export function courseTotal(c){const strokes=c.answers.reduce((n,a)=>n+a.holeScore,0),par=c.answers.length*3;return{strokes,par,relative:strokes-par,holes:c.answers.length};}
@@ -59,6 +62,7 @@ export function readCourse(raw){
   if(c?.kind!=='course'||c.version!==COURSE_VERSION||!['active','complete'].includes(c.status)||!integer(c.seed,1)||typeof c.id!=='string'||!c.id.length||c.id.length>60)return null;
   if(!validPlayerProfile(c.profile))return null;
   if(!Array.isArray(c.schedule)||c.schedule.length!==3||!integer(c.index,0,2)||c.schedule.some(s=>!['tucked','water','split'].includes(s.id)||!integer(s.holeSeed,1)||!integer(s.drawSeed,1)||!integer(s.finishSeed,1)||!['woodland','coast','desert','mountain'].includes(s.landscape))||new Set(c.schedule.map(s=>s.landscape)).size!==1)return null;
+  if(!validConditionSchedule(c.profile,c.schedule)||c.review&&c.profile.difficulty&&c.profile.difficulty!=='easy'&&JSON.stringify(c.review.pattern.conditions||null)!==JSON.stringify(c.schedule[c.index].conditions||null))return null;
   if(!Array.isArray(c.answers)||c.answers.length>3||c.answers.some((a,i)=>a.index!==i||a.par!==3||!integer(a.holeScore,1)||!validAttempts(a.attempts)||!finish(a.finish)||!shot(a.selected)||a.teeShots!==a.attempts.length||a.penalties!==a.attempts.reduce((n,t)=>n+t.penalty,0)||a.holeScore!==a.teeShots+a.penalties+a.finish.strokes||a.score!==a.attempts[0].decision.score||a.kind!==a.attempts[0].decision.kind||a.regret!==a.attempts[0].decision.regret))return null;
   if(!c.current||!integer(c.current.strokes)||!Array.isArray(c.current.attempts)||c.current.attempts.length>=1000||c.current.attempts.some(a=>!attempt(a)))return null;
   if(c.status==='complete'&&(c.answers.length!==3||c.index!==2||!c.review)||c.status==='active'&&c.answers.length!==c.index+(c.review&&!c.review.retee?1:0))return null;
