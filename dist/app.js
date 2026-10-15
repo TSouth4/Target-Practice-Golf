@@ -1,3 +1,4 @@
+import {ROUND_HISTORY_KEY,ROUND_HISTORY_LIMIT,readRoundHistory,archiveRound,dashboardData,roundTrendSVG,difficultyOf,shotSetting} from './dashboard.js';
 import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,INTRO_PURPOSE,hasSeenIntroduction,prepareIntroduction,introductionGraphic} from './introduction.js';
 import {CALM,CONDITIONS_VERSION,conditionsFor,conditionsLabel,conditionsFeedback} from './conditions.js';
 import {createCourse,readCourse,recordCourseShot,advanceCourse,courseTotal,scoreName,scoreToPar,COURSE_FINISH_LABEL,COURSE_KEY,courseFinishHeadline} from './course.js';
@@ -8,7 +9,7 @@ import {ROUND_VERSION,ROUND_KEY,createRound,readRound,addRoundAnswer,roundSummar
 import {SCENARIOS,DEFAULT_COSTS,preset,basicPattern,clamp,random,samples,shotAt,evaluate,optimizeTargets,decisionScore,patternAtTarget,fitTarget,aimAtDepth,aimAtDistance,decisionFeedback} from './model.js';
 import {targetFacts,hazardCallouts,retryRows,greenYardages} from './guidance.js';
 import {decisionLesson,retryImpact} from './lessons.js';
-import {PROGRESS_KEY,MODEL_VERSION,readProgress,profileKey,recordAttempt,progressSummary,trendSVG} from './progress.js';
+import {PROGRESS_KEY,MODEL_VERSION,readProgress,profileKey,recordAttempt} from './progress.js';
 import {DRIVER_LIMITS,reachLimit,trainingBag} from './bag.js';
 import {FLIGHT_PIXEL,APEX_FLIGHT_PIXEL,defaultMemberBag,cleanMemberBag,editingPattern,flightHandles,moveFlightHandle,moveApex,applyFlightToBag,resetFlight,apexY,APEX_X,FINISH_X,FINISH_Y,flightDescription,flightSVG,heightSVG} from './shot-editor.js';
 import {BRAND} from './config.js';
@@ -42,8 +43,10 @@ const storeKey='golfaim101-v2';
 let idCounter=0;
 const makeId=()=>globalThis.crypto?.randomUUID?.()||`${Date.now().toString(36)}-${(++idCounter).toString(36)}-${Math.random().toString(36).slice(2,10)}`;
 state.encounter=makeId();
-let progressHistory=[],progressOpen=false,progressSelection='',progressType='all',progressStored=true,progressMessage='';
+let progressHistory=[],progressOpen=false,progressStored=true,progressMessage='';
 try{progressHistory=readProgress(localStorage.getItem(PROGRESS_KEY));}catch{progressStored=false;}
+let completedRounds=[],roundHistoryStored=true,progressDifficulty='all';try{completedRounds=readRoundHistory(localStorage.getItem(ROUND_HISTORY_KEY));}catch{roundHistoryStored=false;}
+function rememberCompletedRound(candidate){const next=archiveRound(completedRounds,candidate);if(next===completedRounds&&roundHistoryStored)return;completedRounds=next;try{localStorage.setItem(ROUND_HISTORY_KEY,JSON.stringify(completedRounds));roundHistoryStored=true;}catch{roundHistoryStored=false;}}
 const escapeHTML=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const RATING_LABELS={balanced:'Strong decision',aggressive:'Too aggressive',conservative:'Too conservative',refine:'Target needs refining'};
 function effectiveBag(){return round?.profile.shotMode==='custom'?round.profile.bag:state.memberBag;}
@@ -54,30 +57,31 @@ function recordDecision(){
  if(introduction||tutorial||isCourse())return;
  if(!Number.isFinite(best.result.expected)){progressMessage='No progress entry: this run has no usable target comparison.';return;}
  const assessed=decisionFeedback(state.aim,state.pattern,result,best,scene());
- const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit · ${state.pattern.conditions?.difficulty||'easy'}`:`My clubs · ${state.pattern.conditions?.difficulty||'easy'}`,type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected,state.aim,best.aim),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty,conditions:structuredClone(state.pattern.conditions||CALM)};
+ const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit · ${state.pattern.conditions?.difficulty||'easy'}`:`My clubs · ${state.pattern.conditions?.difficulty||'easy'}`,type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected,state.aim,best.aim),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty,conditions:structuredClone(state.pattern.conditions||CALM),handicap:state.basicHandicap,shotMode:state.mode==='advanced'?'custom':'handicap'};
  const recorded=recordAttempt(progressHistory,entry);progressHistory=recorded.history;
  try{localStorage.setItem(PROGRESS_KEY,JSON.stringify(progressHistory));progressStored=true;}catch{progressStored=false;}
  progressMessage=progressStored?(recorded.entry.retry?'Retry saved separately; it does not enter your improvement trend.':'First attempt saved to My progress.'):'Progress is available for this visit, but could not be saved on this device.';
 }
 function renderProgress(){
- const profiles=[...new Set(progressHistory.map(r=>r.profile))];if(!profiles.includes(progressSelection))progressSelection=profiles.includes(currentProfile())?currentProfile():profiles.at(-1)||'';
- $('progressProfile').innerHTML=profiles.length?profiles.map((key,i)=>{const row=progressHistory.find(r=>r.profile===key);return`<option value="${escapeHTML(key)}">${escapeHTML(row.profileLabel)} · profile ${i+1}</option>`;}).join(''):'<option value="">No decisions yet</option>';
- $('progressProfile').value=progressSelection;$('progressProfile').disabled=!profiles.length;$('progressType').value=progressType;
- const summary=progressSummary(progressHistory,progressSelection,progressType);
- $('progressCount').textContent=summary.first.length;$('progressRetryCount').textContent=`${summary.retries} retries recorded separately`;
- $('progressAverage').textContent=summary.recentMean===null?'—':summary.recentMean.toFixed(1)+' / 100';$('progressAverageLabel').textContent=`Last ${summary.recent.length} first attempts`;
- $('progressChange').textContent=summary.change===null?'—':`${summary.change>=0?'+':''}${summary.change.toFixed(1)} pts`;
- $('progressChange').setAttribute('data-trend',summary.change===null?'none':summary.change>0?'up':summary.change<0?'down':'flat');
- $('progressChangeLabel').textContent=summary.change===null?'Starts after 10 first attempts':`Latest ${summary.window} vs first ${summary.window}; no overlap`;
- $('progressCost').textContent=!summary.recent.length?'—':summary.recentRegret===null?'Unbounded':'+'+summary.recentRegret.toFixed(2);
- $('progressChartLabel').textContent=summary.first.length?`Last ${Math.min(50,summary.first.length)} first attempts · same profile · ${progressType==='all'?'tee + approach':progressType+' shots'}`:'Commit a target to start your decision history.';
- $('progressTrend').innerHTML=trendSVG(summary.first);
- $('progressKinds').innerHTML=Object.entries(summary.kinds).map(([kind,count])=>`<div><span>${RATING_LABELS[kind]}</span><strong>${count}</strong><small>${summary.first.length?(100*count/summary.first.length).toFixed(0):0}%</small></div>`).join('');
- $('progressRows').innerHTML=summary.first.slice(-8).reverse().map(row=>`<tr><td>${escapeHTML(new Date(row.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))}</td><td>${row.type==='tee'?'Tee':'Approach'}</td><td>${row.score} / 100</td><td>${RATING_LABELS[row.kind]}</td></tr>`).join('');
- $('progressEmpty').textContent=summary.first.length?'':summary.retries?'Only retries in this profile so far. Take Next shot to start a new first attempt.':'No first attempts in this profile and shot type yet.';
- $('progressStorage').textContent=progressStored?'Saved locally in this browser. Keeps the latest 1,000 attempts, including retries. Clearing browser data removes this history.':'Local saving is unavailable. History from this visit may be lost when you close the page.';
+ const data=dashboardData(progressHistory,completedRounds,progressDifficulty),average=v=>v===null?'—':v.toFixed(1)+' / 100',cost=d=>!d.count?'—':d.unbounded?'Unbounded':'+'+(d.cost*100).toFixed(1),relative=v=>v===null?'—':Math.abs(v)<.05?'Even par':(v>0?'+':'')+v.toFixed(1),date=at=>new Date(at).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+ $('progressDifficulty').value=progressDifficulty;$('progressScope').textContent=progressDifficulty==='all'?'Overall · all difficulties':`${progressDifficulty[0].toUpperCase()+progressDifficulty.slice(1)} difficulty`;
+ $('progressCount').textContent=data.count;$('progressRetryCount').textContent=`${data.retries} ${data.retries===1?'retry':'retries'} excluded`;$('progressAverage').textContent=average(data.score);$('progressAverageLabel').textContent='First choices only · current scoring rules';$('progressCost').textContent=cost(data);$('progressCourseAverage').textContent=relative(data.courseMean);$('progressCourseCount').textContent=`${data.courseCount} completed 18-hole ${data.courseCount===1?'round':'rounds'}`;
+ $('progressChartLabel').textContent=`${data.learning.length} completed five-shot rounds · higher is better`;$('progressTrend').innerHTML=roundTrendSVG(data.learning,'practice');$('progressCourseChartLabel').textContent=`${data.courses.length} completed 18-hole rounds · lower is better`;$('progressCourseTrend').innerHTML=roundTrendSVG(data.courses,'course');
+ $('progressKinds').innerHTML=Object.entries(data.kinds).map(([kind,count])=>`<div><span>${RATING_LABELS[kind]}</span><strong>${count}</strong><small>${data.count?(100*count/data.count).toFixed(0):0}%</small></div>`).join('');
+ const tendency=d=>{if(!d.count)return'—';const max=Math.max(...Object.values(d.kinds)),top=Object.entries(d.kinds).filter(([,n])=>n===max);return top.length>1?'Mixed tendencies':RATING_LABELS[top[0][0]];};
+ $('progressShotComparison').innerHTML=[['Decisions scored',data.tee.count,data.approach.count],['Average decision score',average(data.tee.score),average(data.approach.score)],['Extra modeled strokes per 100',cost(data.tee),cost(data.approach)],['Most common tendency',tendency(data.tee),tendency(data.approach)]].map(([label,tee,approach])=>`<tr><th scope="row">${label}</th><td>${tee}</td><td>${approach}</td></tr>`).join('');
+ $('progressDifficultyRows').innerHTML=data.breakdown.filter(d=>d.count||d.courses.length).map(d=>`<tr><th scope="row">${d.difficulty==='unknown'?'Earlier unspecified difficulty':d.difficulty[0].toUpperCase()+d.difficulty.slice(1)}</th><td>${d.count}</td><td>${average(d.score)}</td><td>${cost(d)}</td><td>${d.courses.length?relative(d.courses.reduce((n,r)=>n+r.relative,0)/d.courses.length):'—'}</td></tr>`).join('')||'<tr><td colspan="5">No recorded decisions or completed rounds yet.</td></tr>';
+ $('progressSettings').textContent=data.settings.length?`Shot settings included: ${data.settings.join(', ')}. Settings are saved with results; no profile selection is needed.`:'Your handicap or custom-shot setting will be saved with your results.';
+ $('progressPilotNote').textContent=data.pilotCount?`${data.pilotCount} three-hole pilot ${data.pilotCount===1?'round is':'rounds are'} saved separately and excluded from the 18-hole average.`:'';
+ $('progressPreviousNote').textContent=data.previousCount?`${data.previousCount} decisions under earlier scoring rules are retained separately.`:'';
+ $('progressAssessmentRows').innerHTML=data.assessments.slice(-5).reverse().map(r=>`<li>${r.recovered?'Earlier round (recovered)':date(r.completedAt)} · ${average(r.decisions.reduce((n,d)=>n+d.score,0)/r.decisions.length)} · ${difficultyOf(r)} · ${shotSetting(r)}${r.model==='earlier-unrecorded'?' · earlier scoring rules not recorded':''}</li>`).join('')||'<li>Complete a ten-shot assessment to start this history.</li>';
+ const recent=[...data.learning,...data.courses,...data.assessments,...data.pilots].sort((a,b)=>Date.parse(b.completedAt)-Date.parse(a.completedAt));
+ $('progressRoundRows').innerHTML=recent.slice(0,12).map(r=>`<tr><td>${r.recovered?'Earlier round (recovered)':date(r.completedAt)}</td><td>${r.kind==='course'?(r.holes===18?'18-hole par-3':'3-hole pilot'):r.kind==='assessment'?'Assessment':'Learning round'}</td><td>${r.kind==='course'?relative(r.relative):average(r.decisions.reduce((n,d)=>n+d.score,0)/r.decisions.length)}</td><td>${difficultyOf(r)} · ${shotSetting(r)}</td></tr>`).join('')||'<tr><td colspan="4">Completed rounds will appear here.</td></tr>';
+ $('progressRows').innerHTML=data.first.slice(-8).reverse().map(row=>`<tr><td>${escapeHTML(date(row.at))}</td><td>${row.type==='tee'?'Tee':'Approach'}</td><td>${row.score.toFixed(0)} / 100</td><td>${RATING_LABELS[row.kind]}</td></tr>`).join('');
+ $('progressEmpty').textContent=data.count?'':'No scored decisions yet. Choose a target in practice or complete a round to begin.';
+ $('progressStorage').textContent=progressStored&&roundHistoryStored?`Saved in this browser: up to 1,000 practice attempts and ${ROUND_HISTORY_LIMIT} completed rounds. Older rounds that were replaced before this update cannot be recovered. Clearing browser data removes history.`:'Local saving is unavailable for some history. Results from this visit may be lost when you close the page.';
 }
-function openProgress(){if(!prepareNavigation())return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();progressOpen=true;progressSelection=currentProfile();$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
+function openProgress(){if(!prepareNavigation())return;roundView=false;$('roundScreen').hidden=true;leaveFullscreen();closeMenu();rememberCompletedRound(round);rememberCompletedRound(storedCourse());progressOpen=true;progressDifficulty='all';$('practiceScreen').hidden=true;$('progressScreen').hidden=false;renderProgress();updateLabels();$('progressScreen').scrollIntoView({behavior:'auto'});$('closeProgress').focus?.();}
 function closeProgress(){progressOpen=false;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;updateLabels();$('practiceScreen').scrollIntoView({behavior:'auto'});$('menuToggle').focus?.();}
 
 let cachedScene,sceneKey;
@@ -97,7 +101,7 @@ if(state.mode==='advanced'){state.pattern=member();state.costs=memberCosts();sta
 state.recent=state.recent.length?state.recent:[state.scenario];
 function member(){return{...basic(),customBag:effectiveBag(),shotType:scene().type};}
 function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.querySelectorAll('[data-cost]'))out[el.dataset.cost]=num(state.memberCosts?.[el.dataset.cost],Number(el.min),Number(el.max),DEFAULT_COSTS[el.dataset.cost]);return out;}
-function save(){if(tutorialReturn){try{localStorage.setItem(storeKey,JSON.stringify(tutorialReturn.state));localStorage.setItem(ROUND_KEY,JSON.stringify(tutorialReturn.round));}catch{}return;}if(round?.status==='active'&&!isCourse()&&!round.answers.length&&state.mode==='basic')round.profile=selectedPlayerProfile();try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));if(isCourse()){localStorage.setItem(COURSE_KEY,JSON.stringify(round));courseStorageOK=true;}}catch{if(isCourse())courseStorageOK=false;}}
+function save(){if(tutorialReturn){try{localStorage.setItem(storeKey,JSON.stringify(tutorialReturn.state));localStorage.setItem(ROUND_KEY,JSON.stringify(tutorialReturn.round));}catch{}return;}rememberCompletedRound(round);if(round?.status==='active'&&!isCourse()&&!round.answers.length&&state.mode==='basic')round.profile=selectedPlayerProfile();try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));if(isCourse()){localStorage.setItem(COURSE_KEY,JSON.stringify(round));courseStorageOK=true;}}catch{if(isCourse())courseStorageOK=false;}}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function setSideTarget(x){
  const range=state.pattern.aimXRange||[-60,60],distance=state.pattern.carry;
@@ -381,7 +385,7 @@ function showRoundScreen(intro=false){
 function recordRoundDecision(r,b){
  if(round?.status!=='active'||isCourse())return;
  const assessment=decisionFeedback(state.aim,state.pattern,r,b,scene());
- addRoundAnswer(round,{kind:assessment.kind,score:decisionScore(r.expected,b.result.expected,state.aim,b.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(b.result.expected)?Math.max(0,r.expected-b.result.expected):null,dx:b.aim.x-state.aim.x,dy:b.pattern.carry-state.pattern.carry});save();
+ addRoundAnswer(round,{kind:assessment.kind,score:decisionScore(r.expected,b.result.expected,state.aim,b.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(b.result.expected)?Math.max(0,r.expected-b.result.expected):null,dx:b.aim.x-state.aim.x,dy:b.pattern.carry-state.pattern.carry});if(round.answers.length===round.schedule.length&&!round.completedAt)round.completedAt=new Date().toISOString();save();
 }
 function nextRoundSlot(){
  if(working||!roundRecorded())return;roundResumed=false;
@@ -586,7 +590,7 @@ async function run(newSeed=false){
   if(snapshot!==JSON.stringify(state)){toast('Settings changed. Commit the updated target.');return;}
   if(isCourse()){
    const s=scene(),feedback=decisionFeedback(state.aim,state.pattern,r,comparison,s),lesson=decisionLesson(state.aim,state.pattern,r,comparison,s,feedback),decision={kind:feedback.kind,label:feedback.label,reason:feedback.reason,action:(lesson.hazardDetail||lesson.why)+' '+(lesson.tradeoff||'')+` The comparison target on this hole is ${Math.round(comparison.pattern.carry)} yd carry, ${sided(comparison.aim.x)}. Use practice mode to try the alternative.`,score:decisionScore(r.expected,comparison.result.expected,state.aim,comparison.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(comparison.result.expected)?Math.max(0,r.expected-comparison.result.expected):null};
-   const review=recordCourseShot(round,r.points,s,decision,state.aim,state.pattern);save();traceShots=tracerSample(r.points);traceShots[0]=review.selected;phase='shooting';updateLabels();drawCourse();
+   const review=recordCourseShot(round,r.points,s,decision,state.aim,state.pattern);if(round.status==='complete'&&!round.completedAt)round.completedAt=new Date().toISOString();save();traceShots=tracerSample(r.points);traceShots[0]=review.selected;phase='shooting';updateLabels();drawCourse();
    const motion=!matchMedia('(prefers-reduced-motion: reduce)').matches;if(motion)await wait(2200);
    result=r;best=comparison;traceShots=[];phase='course-pattern';updateLabels();drawCourse();if(motion)await wait(1000);
    phase='course-selecting';traceShots=[review.selected];updateLabels();drawCourse();if(motion)await wait(900);
@@ -666,8 +670,8 @@ for(const id of ['modelTop','modelFooter'])$(id).addEventListener('click',()=>{$
 $('decisionVerdict').addEventListener('click',()=>{if(!result)return;$('decisionLesson').hidden=!$('decisionLesson').hidden;$('decisionVerdict').setAttribute('aria-expanded',!$('decisionLesson').hidden);});
 for(const id of ['progressMenu','progressResult'])$(id).addEventListener('click',openProgress);
 $('closeProgress').addEventListener('click',closeProgress);
-$('progressProfile').addEventListener('change',()=>{progressSelection=$('progressProfile').value;renderProgress();});
-$('progressType').addEventListener('change',()=>{progressType=['all','tee','approach'].includes($('progressType').value)?$('progressType').value:'all';renderProgress();});
+$('progressDifficulty').addEventListener('change',()=>{progressDifficulty=['all','easy','medium','hard'].includes($('progressDifficulty').value)?$('progressDifficulty').value:'all';renderProgress();});
+rememberCompletedRound(storedCourse());
 $('brandName').textContent=BRAND.name;$('brandFooter').textContent=BRAND.name;document.title=BRAND.title;
 if(round?.status==='active'){
  restorePlayerProfile();loadRoundSlot();

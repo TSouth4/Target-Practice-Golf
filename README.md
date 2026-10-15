@@ -1,3 +1,15 @@
+# Simpler My Progress and completed-round history (17.1.0)
+
+My Progress opens with overall average decision quality, extra modeled strokes per 100 decisions, and average completed 18-hole par-3 score relative to par. The scored-decision count is supporting text. The profile selector and early-versus-late KPI are removed. Tendencies retain counts/percentages, with a tee/approach comparison and optional difficulty breakdown. Settings are retained with results rather than requiring users to select an opaque profile ID.
+
+Separate charts show completed five-shot learning-round averages and 18-hole course scores. Lines connect matching profile/difficulty/scoring settings; mixed settings remain visible as separate points and are identified in the breakdown. Completed assessments and recent rounds also have history lists. Retries do not enter decision averages. Existing practice first choices and completed-round first choices are deduplicated by encounter. Course choices are counted as tee decisions, with only the original choice per hole graded; ongoing course/assessment choices are added after completion. Lessons/Introduction do not enter these statistics.
+
+Completed-round summaries are now retained separately under `target-practice-completed-rounds-v1` (latest 200), with immutable player/difficulty/club snapshots, original mode/version, decision summaries, and course totals. New rounds record the decision model and completion time. A fully answered learning round is saved even if the player leaves before pressing Next. Reload/report/restart does not duplicate a result. Three-hole pilots are retained separately and excluded from 18-hole averages. Existing completed current/latest course saves can be recovered; records with unknown historical completion times are marked as recovered. Previously overwritten rounds cannot be reconstructed. Older scoring-rule decision records remain stored but are excluded from current-rule decision KPIs.
+
+History is still local to this browser, not an account/cloud service. Storage failures retain the current visit's results in memory and display a limitation. The original v17.0 wording-review documents remain unchanged to preserve the owner's editing references.
+
+Validation: all 184 automated tests and syntax checks passed. Chromium checks at 1440, 390 and 320 pixels covered populated/empty dashboards, difficulty filtering, chart counts, preserved practice state and page overflow.
+
 # Eighteen-hole par-3 rounds (17.0.0)
 
 New par-3 rounds have 18 seeded holes (par 54), using tucked-flag, water, split-green, bowl and creek layouts. New rounds mix their variants while retaining one environment and the difficulty/profile chosen at setup. Layouts retain the pilot's reachable 175-yard maximum. Existing saved three-hole pilots remain readable and finish at three holes; starting or restarting creates an 18-hole round. The finish probability model and penalties are unchanged.

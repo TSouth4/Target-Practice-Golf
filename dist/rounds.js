@@ -1,3 +1,4 @@
+import {MODEL_VERSION} from './progress.js';
 import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
 import {readCourse} from './course.js';
@@ -23,7 +24,7 @@ export function createRound(kind,seed,profile){
  }
  for(let i=schedule.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[schedule[i],schedule[j]]=[schedule[j],schedule[i]];}
  if(profile.difficulty&&profile.difficulty!=='easy')for(const slot of schedule)slot.conditions=conditionsFor(profile.difficulty,kind==='assessment'?seed^0x6137:slot.drawSeed^0x6137);
- return {id:`${kind}-${seed}`,version:ROUND_VERSION,kind,seed,profile,schedule,index:0,answers:[],status:'active'};
+ return {id:`${kind}-${seed}`,version:ROUND_VERSION,decisionModel:MODEL_VERSION,kind,seed,profile,schedule,index:0,answers:[],status:'active'};
 }
 export function readRound(raw){
  try{const r=JSON.parse(raw);if(r?.kind==='course')return readCourse(r);if(!r||!(r.version===ROUND_VERSION||['rounds-v3-model-v5','rounds-v2-model-v4','rounds-v1-model-v3'].includes(r.version)&&r.status==='complete')||!['practice','assessment'].includes(r.kind)||!['active','complete'].includes(r.status))return null;

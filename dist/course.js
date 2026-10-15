@@ -1,3 +1,4 @@
+import {MODEL_VERSION} from './progress.js';
 import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
 import {SCENARIOS,random,outcome,remaining,DEFAULT_COSTS} from './model.js';
@@ -31,7 +32,7 @@ export function createCourse(seed,profile,landscape='woodland'){
  const rng=random(seed),families=['tucked','water','split'],schedule=[];
  for(let i=0;i<COURSE_HOLES;i++){if(i>=families.length){const bag=[...COURSE_FAMILIES];for(let n=bag.length-1;n>0;n--){const j=Math.floor(rng()*(n+1));[bag[n],bag[j]]=[bag[j],bag[n]];}if(bag[0]===families.at(-1))[bag[0],bag[1]]=[bag[1],bag[0]];families.push(...bag);}const id=families[i];let holeSeed=Math.floor(rng()*2147483000)+1;for(let n=0;n<512;n++){const s=generateScenario(SCENARIOS.find(s=>s.id===id),holeSeed);if(Math.hypot(s.pin.x,s.pin.y)<=175)break;holeSeed++;}schedule.push({id,holeSeed,drawSeed:Math.floor(rng()*2147483000)+1,finishSeed:Math.floor(rng()*2147483000)+1,landscape});}
  if(profile.difficulty&&profile.difficulty!=='easy')for(const slot of schedule)slot.conditions=conditionsFor(profile.difficulty,slot.drawSeed^0x6137);
- return{id:`course-${seed}`,kind:'course',version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};
+ return{id:`course-${seed}`,kind:'course',decisionModel:MODEL_VERSION,version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};
 }
 export function courseTotal(c){const strokes=c.answers.reduce((n,a)=>n+a.holeScore,0),par=c.answers.length*3;return{strokes,par,relative:strokes-par,holes:c.answers.length};}
 export function scoreToPar(relative){return relative===0?'Even par':relative>0?'+'+relative:String(relative);}

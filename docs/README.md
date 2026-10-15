@@ -13,3 +13,5 @@ Use [the editable Word document](Target-Practice-Website-Wording-Review.docx) to
 `SITE-TEXT-SOURCE-MAP.json` is an implementation reference for applying edits; you do not need to edit it. Generated numbers, decorative symbols and internal code are not wording changes. Account, billing and legal-policy copy will need a separate review when those features are built.
 
 No website text has been changed by creating these documents.
+
+The wording review is intentionally frozen at v17.0 so existing TP references stay stable. The v17.1 My Progress redesign introduces new copy beyond that snapshot; returned edits will be matched to the appropriate current screen.
