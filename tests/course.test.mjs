@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal,courseFinishHeadline,LEGACY_COURSE_VERSION} from '../dist/course.js';
+import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal,courseFinishHeadline,LEGACY_COURSE_VERSION,courseDistanceRange} from '../dist/course.js';
 import {SCENARIOS,basicPattern,samples,evaluate,remaining,DEFAULT_COSTS} from '../dist/model.js';import {generateScenario} from '../dist/practice.js';import {baselineStrokes} from '../dist/strokes-baseline.js';import {readRound} from '../dist/rounds.js';
 const profile={handicap:'5',limit:265},decision={kind:'balanced',label:'Strong decision',reason:'Useful room',action:'Keep room',score:98,regret:.01};
 test('finishing distributions have real variation and calibrated reference means, not rounded averages',()=>{
@@ -8,7 +8,7 @@ test('finishing distributions have real variation and calibrated reference means
  assert.equal(simulateFinish('green',.03,1).strokes,0);
 });
 test('eighteen varied reachable par-3 layouts share an environment and persist through the round reader',()=>{
- for(let seed=1;seed<=40;seed++){const c=createCourse(seed,profile,'mountain');assert.deepEqual(c,createCourse(seed,profile,'mountain'));assert.equal(c.schedule.length,18);for(const slot of c.schedule){assert.equal(slot.landscape,'mountain');const s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed);assert.ok(Math.hypot(s.pin.x,s.pin.y)<=175);}assert.deepEqual(readRound(JSON.stringify(c)),c);}
+ for(let seed=1;seed<=40;seed++){const c=createCourse(seed,profile,'mountain');assert.deepEqual(c,createCourse(seed,profile,'mountain'));assert.equal(c.schedule.length,18);assert.ok([4,5].includes(c.schedule.filter(s=>s.distanceBand==='long').length));for(const slot of c.schedule){assert.equal(slot.landscape,'mountain');const s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed),range=courseDistanceRange(c.profile,slot.id,slot.conditions,slot.distanceBand==='long'),distance=Math.hypot(s.pin.x,s.pin.y);assert.ok(distance>=range.min&&distance<=range.max);assert.ok(Math.hypot(s.green.x,s.green.y-s.green.ry+3)<=range.available);}assert.deepEqual(readRound(JSON.stringify(c)),c);}
 });
 test('OB counts the stroke and penalty, requires another tee decision and cannot produce a fake finish',()=>{
  const c=createCourse(81,profile),slot=c.schedule[0],s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed),p=basicPattern(5,s),ob={x:s.bounds[1]+10,y:120,landing:{x:s.bounds[1]+10,y:120},kind:'ob'};

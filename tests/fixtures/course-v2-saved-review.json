@@ -1,0 +1,349 @@
+{
+  "id": "course-1234",
+  "kind": "course",
+  "decisionModel": "decision-model-v7",
+  "version": "par3-v2-18-finish-v1",
+  "seed": 1234,
+  "profile": {
+    "handicap": "5",
+    "limit": 265
+  },
+  "schedule": [
+    {
+      "id": "tucked",
+      "holeSeed": 157399720,
+      "drawSeed": 1510565291,
+      "finishSeed": 1938867953,
+      "landscape": "mountain"
+    },
+    {
+      "id": "water",
+      "holeSeed": 2084238266,
+      "drawSeed": 87969443,
+      "finishSeed": 252894272,
+      "landscape": "mountain"
+    },
+    {
+      "id": "split",
+      "holeSeed": 347430498,
+      "drawSeed": 1723907051,
+      "finishSeed": 856694719,
+      "landscape": "mountain"
+    },
+    {
+      "id": "bowl",
+      "holeSeed": 1167034297,
+      "drawSeed": 566891931,
+      "finishSeed": 891954525,
+      "landscape": "mountain"
+    },
+    {
+      "id": "water",
+      "holeSeed": 1066103217,
+      "drawSeed": 196981447,
+      "finishSeed": 2055689183,
+      "landscape": "mountain"
+    },
+    {
+      "id": "creek-par3",
+      "holeSeed": 1864622871,
+      "drawSeed": 1078200487,
+      "finishSeed": 2116803169,
+      "landscape": "mountain"
+    },
+    {
+      "id": "split",
+      "holeSeed": 1963392471,
+      "drawSeed": 510604129,
+      "finishSeed": 1370186400,
+      "landscape": "mountain"
+    },
+    {
+      "id": "tucked",
+      "holeSeed": 421219005,
+      "drawSeed": 1201947566,
+      "finishSeed": 1289078498,
+      "landscape": "mountain"
+    },
+    {
+      "id": "water",
+      "holeSeed": 1140699268,
+      "drawSeed": 696426900,
+      "finishSeed": 1466861406,
+      "landscape": "mountain"
+    },
+    {
+      "id": "split",
+      "holeSeed": 2097686774,
+      "drawSeed": 953988261,
+      "finishSeed": 921945946,
+      "landscape": "mountain"
+    },
+    {
+      "id": "tucked",
+      "holeSeed": 41448166,
+      "drawSeed": 1376434652,
+      "finishSeed": 1979468847,
+      "landscape": "mountain"
+    },
+    {
+      "id": "bowl",
+      "holeSeed": 2099716608,
+      "drawSeed": 1517650068,
+      "finishSeed": 185403611,
+      "landscape": "mountain"
+    },
+    {
+      "id": "creek-par3",
+      "holeSeed": 200549232,
+      "drawSeed": 648876087,
+      "finishSeed": 1701604359,
+      "landscape": "mountain"
+    },
+    {
+      "id": "bowl",
+      "holeSeed": 1095745345,
+      "drawSeed": 1145464338,
+      "finishSeed": 601441910,
+      "landscape": "mountain"
+    },
+    {
+      "id": "water",
+      "holeSeed": 1583264259,
+      "drawSeed": 664444561,
+      "finishSeed": 1003416475,
+      "landscape": "mountain"
+    },
+    {
+      "id": "creek-par3",
+      "holeSeed": 1824651081,
+      "drawSeed": 982686537,
+      "finishSeed": 297819937,
+      "landscape": "mountain"
+    },
+    {
+      "id": "split",
+      "holeSeed": 643084368,
+      "drawSeed": 1459697177,
+      "finishSeed": 331321393,
+      "landscape": "mountain"
+    },
+    {
+      "id": "tucked",
+      "holeSeed": 1998937180,
+      "drawSeed": 1539376073,
+      "finishSeed": 1426760679,
+      "landscape": "mountain"
+    }
+  ],
+  "index": 0,
+  "answers": [
+    {
+      "index": 0,
+      "holeScore": 1,
+      "par": 3,
+      "kind": "balanced",
+      "score": 95,
+      "regret": 0.02,
+      "teeShots": 1,
+      "penalties": 0,
+      "finish": {
+        "strokes": 0,
+        "putts": 0,
+        "offGreen": 0,
+        "kind": "green",
+        "distance": 0,
+        "reference": 0
+      },
+      "selected": {
+        "x": 33.268293877560644,
+        "y": 135.961237302205,
+        "landing": {
+          "x": 33.268293877560644,
+          "y": 135.961237302205
+        },
+        "kind": "green"
+      },
+      "attempts": [
+        {
+          "selected": {
+            "x": 33.268293877560644,
+            "y": 135.961237302205,
+            "landing": {
+              "x": 33.268293877560644,
+              "y": 135.961237302205
+            },
+            "kind": "green"
+          },
+          "decision": {
+            "kind": "balanced",
+            "label": "Strong decision",
+            "reason": "Room for the miss",
+            "action": "Keep room",
+            "score": 95,
+            "regret": 0.02
+          },
+          "aim": {
+            "x": 33.268293877560644,
+            "y": 135.961237302205
+          },
+          "pattern": {
+            "carry": 139,
+            "roll": 0,
+            "sdSide": 6.27741935483871,
+            "sdLong": 7.174193548387097,
+            "bigPct": 0,
+            "bigShift": 22,
+            "bigDirection": "both",
+            "bigShort": 0,
+            "start": 0,
+            "curve": 0,
+            "bias": 0,
+            "height": 25,
+            "rho": 0,
+            "autoBag": true,
+            "handicap": 5,
+            "driverLimit": 265,
+            "shotType": "approach",
+            "aimXRange": [
+              -60,
+              60
+            ],
+            "driverSide": 15,
+            "driverLong": 12,
+            "ironSide": 7,
+            "ironLong": 8,
+            "club": "8 iron",
+            "stockDistance": 140.45000000000002,
+            "aimMode": "carry"
+          },
+          "penalty": 0
+        }
+      ]
+    }
+  ],
+  "status": "active",
+  "current": {
+    "strokes": 1,
+    "attempts": [
+      {
+        "selected": {
+          "x": 33.268293877560644,
+          "y": 135.961237302205,
+          "landing": {
+            "x": 33.268293877560644,
+            "y": 135.961237302205
+          },
+          "kind": "green"
+        },
+        "decision": {
+          "kind": "balanced",
+          "label": "Strong decision",
+          "reason": "Room for the miss",
+          "action": "Keep room",
+          "score": 95,
+          "regret": 0.02
+        },
+        "aim": {
+          "x": 33.268293877560644,
+          "y": 135.961237302205
+        },
+        "pattern": {
+          "carry": 139,
+          "roll": 0,
+          "sdSide": 6.27741935483871,
+          "sdLong": 7.174193548387097,
+          "bigPct": 0,
+          "bigShift": 22,
+          "bigDirection": "both",
+          "bigShort": 0,
+          "start": 0,
+          "curve": 0,
+          "bias": 0,
+          "height": 25,
+          "rho": 0,
+          "autoBag": true,
+          "handicap": 5,
+          "driverLimit": 265,
+          "shotType": "approach",
+          "aimXRange": [
+            -60,
+            60
+          ],
+          "driverSide": 15,
+          "driverLong": 12,
+          "ironSide": 7,
+          "ironLong": 8,
+          "club": "8 iron",
+          "stockDistance": 140.45000000000002,
+          "aimMode": "carry"
+        },
+        "penalty": 0
+      }
+    ]
+  },
+  "review": {
+    "selected": {
+      "x": 33.268293877560644,
+      "y": 135.961237302205,
+      "landing": {
+        "x": 33.268293877560644,
+        "y": 135.961237302205
+      },
+      "kind": "green"
+    },
+    "decision": {
+      "kind": "balanced",
+      "label": "Strong decision",
+      "reason": "Room for the miss",
+      "action": "Keep room",
+      "score": 95,
+      "regret": 0.02
+    },
+    "aim": {
+      "x": 33.268293877560644,
+      "y": 135.961237302205
+    },
+    "pattern": {
+      "carry": 139,
+      "roll": 0,
+      "sdSide": 6.27741935483871,
+      "sdLong": 7.174193548387097,
+      "bigPct": 0,
+      "bigShift": 22,
+      "bigDirection": "both",
+      "bigShort": 0,
+      "start": 0,
+      "curve": 0,
+      "bias": 0,
+      "height": 25,
+      "rho": 0,
+      "autoBag": true,
+      "handicap": 5,
+      "driverLimit": 265,
+      "shotType": "approach",
+      "aimXRange": [
+        -60,
+        60
+      ],
+      "driverSide": 15,
+      "driverLong": 12,
+      "ironSide": 7,
+      "ironLong": 8,
+      "club": "8 iron",
+      "stockDistance": 140.45000000000002,
+      "aimMode": "carry"
+    },
+    "penalty": 0,
+    "finish": {
+      "strokes": 0,
+      "putts": 0,
+      "offGreen": 0,
+      "kind": "green",
+      "distance": 0,
+      "reference": 0
+    },
+    "strokes": 1,
+    "retee": false
+  }
+}

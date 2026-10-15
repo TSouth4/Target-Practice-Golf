@@ -1,11 +1,14 @@
 import {MODEL_VERSION} from './progress.js';
-import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
+import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule,windEffect} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
-import {SCENARIOS,random,outcome,remaining,DEFAULT_COSTS} from './model.js';
+import {SCENARIOS,random,outcome,remaining,DEFAULT_COSTS,basicPattern,patternAtTarget} from './model.js';
 import {generateScenario} from './practice.js';
+import {reachLimit} from './bag.js';
 import {baselineStrokes} from './strokes-baseline.js';
 export const COURSE_KEY='target-practice-course-v1';
-export const COURSE_VERSION='par3-v2-18-finish-v1';
+export const COURSE_VERSION='par3-v3-long-finish-v1';
+export const PREVIOUS_COURSE_VERSION='par3-v2-18-finish-v1';
+export const EIGHTEEN_HOLE_VERSIONS=[COURSE_VERSION,PREVIOUS_COURSE_VERSION];
 export const LEGACY_COURSE_VERSION='par3-v1-finish-v1';
 export const COURSE_HOLES=18;
 const COURSE_FAMILIES=['tucked','water','split','bowl','creek-par3'];
@@ -27,11 +30,37 @@ export function simulateFinish(kind,yards,seed,reference=null){
  const putts=kind==='green'?strokes:strokes===1?0:Math.min(strokes-1,strokes<=3?strokes-1:2+(rng()<.35?1:0));
  return{strokes,putts,offGreen:kind==='green'?0:strokes-putts,kind,distance:yards,reference:d.mean};
 }
+// Pick longer existing layouts rather than enlarging greens or changing hazard geometry.
+// A separate seeded stream controls the mix without changing draw/finish randomness.
+export function courseDistanceRange(profile,id,conditions=null,long=false){
+ const template=SCENARIOS.find(s=>s.id==='tucked'),p={...basicPattern(profile.handicap,template,profile.limit),aimMode:'carry',...(profile.shotMode==='custom'?{customBag:profile.bag}:{}),conditions};
+ const carry=Math.min(330,reachLimit(p)),aim={x:0,y:carry},flight=patternAtTarget(aim,p),available=carry+windEffect(aim,flight,carry).y;
+ if(!long)return{min:0,max:Math.min(175,available),available};
+ // Front pins in the water family have a shorter authored range than back pins.
+ const authoredMax=id==='water'?200:['tucked','split'].includes(id)?217:225,max=Math.min(authoredMax,available*.97);
+ return{min:Math.min(max-8,Math.max(176,available*.85)),max,available};
+}
+function courseHoleSeed(id,initial,range){
+ const base=SCENARIOS.find(s=>s.id===id);let best=initial,penalty=Infinity;
+ for(let n=0;n<256;n++){
+  const seed=initial+n,s=generateScenario(base,seed),distance=Math.hypot(s.pin.x,s.pin.y),front=Math.hypot(s.green.x,s.green.y-s.green.ry+3),miss=Math.max(0,range.min-distance,distance-range.max)+Math.max(0,front-range.available)*2;
+  if(miss<penalty){best=seed;penalty=miss;}if(miss===0)return{seed,matched:true};
+ }
+ // Very short/unusual custom bags can fall outside the authored layout range.
+ // Keep the nearest existing layout, without inventing reach or altering the shot model.
+ return{seed:best,matched:false};
+}
 export function createCourse(seed,profile,landscape='woodland'){
  profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
- const rng=random(seed),families=['tucked','water','split'],schedule=[];
- for(let i=0;i<COURSE_HOLES;i++){if(i>=families.length){const bag=[...COURSE_FAMILIES];for(let n=bag.length-1;n>0;n--){const j=Math.floor(rng()*(n+1));[bag[n],bag[j]]=[bag[j],bag[n]];}if(bag[0]===families.at(-1))[bag[0],bag[1]]=[bag[1],bag[0]];families.push(...bag);}const id=families[i];let holeSeed=Math.floor(rng()*2147483000)+1;for(let n=0;n<512;n++){const s=generateScenario(SCENARIOS.find(s=>s.id===id),holeSeed);if(Math.hypot(s.pin.x,s.pin.y)<=175)break;holeSeed++;}schedule.push({id,holeSeed,drawSeed:Math.floor(rng()*2147483000)+1,finishSeed:Math.floor(rng()*2147483000)+1,landscape});}
- if(profile.difficulty&&profile.difficulty!=='easy')for(const slot of schedule)slot.conditions=conditionsFor(profile.difficulty,slot.drawSeed^0x6137);
+ const rng=random(seed),mix=random(seed^0x37ab91),longCount=4+Math.floor(mix()*2),longSlots=new Set();
+ for(let i=0;i<longCount;i++){const first=Math.floor(i*COURSE_HOLES/longCount),last=Math.floor((i+1)*COURSE_HOLES/longCount);longSlots.add(first+Math.floor(mix()*(last-first)));}
+ const families=['tucked','water','split'],schedule=[];
+ for(let i=0;i<COURSE_HOLES;i++){
+  if(i>=families.length){const bag=[...COURSE_FAMILIES];for(let n=bag.length-1;n>0;n--){const j=Math.floor(rng()*(n+1));[bag[n],bag[j]]=[bag[j],bag[n]];}if(bag[0]===families.at(-1))[bag[0],bag[1]]=[bag[1],bag[0]];families.push(...bag);}
+  const id=families[i],initial=Math.floor(rng()*2147483000)+1,drawSeed=Math.floor(rng()*2147483000)+1,finishSeed=Math.floor(rng()*2147483000)+1,conditions=profile.difficulty&&profile.difficulty!=='easy'?conditionsFor(profile.difficulty,drawSeed^0x6137):null;
+  const range=courseDistanceRange(profile,id,conditions,longSlots.has(i)),choice=courseHoleSeed(id,initial,range);
+  schedule.push({id,holeSeed:choice.seed,drawSeed,finishSeed,landscape,distanceBand:longSlots.has(i)&&choice.matched?'long':'standard',...(conditions?{conditions}:{} )});
+ }
  return{id:`course-${seed}`,kind:'course',decisionModel:MODEL_VERSION,version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};
 }
 export function courseTotal(c){const strokes=c.answers.reduce((n,a)=>n+a.holeScore,0),par=c.answers.length*3;return{strokes,par,relative:strokes-par,holes:c.answers.length};}
@@ -63,10 +92,11 @@ export function readCourse(raw){
   const attempt=a=>a&&shot(a.selected)&&point(a.aim)&&a.pattern&&['carry','roll','sdSide','sdLong','height','start','curve','bias','rho'].every(k=>Number.isFinite(a.pattern[k]))&&a.pattern.carry>0&&decision(a.decision)&&a.penalty===(['water','ob'].includes(a.selected.kind)?1:0);
   const finish=f=>f&&integer(f.strokes,0,8)&&integer(f.putts,0,4)&&integer(f.offGreen,0,8)&&f.putts+f.offGreen===f.strokes&&Number.isFinite(f.distance)&&f.distance>=0&&Number.isFinite(f.reference)&&f.reference>=0&&['green','fairway','rough','bunker','trees'].includes(f.kind);
   const validAttempts=arr=>Array.isArray(arr)&&arr.length>0&&arr.length<1000&&arr.every(attempt)&&arr.slice(0,-1).every(a=>a.selected.kind==='ob');
-  if(c?.kind!=='course'||![COURSE_VERSION,LEGACY_COURSE_VERSION].includes(c.version)||!['active','complete'].includes(c.status)||!integer(c.seed,1)||typeof c.id!=='string'||!c.id.length||c.id.length>60)return null;
+  if(c?.kind!=='course'||![...EIGHTEEN_HOLE_VERSIONS,LEGACY_COURSE_VERSION].includes(c.version)||!['active','complete'].includes(c.status)||!integer(c.seed,1)||typeof c.id!=='string'||!c.id.length||c.id.length>60)return null;
   if(!validPlayerProfile(c.profile))return null;
   const holes=c.version===LEGACY_COURSE_VERSION?3:COURSE_HOLES;
   if(!Array.isArray(c.schedule)||c.schedule.length!==holes||!integer(c.index,0,holes-1)||c.schedule.some(s=>!(c.version===LEGACY_COURSE_VERSION?['tucked','water','split']:COURSE_FAMILIES).includes(s.id)||!integer(s.holeSeed,1)||!integer(s.drawSeed,1)||!integer(s.finishSeed,1)||!['woodland','coast','desert','mountain'].includes(s.landscape))||new Set(c.schedule.map(s=>s.landscape)).size!==1)return null;
+  if(c.version===COURSE_VERSION&&c.schedule.some(s=>!['long','standard'].includes(s.distanceBand)))return null;
   if(!validConditionSchedule(c.profile,c.schedule)||c.review&&c.profile.difficulty&&c.profile.difficulty!=='easy'&&JSON.stringify(c.review.pattern.conditions||null)!==JSON.stringify(c.schedule[c.index].conditions||null))return null;
   if(!Array.isArray(c.answers)||c.answers.length>holes||c.answers.some((a,i)=>a.index!==i||a.par!==3||!integer(a.holeScore,1)||!validAttempts(a.attempts)||!finish(a.finish)||!shot(a.selected)||a.teeShots!==a.attempts.length||a.penalties!==a.attempts.reduce((n,t)=>n+t.penalty,0)||a.holeScore!==a.teeShots+a.penalties+a.finish.strokes||a.score!==a.attempts[0].decision.score||a.kind!==a.attempts[0].decision.kind||a.regret!==a.attempts[0].decision.regret))return null;
   if(!c.current||!integer(c.current.strokes)||!Array.isArray(c.current.attempts)||c.current.attempts.length>=1000||c.current.attempts.some(a=>!attempt(a)))return null;

@@ -1,6 +1,6 @@
 import {MODEL_VERSION} from './progress.js';
 import {readRound} from './rounds.js';
-import {COURSE_VERSION} from './course.js';
+import {EIGHTEEN_HOLE_VERSIONS} from './course.js';
 import {SCENARIOS} from './model.js';
 import {validPlayerProfile} from './shot-editor.js';
 export const ROUND_HISTORY_KEY='target-practice-completed-rounds-v1';
@@ -29,7 +29,7 @@ export function dashboardData(history,roundHistory,difficulty='all'){
  const choices=new Map();for(const r of history.filter(r=>!r.retry&&r.model===MODEL_VERSION&&selected(r)))if(!choices.has(r.encounter))choices.set(r.encounter,r);
  for(const r of roundHistory.filter(r=>r.model===MODEL_VERSION&&selected(r)))for(const[d,choice]of r.decisions.entries()){const encounter=`round-${r.id}-${d}`;if(!choices.has(encounter))choices.set(encounter,{...choice,id:encounter,encounter,at:r.completedAt,profile:r.profile,model:r.model,conditions:{difficulty:difficultyOf(r)},profileLabel:shotSetting(r)});}
  const first=[...choices.values()].sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)),summary=rows=>({count:rows.length,score:mean(rows.map(r=>r.score)),cost:rows.some(r=>r.regret===null)?null:mean(rows.map(r=>r.regret)),unbounded:rows.some(r=>r.regret===null),kinds:Object.fromEntries(kinds.map(k=>[k,rows.filter(r=>r.kind===k).length]))});
- const rounds=roundHistory.filter(selected).sort((a,b)=>Date.parse(a.completedAt)-Date.parse(b.completedAt)),courses=rounds.filter(r=>r.kind==='course'&&r.holes===18&&r.version===COURSE_VERSION),learning=rounds.filter(r=>r.kind==='practice'),assessments=rounds.filter(r=>r.kind==='assessment');
+ const rounds=roundHistory.filter(selected).sort((a,b)=>Date.parse(a.completedAt)-Date.parse(b.completedAt)),courses=rounds.filter(r=>r.kind==='course'&&r.holes===18&&EIGHTEEN_HOLE_VERSIONS.includes(r.version)),learning=rounds.filter(r=>r.kind==='practice'),assessments=rounds.filter(r=>r.kind==='assessment');
  const breakdown=['easy','medium','hard','unknown'].map(key=>({difficulty:key,...summary(first.filter(r=>difficultyOf(r)===key)),courses:courses.filter(r=>difficultyOf(r)===key)}));
  return{...summary(first),first,learning,courses,assessments,pilots:rounds.filter(r=>r.kind==='course'&&r.holes===3),breakdown,tee:summary(first.filter(r=>r.type==='tee')),approach:summary(first.filter(r=>r.type==='approach')),courseMean:mean(courses.map(r=>r.relative)),courseCount:courses.length,pilotCount:rounds.filter(r=>r.kind==='course'&&r.holes===3).length,previousCount:history.filter(r=>!r.retry&&r.model!==MODEL_VERSION&&selected(r)).length,retries:history.filter(r=>r.retry&&selected(r)).length+rounds.reduce((n,r)=>n+(r.excludedRetries||0),0),settings:[...new Set(first.map(shotSetting))],difficulty};
 }
