@@ -1,3 +1,5 @@
+My Progress clarification: the cost metric is labeled “Estimated strokes lost per 100 decisions,” without a plus sign. The same wording is used in its tee/approach and difficulty breakdowns. Calculations are unchanged.
+
 # Simpler My Progress and completed-round history (17.1.0)
 
 My Progress opens with overall average decision quality, extra modeled strokes per 100 decisions, and average completed 18-hole par-3 score relative to par. The scored-decision count is supporting text. The profile selector and early-versus-late KPI are removed. Tendencies retain counts/percentages, with a tee/approach comparison and optional difficulty breakdown. Settings are retained with results rather than requiring users to select an opaque profile ID.
