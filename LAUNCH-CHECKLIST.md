@@ -48,3 +48,13 @@ Use simple managed services where appropriate. Custom infrastructure, native pho
 ## How we will use this
 
 During product refinement, keep these requirements visible without treating every future service as work to build now. Before the pilot, confirm its access, privacy, support and measurement arrangements. During launch preparation, assign each gate an owner, evidence and unresolved issues, verify current official provider/legal/tax details, and close the applicable items before public membership launch. No launch date is committed yet.
+
+## Explicit wind validation before paid launch — pending
+
+Tyler requested this check after reviewing how the current wind estimate works. Software tests verify the implemented formula, not real-world displacement accuracy.
+
+- Compare predicted carry/lateral movement with credible, appropriately licensed launch-monitor or ball-flight data and golfer/coach review.
+- Cover crosswinds, headwinds and tailwinds across wedge/iron/long-club distances, different flight heights and straight/draw/fade profiles. Check whether spin/shape interaction needs a better model.
+- Evaluate and document acceptable error and known limitations. Current coefficients (at standard height, roughly 10 yd sideways or short / 6 yd longer for 10 mph at 150 yd) are illustrative estimates, not measured calibration.
+- Revisit the coefficients or model as evidence warrants; retest target rankings and teaching feedback, not just endpoint movement.
+- Until validated, describe wind yardages as training estimates. If coefficients change, version conditions/results so historical progress and competitive scores remain interpretable.
