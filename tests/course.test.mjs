@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal} from '../dist/course.js';
+import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal,courseFinishHeadline,LEGACY_COURSE_VERSION} from '../dist/course.js';
 import {SCENARIOS,basicPattern,samples,evaluate,remaining,DEFAULT_COSTS} from '../dist/model.js';import {generateScenario} from '../dist/practice.js';import {baselineStrokes} from '../dist/strokes-baseline.js';import {readRound} from '../dist/rounds.js';
 const profile={handicap:'5',limit:265},decision={kind:'balanced',label:'Strong decision',reason:'Useful room',action:'Keep room',score:98,regret:.01};
 test('finishing distributions have real variation and calibrated reference means, not rounded averages',()=>{
@@ -7,8 +7,8 @@ test('finishing distributions have real variation and calibrated reference means
  let total=0;const results=new Set();for(let seed=1;seed<=20000;seed++){const f=simulateFinish('bunker',20,seed);assert.equal(f.strokes,f.putts+f.offGreen);assert.deepEqual(f,simulateFinish('bunker',20,seed));total+=f.strokes;results.add(f.strokes);}assert.ok(Math.abs(total/20000-baselineStrokes('bunker',20))<.03);assert.ok(results.size>3);
  assert.equal(simulateFinish('green',.03,1).strokes,0);
 });
-test('three fixed reachable par-3 layouts share an environment and persist through the round reader',()=>{
- for(let seed=1;seed<=40;seed++){const c=createCourse(seed,profile,'mountain');assert.deepEqual(c,createCourse(seed,profile,'mountain'));assert.equal(c.schedule.length,3);for(const slot of c.schedule){assert.equal(slot.landscape,'mountain');const s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed);assert.ok(Math.hypot(s.pin.x,s.pin.y)<=175);}assert.deepEqual(readRound(JSON.stringify(c)),c);}
+test('eighteen varied reachable par-3 layouts share an environment and persist through the round reader',()=>{
+ for(let seed=1;seed<=40;seed++){const c=createCourse(seed,profile,'mountain');assert.deepEqual(c,createCourse(seed,profile,'mountain'));assert.equal(c.schedule.length,18);for(const slot of c.schedule){assert.equal(slot.landscape,'mountain');const s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed);assert.ok(Math.hypot(s.pin.x,s.pin.y)<=175);}assert.deepEqual(readRound(JSON.stringify(c)),c);}
 });
 test('OB counts the stroke and penalty, requires another tee decision and cannot produce a fake finish',()=>{
  const c=createCourse(81,profile),slot=c.schedule[0],s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed),p=basicPattern(5,s),ob={x:s.bounds[1]+10,y:120,landing:{x:s.bounds[1]+10,y:120},kind:'ob'};
@@ -17,4 +17,14 @@ test('OB counts the stroke and penalty, requires another tee decision and cannot
 });
 test('water adds one penalty and simulates from the authored drop; finishing totals and scorecard reconcile',()=>{
  const c=createCourse(9,profile);{const first=c.schedule[0],s=generateScenario(SCENARIOS.find(s=>s.id===first.id),first.holeSeed);recordCourseShot(c,[{...s.pin,landing:{...s.pin},kind:'green'}],s,decision,s.pin,basicPattern(5,s));advanceCourse(c);}const slot=c.schedule[1],s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed),p={...basicPattern(5,s),aimMode:'carry'},water=evaluate(s.pin,p,s,DEFAULT_COSTS,samples(4000,slot.drawSeed),true).points.find(p=>p.kind==='water');assert.ok(water);const r=recordCourseShot(c,[water],s,decision,s.pin,p);assert.equal(c.answers[1].holeScore,2+r.finish.strokes);assert.ok(r.finish.drop);assert.equal(r.finish.kind,'rough');assert.equal(r.finish.reference,remaining(r.finish.drop,s,DEFAULT_COSTS,'rough'));assert.equal(r.finish.strokes,r.finish.putts+r.finish.offGreen);assert.equal(courseTotal(c).strokes,c.answers[0].holeScore+c.answers[1].holeScore);assert.deepEqual(readCourse(JSON.stringify(c)),c);const bad=structuredClone(c);bad.current.strokes++;assert.equal(readCourse(bad),null);assert.equal(readCourse('{bad'),null);
+});
+
+test('an 18-hole round finishes only after hole 18, resumes throughout, and totals par 54',()=>{
+ const c=createCourse(745,{...profile,difficulty:'hard'},'coast');assert.equal(new Set(c.schedule.map(s=>s.id+':'+s.holeSeed)).size,18);assert.equal(new Set(c.schedule.map(s=>s.id)).size,5);
+ for(let i=0;i<18;i++){assert.equal(c.index,i);assert.equal(c.status,'active');const slot=c.schedule[i],s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed),p={...basicPattern(5,s),conditions:slot.conditions},point={x:s.pin.x+2,y:s.pin.y,landing:{x:s.pin.x+2,y:s.pin.y},kind:'green'};recordCourseShot(c,[point],s,decision,s.pin,p);assert.equal(c.answers.length,i+1);assert.deepEqual(readCourse(JSON.stringify(c)),c);if(i<17){assert.equal(c.status,'active');assert.equal(advanceCourse(c),true);}}
+ assert.equal(c.status,'complete');assert.equal(courseTotal(c).par,54);assert.equal(courseTotal(c).strokes,c.answers.reduce((n,a)=>n+a.holeScore,0));assert.equal(advanceCourse(c),false);
+ const short=createCourse(9,profile);short.schedule=short.schedule.slice(0,3);assert.equal(readCourse(short),null);short.version=LEGACY_COURSE_VERSION;assert.deepEqual(readCourse(short),short);for(let i=0;i<3;i++){const slot=short.schedule[i],s=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed);recordCourseShot(short,[{...s.pin,landing:{...s.pin},kind:'green'}],s,decision,s.pin,basicPattern(5,s));if(i<2)advanceCourse(short);}assert.equal(short.status,'complete');assert.equal(courseTotal(short).par,9);assert.deepEqual(readCourse(short),short);short.schedule.push(short.schedule[0]);assert.equal(readCourse(short),null);
+});
+test('finish headlines describe the actual putting, recovery and penalty result',()=>{
+ assert.equal(courseFinishHeadline({retee:false,strokes:3,finish:{strokes:2,putts:2,offGreen:0}}),'Simulated 2-putt for par');assert.equal(courseFinishHeadline({retee:false,strokes:4,finish:{strokes:2,putts:2,offGreen:0}}),'Simulated 2-putt for bogey');assert.match(courseFinishHeadline({retee:false,strokes:4,finish:{strokes:3,putts:2,offGreen:1,kind:'bunker',distance:12}}),/1 bunker shot \+ 2 putts for bogey/);assert.match(courseFinishHeadline({retee:true}),/re-tee/);assert.equal(courseFinishHeadline({retee:false,strokes:3,finish:{strokes:0,putts:0,offGreen:0}}),'Holed tee shot for par');
 });

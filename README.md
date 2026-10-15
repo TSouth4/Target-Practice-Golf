@@ -1,3 +1,13 @@
+# Eighteen-hole par-3 rounds (17.0.0)
+
+New par-3 rounds have 18 seeded holes (par 54), using tucked-flag, water, split-green, bowl and creek layouts. New rounds mix their variants while retaining one environment and the difficulty/profile chosen at setup. Layouts retain the pilot's reachable 175-yard maximum. Existing saved three-hole pilots remain readable and finish at three holes; starting or restarting creates an 18-hole round. The finish probability model and penalties are unchanged.
+
+After commitment, the selected ball remains consistent through the fade and overhead transition. Normal animation pauses for 1.5 seconds after reaching overhead, then displays the simulated finish in a centered course card, such as “Simulated 2-putt for par.” Other outcomes name short-game shots, hole-outs or OB/re-tee accurately. Next hole is on the card, with detailed finish/penalty and target coaching available in its expandable section. Reduced-motion users skip timed pauses. Reload resumes the saved result without drawing a different ball or score.
+
+Scorecards have front/back-nine tables with Out/In totals and a full-round stroke/par summary. Narrow screens scroll each table horizontally rather than expanding the page. Saved legacy pilots still show their three holes and par 9.
+
+Validation: all 177 automated tests and syntax checks passed. Course coverage includes an actual 18-hole UI play-through, par-54 totals, five reachable hole families across 40 seeds, saved-state validation, legacy three-hole completion, OB/water handling and finish headline correctness. Browser checks at 1440/390/844 widths covered centered normal/full-screen cards, the real animation pause, selected result persistence, accessible round controls, front/back scorecards and no page overflow.
+
 # Header logo (16.7.2)
 
 The header now uses the supplied green/lime Target Practice design in place of the target icon and plain text. A transparent image was prepared from the supplied chat image; the header viewport removes empty margins and preserves the whole arrow. The logo scales down on phones while keeping Menu available, with an accessible text name. Other site colors are unchanged. Asset: `dist/assets/target-practice-logo.png`.
