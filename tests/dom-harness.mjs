@@ -11,6 +11,7 @@ export function setupDOM({reducedMotion=true,practiceMode='free'}={}){
   addEventListener(type,handler){(this.listeners[type]??=[]).push(handler);}
   setAttribute(key,value){this.attrs[key]=value;}
   async fire(type,extra={}){for(const cb of this.listeners[type]||[])await cb({target:this,...extra});}
+  dispatchEvent(event){return this.fire(event.type,{preventDefault(){}});}
   scrollIntoView(){this.scrolled=true;}
   createSVGPoint(){return {x:0,y:0,matrixTransform(){return{x:this.x,y:this.y};}};}
   getScreenCTM(){return {inverse(){return{};}};}

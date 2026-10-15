@@ -23,6 +23,7 @@ const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bi
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
 let state={scenario:'cedar',holeSeed:0,elevated:true,landscape:'woodland',practiceMode:'free',difficulty:'easy',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
+let homeOpen=false;
 let courseSetupOpen=false,courseSetupFocus=null;
 let introduction=null,introductionSeen=false,introductionSaved=true;try{introductionSeen=hasSeenIntroduction(localStorage.getItem(INTRO_KEY));}catch{introductionSaved=false;}
 let tutorial=null,tutorialReturn=null,lessonScreenOpen=false,lessonCompleted=[],lessonStorageOK=true;const tutorialCache=new Map();try{lessonCompleted=readLessonCompletion(localStorage.getItem(LESSON_KEY));}catch{lessonStorageOK=false;}
@@ -179,9 +180,9 @@ function updateLabels(){
  $('tryAgain').disabled=working;$('retryThisHole').disabled=working;$('useBest').disabled=working;
 }
 async function openIntroduction(){
- if(working)return;if(introduction)closeIntroduction('skipped');else if(tutorialReturn)closeLessons();if(editorDraft)prepareNavigation();leaveFullscreen();closeMenu();
- tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
- introduction={step:-1,selected:false,revealed:false,prepared:null};
+ if(working)return;const fromHome=homeOpen||!!tutorialReturn?.homeOpen;hideHome();if(introduction)closeIntroduction('skipped');else if(tutorialReturn)closeLessons();if(editorDraft)prepareNavigation();leaveFullscreen();closeMenu();
+ tutorialReturn={homeOpen,state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
+ hideHome();tutorialReturn.homeOpen=fromHome;$('introductionSkip').textContent=fromHome?'Back to home':'Back to practice';introduction={step:-1,selected:false,revealed:false,prepared:null};
  for(const id of ['practiceScreen','roundScreen','progressScreen','lessonsScreen'])$(id).hidden=true;
  $('introductionScreen').hidden=false;updateLabels();$('introductionTitle').focus?.();
  working=true;updateIntroductionControls();
@@ -193,7 +194,7 @@ function closeIntroduction(status='skipped'){
  introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
- $('introductionMenu').disabled=working;$('introductionStart').hidden=courseSetupOpen||introductionSeen||!!introduction||isCourse()||!!round||!!tutorialReturn||!!editorDraft||progressOpen||roundView||lessonScreenOpen||state.practiceMode!=='free';$('introductionScreen').hidden=!introduction;
+ $('homeIntroductionRecommended').hidden=!homeOpen||introductionSeen;$('introductionMenu').disabled=working;$('introductionStart').hidden=true;$('introductionScreen').hidden=!introduction;
  if(!introduction)return;const i=introduction.step,step=i<0?INTRO_PURPOSE:INTRO_STEPS[i];
  $('introductionStep').textContent=`Introduction · ${i+2} / ${INTRO_STEPS.length+1}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
  const t=introduction.prepared?.targets[Math.min(i,2)];
@@ -221,9 +222,9 @@ $('introductionFinish').addEventListener('click',()=>{if(introduction?.step===IN
 $('introductionRound').addEventListener('click',()=>{if(introduction?.step!==INTRO_STEPS.length-1)return;closeIntroduction('completed');startRound('practice');});
 $('introductionLessons').addEventListener('click',()=>{if(introduction?.step!==INTRO_STEPS.length-1)return;closeIntroduction('completed');openLessons();});
 function openLessons(){
- if(working)return;if(introduction)closeIntroduction('skipped');if(editorDraft)prepareNavigation(false);
- if(!tutorialReturn)tutorialReturn={state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
- leaveFullscreen();closeMenu();tutorial=null;lessonScreenOpen=true;$('tutorialCard').hidden=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('lessonsScreen').hidden=false;$('lessonCatalog').hidden=false;$('tutorialRecap').hidden=true;
+ if(working)return;const fromHome=homeOpen||!!tutorialReturn?.homeOpen;hideHome();if(introduction)closeIntroduction('skipped');if(editorDraft)prepareNavigation(false);
+ if(!tutorialReturn)tutorialReturn={homeOpen,state:structuredClone(state),round:structuredClone(round),roundView,progressOpen,result,best,oneShot,phase,hasAim,traceShots,landingCamera,retryBaseline,retryHint,progressMessage};
+ hideHome();tutorialReturn.homeOpen=fromHome;$('closeLessons').textContent=fromHome?'Back to home':'Back to practice';leaveFullscreen();closeMenu();tutorial=null;lessonScreenOpen=true;$('tutorialCard').hidden=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('lessonsScreen').hidden=false;$('lessonCatalog').hidden=false;$('tutorialRecap').hidden=true;
  CURRICULUM.forEach((lesson,i)=>{$('lessonStatus'+(i+1)).textContent=lessonCompleted.includes(lesson.id)?'Completed · repeat any time':'Not completed';$('lessonStart'+(i+1)).textContent=lessonCompleted.includes(lesson.id)?'Repeat lesson':'Start lesson';});
  $('lessonStorage').textContent=lessonStorageOK?'Completion is saved in this browser. Lessons use selected examples, not random holes.':'Completion saving is unavailable; lessons still work for this visit.';
  updateLabels();$('lessonsScreen').scrollIntoView({behavior:'auto'});$('closeLessons').focus?.();
@@ -231,7 +232,7 @@ function openLessons(){
 function closeLessons(){
  if(working)return;leaveFullscreen();const previous=tutorialReturn;tutorial=null;tutorialReturn=null;lessonScreenOpen=false;$('lessonsScreen').hidden=true;$('tutorialCard').hidden=true;
  if(previous){state=previous.state;round=previous.round;roundView=previous.roundView;progressOpen=previous.progressOpen;result=previous.result;best=previous.best;oneShot=previous.oneShot;phase=previous.phase;hasAim=previous.hasAim;traceShots=previous.traceShots;landingCamera=previous.landingCamera;retryBaseline=previous.retryBaseline;retryHint=previous.retryHint;progressMessage=previous.progressMessage;sceneKey=null;resetAimZoom();}
- $('practiceScreen').hidden=roundView||progressOpen;$('roundScreen').hidden=!roundView;$('progressScreen').hidden=!progressOpen;$('results').hidden=!result;updateControls();if(result)showResult();else drawCourse();save();$('menuToggle').focus?.();
+ homeOpen=previous?.homeOpen||false;$('homeScreen').hidden=!homeOpen;$('practiceScreen').hidden=homeOpen||roundView||progressOpen;$('roundScreen').hidden=!roundView;$('progressScreen').hidden=!progressOpen;$('results').hidden=!result;updateControls();if(result)showResult();else drawCourse();save();$('menuToggle').focus?.();
 }
 async function startTutorial(id){
  if(working)return;const definition=lessonById(id);if(!definition)return;if(!tutorialReturn)openLessons();
@@ -433,9 +434,9 @@ function dirty(){lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionV
 function setScenario(id,holeSeed=0,setting=null){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=Object.hasOwn(LANDSCAPES,setting)?setting:nextLandscape(state.landscape,holeSeed,scene());state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode,allowAssessmentExit=false){if(!prepareNavigation())return;round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
 function prepareNavigation(exitLessons=true){
- if(working)return false;closeCourseSetup(false);if(introduction)closeIntroduction(introduction.compared?'completed':'skipped');if(exitLessons&&tutorialReturn)closeLessons();
+ if(working)return false;hideHome();closeCourseSetup(false);if(introduction)closeIntroduction(introduction.compared?'completed':'skipped');if(exitLessons&&tutorialReturn)closeLessons();
  if(editorDraft){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;}
- progressOpen=false;roundView=false;$('progressScreen').hidden=true;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();return true;
+ hideHome();progressOpen=false;roundView=false;$('progressScreen').hidden=true;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();return true;
 }
 function closeMenu(){$('practiceMenu').hidden=true;$('menuToggle').setAttribute('aria-expanded',false);}
 function openEditor(){
@@ -671,6 +672,22 @@ $('decisionVerdict').addEventListener('click',()=>{if(!result)return;$('decision
 for(const id of ['progressMenu','progressResult'])$(id).addEventListener('click',openProgress);
 $('closeProgress').addEventListener('click',closeProgress);
 $('progressDifficulty').addEventListener('change',()=>{progressDifficulty=['all','easy','medium','hard'].includes($('progressDifficulty').value)?$('progressDifficulty').value:'all';renderProgress();});
+function hideHome(){homeOpen=false;$('homeScreen').hidden=true;}
+function resumableRound(){return round?.status==='active'?round:storedCourse()?.status==='active'?storedCourse():null;}
+function openHome(){
+ if(!prepareNavigation())return;leaveFullscreen();save();homeOpen=true;$('homeScreen').hidden=false;
+ for(const id of ['practiceScreen','roundScreen','progressScreen','lessonsScreen','shotEditor','assumptions'])$(id).hidden=true;
+ $('homePracticeChoices').hidden=true;const saved=resumableRound();$('homeContinue').hidden=!saved;$('homeContinueDetails').hidden=!saved;
+ $('homeContinueDetails').textContent=saved?`${saved.kind==='course'?'Par-3 course':saved.kind==='assessment'?'Assessment':'Learning round'} · ${saved.kind==='course'?'Hole':'Shot'} ${saved.index+1} of ${saved.schedule.length}`:'';
+ updateIntroductionControls();$('homeScreen').scrollIntoView({behavior:'auto'});$('homeTitle').focus?.();
+}
+$('homeLogo').addEventListener('click',e=>{e.preventDefault();openHome();});$('homeMenu').addEventListener('click',openHome);
+for(const id of ['homeIntroduction','homeIntroductionRecommended'])$(id).addEventListener('click',openIntroduction);
+$('homeLessons').addEventListener('click',openLessons);$('homeProgress').addEventListener('click',openProgress);
+$('homePractice').addEventListener('click',()=>{$('homePracticeChoices').hidden=false;$('homeUnlimited').focus?.();});
+for(const [id,target] of [['homeUnlimited','freePracticeMenu'],['homeLearning','practiceRoundMenu'],['homeAssessment','assessmentMenu']])$(id).addEventListener('click',()=>$(target).dispatchEvent(new Event('click')));
+$('homeCourse').addEventListener('click',()=>{const saved=isCourse()?round:storedCourse();if(saved?.status==='active')$('courseMenu').dispatchEvent(new Event('click'));else openCourseSetup($('homeCourse'));});
+$('homeContinue').addEventListener('click',()=>{const saved=resumableRound();if(!saved||!prepareNavigation())return;round=saved;restorePlayerProfile();sceneKey=null;loadRoundSlot();});
 rememberCompletedRound(storedCourse());
 $('brandName').textContent=BRAND.name;$('brandFooter').textContent=BRAND.name;document.title=BRAND.title;
 if(round?.status==='active'){
@@ -679,3 +696,5 @@ if(round?.status==='active'){
 else if(state.practiceMode!=='free'){startRound('practice');}
 updateControls();drawCourse();save();
 updateIntroductionControls();
+
+openHome();

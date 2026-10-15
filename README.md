@@ -1,4 +1,10 @@
+# Home page (17.2.0)
+
+The app now opens on Home, with Introduction, Lessons, Practice, Par-3 Course and My Progress. Practice opens choices for unlimited practice, a five-shot learning round or a ten-shot assessment. The header logo and Home menu item return here. Active saved rounds offer Continue round; navigation home does not erase their answers or redraw a course result. The first-time Introduction recommendation appears only on Home and disappears after completion. Introduction and Lessons opened from Home return there when closed. Existing progress remains browser-local and scoring is unchanged.
+
 My Progress clarification: the cost metric is labeled “Estimated strokes lost per 100 decisions,” without a plus sign. The same wording is used in its tee/approach and difficulty breakdowns. Calculations are unchanged.
+
+Validation: all 186 automated tests passed, with syntax checks and Chromium navigation/layout checks at 1440, 390 and 320 pixels. Browser coverage includes new/returning entry, home/logo navigation, practice choices, lesson/introduction return, course setup cancellation and saved hard-course continuation.
 
 # Simpler My Progress and completed-round history (17.1.0)
 
