@@ -39,6 +39,10 @@ This round establishes a baseline and adds manual recovery. It does not claim a 
 4. Test actual iPhone/Safari and Android/Chrome devices, including older phones, before promising support. Record versions, storage/download/restore behavior, repeated-shot responsiveness and any limitations.
 5. Confirm production compression, cache/release consistency, HTTPS, CDN/hosting quotas, monitoring and rollback. Measure the real deployed site after those choices. Once accounts/payments exist, test their server services separately under an agreed load; this script does not establish their capacity.
 
+## Later builds
+
+These figures describe 17.3 before background execution. On 17.5 and later, use the [same-build worker/fallback comparison](WORKER-PERFORMANCE.md) to distinguish page responsiveness from worker execution time. The general performance script now records its detected backend and warns that page CPU throttling may not affect workers. The historical raw baseline remains unchanged.
+
 ## Reproduce
 
 Use a separate terminal to serve the unmodified static site:

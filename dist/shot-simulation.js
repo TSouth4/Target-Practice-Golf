@@ -1,6 +1,7 @@
 import {samples,evaluate,optimizeTargets} from './model.js';
 
 export const SHOT_COUNT=4000;
+export const SIMULATION_PROTOCOL=1;
 // Pure calculation boundary: no DOM, storage, animation or mode-specific scoring.
 // Both targets use the same full seeded draw bank, including cached lesson guides.
 export async function calculateShot({aim,pattern,scenario,costs,seed},{guide=null,yieldControl=async()=>{}}={}){

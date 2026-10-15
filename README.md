@@ -1,3 +1,11 @@
+# Isolated shot calculations and background execution (17.5.0)
+
+Committed-shot calculations now live in a dedicated, deterministic module. Supported browsers run that same code in a background worker so the screen can paint and scroll while it calculates. A worker support/loading failure uses the existing page-thread calculation path. Sample count, target search, golf model, grades, feedback, mode behavior and saved data remain unchanged. The worker has bounded execution and is cleaned up after each attempt. Cached lesson guides and non-finite costs retain their existing meaning.
+
+See [refactor design and verification](docs/SIMULATION-REFACTOR.md) and [measured responsiveness comparison](docs/WORKER-PERFORMANCE.md). Initial lesson/Introduction preparation and SVG drawing remain on the page; actual-device and production-host checks are still pending. The 17.4 long-par-3 mix is included. The owner's wording-review snapshot is unchanged.
+
+Validation: all 203 automated tests and syntax checks passed. Real Chromium module-worker/fallback comparisons passed at desktop and phone widths across practice, learning rounds, assessment and par-3 modes, with full-array/cached-guide/Infinity parity, retry and selected-ball persistence, worker closure and blocked-worker recovery. The 24-run timing report preserves identical grades/costs and records reduced page blocking with explicit throttling/hardware limits.
+
 # Balanced longer par-3 mix (17.4.0)
 
 New 18-hole par-3 rounds now mix in four or five longer holes, spread through the round, alongside the existing shorter/mid-range layouts. The same five strategic families are used: tucked flag, front water, split bunkers, bowl and creek. Longer variants keep their actual green size and hazards; this selects different existing seeded geometry rather than enlarging the green. The environment and selected difficulty/profile remain fixed for the round.
