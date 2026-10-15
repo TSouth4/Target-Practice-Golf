@@ -1,3 +1,4 @@
+import {createCarryOutlineCache} from './carry-outline.js';
 import {simulateShot} from './simulation-client.js';
 import {makeBackup,parseBackup,backupSummary,restoreBackup,BACKUP_MAX_BYTES} from './backup.js';
 import {ROUND_HISTORY_KEY,ROUND_HISTORY_LIMIT,readRoundHistory,archiveRound,dashboardData,roundTrendSVG,difficultyOf,shotSetting} from './dashboard.js';
@@ -485,6 +486,7 @@ function polygon(points){const vertices=[];for(let i=0;i<points.length;i++){cons
 function ringPoints(cx,cy,rx,ry,n=64){return Array.from({length:n},(_,i)=>[cx+Math.cos(i/n*Math.PI*2)*rx,cy+Math.sin(i/n*Math.PI*2)*ry]);}
 function line(a,b,attrs=''){const x=project(a),y=project(b);return `<line x1="${x.x}" y1="${x.y}" x2="${y.x}" y2="${y.y}" ${attrs}/>`;}
 function textAt(x,y,label,attrs=''){const p=project({x,y});return `<text x="${p.x}" y="${p.y}" ${attrs}>${label}</text>`;}
+const cachedCarryOutline=createCarryOutlineCache();
 function drawCourse(){
  const course=isCourse(),showPattern=!course||['course-pattern','course-selecting'].includes(phase);
  const focus=kind=>!!tutorial&&!lessonScreenOpen&&tutorial.stage==='guided'&&lessonById(tutorial.id).focus.includes(kind);
@@ -541,7 +543,7 @@ function drawCourse(){
  if(result&&showPattern){if(!course){const path=tracerTrajectory({x:center.finish.x,y:center.finish.y,landing:center.landing},state.aim,p,48).slice(0,-1).map((world,i)=>{const at=project(world);return`${i?'L':'M'}${at.x.toFixed(1)} ${at.y.toFixed(1)} `;}).join('');
  html+=`<path d="${path}" fill="none" stroke="#fffced" stroke-width="2" opacity=".78"/>`+line(center.landing,center.finish,'stroke="#fffced" stroke-width="2" stroke-dasharray="4 4" opacity=".8"');}
  // Smooth carry core: wind and shape, before surface-dependent rollout.
- for(const [aim,color,id] of (course?[[state.aim,'#e5ab53','yourContour']]:[[best.aim,'#5195cc','idealContour'],[state.aim,'#e5ab53','yourContour']])){let contour=[];for(let i=0;i<64;i++){const t=i/64*Math.PI*2,pt=shotAt(aim,{...patternAtTarget(aim,p),bigPct:0},{z1:1.794*Math.cos(t),z2:1.794*Math.sin(t),u:1,sign:1});contour.push([pt.landing.x,pt.landing.y]);}html+=`<polygon id="${id}" points="${polygon(contour)}" fill="${color}" fill-opacity=".08" stroke="${color}" stroke-dasharray="${id==='idealContour'?'7 4':'none'}" stroke-width="2.5"><title>80% carry core before rollout; dots show final outcomes</title></polygon>`;}
+ for(const [aim,color,id] of (course?[[state.aim,'#e5ab53','yourContour']]:[[best.aim,'#5195cc','idealContour'],[state.aim,'#e5ab53','yourContour']])){const contour=cachedCarryOutline(aim,p);html+=`<polygon id="${id}" points="${polygon(contour)}" fill="${color}" fill-opacity=".08" stroke="${color}" stroke-dasharray="${id==='idealContour'?'7 4':'none'}" stroke-width="2.5"><title>80% carry core before rollout; dots show final outcomes</title></polygon>`;}
  if(!course){html+='<g id="idealCloud">';for(let i=0;i<best.result.points.length;i+=16){const shot=best.result.points[i],at=project(shot);html+=`<circle data-outcome="${shot.kind}" cx="${at.x.toFixed(2)}" cy="${at.y.toFixed(2)}" r="2" fill="none" stroke="${TRACER_COLORS[shot.kind]}" stroke-width="1.2" opacity=".6"/>`;}html+='</g>';}
  html+='<g id="shotCloud">';for(let i=0;i<result.points.length;i+=8){const shot=result.points[i],at=project(shot);html+=`<circle data-outcome="${shot.kind}" cx="${at.x.toFixed(2)}" cy="${at.y.toFixed(2)}" r="${shot.big?3.5:2.5}" fill="${TRACER_COLORS[shot.kind]}" stroke="#29422e" stroke-width=".65" opacity=".95"/>`;}html+='</g>';
   if(!course){const b=project(best.aim);html+=line(zero,best.aim,'stroke="#5195cc" stroke-width="1.5" stroke-dasharray="3 6" opacity=".65"');html+=`<g transform="translate(${b.x},${b.y})"><path d="M0-10L8 0 0 10-8 0Z" fill="#27608a" stroke="#acd6f3" stroke-width="2"/></g>`;}

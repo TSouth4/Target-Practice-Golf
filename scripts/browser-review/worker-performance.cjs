@@ -15,7 +15,7 @@ const{chromium}=require(process.env.TARGET_PRACTICE_PLAYWRIGHT||'playwright-core
    },{fixture,backend});
    const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));
    const cdp=await context.newCDPSession(p);await cdp.send('Emulation.setCPUThrottlingRate',{rate:config.cpu});await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});if(config.network)await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:1.6*1024*1024/8,uploadThroughput:750*1024/8});
-   await p.goto(base);await p.locator('#homeScreen').waitFor({state:'visible'});const homeReadyMs=await p.evaluate(()=>performance.now());await p.locator('#homePractice').click();await p.locator('#homeUnlimited').click();
+   await p.goto(base);await p.locator('#homeScreen').waitFor({state:'visible'});const homeReadyMs=await p.evaluate(()=>performance.now());await p.locator('#homePractice').click();
    await p.evaluate(()=>{const el=document.getElementById('aimX');el.value='5';el.dispatchEvent(new Event('input'));window.measurementHeartbeat={last:performance.now(),gaps:[]};window.measurementHeartbeatTimer=setInterval(()=>{const h=window.measurementHeartbeat,now=performance.now();h.gaps.push({start:h.last,duration:now-h.last});h.last=now;},25);});
    const start=await p.evaluate(()=>performance.now());await p.locator('#simulate').click();await p.locator('#results').waitFor({state:'visible',timeout:120000});await p.waitForTimeout(80);
    const timing=await p.evaluate(start=>{

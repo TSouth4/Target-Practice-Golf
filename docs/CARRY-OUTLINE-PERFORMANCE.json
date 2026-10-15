@@ -1,0 +1,121 @@
+{
+  "version": "17.7.0",
+  "browser": "154.0.8037.57",
+  "runs": [
+    {
+      "width": 1440,
+      "scenario": "cedar",
+      "cached": false,
+      "redraws": 20,
+      "medianDrawMs": 23,
+      "totalDrawMs": 430.09999999962747
+    },
+    {
+      "width": 1440,
+      "scenario": "cedar",
+      "cached": true,
+      "redraws": 20,
+      "medianDrawMs": 22.799999999813735,
+      "totalDrawMs": 402.199999996461
+    },
+    {
+      "width": 1440,
+      "scenario": "tucked",
+      "cached": false,
+      "redraws": 20,
+      "medianDrawMs": 13.099999999627471,
+      "totalDrawMs": 278.90000000037253
+    },
+    {
+      "width": 1440,
+      "scenario": "tucked",
+      "cached": true,
+      "redraws": 20,
+      "medianDrawMs": 13.599999999627471,
+      "totalDrawMs": 273.8999999985099
+    },
+    {
+      "width": 390,
+      "scenario": "cedar",
+      "cached": false,
+      "redraws": 20,
+      "medianDrawMs": 24.200000000186265,
+      "totalDrawMs": 565.0000000009313
+    },
+    {
+      "width": 390,
+      "scenario": "cedar",
+      "cached": true,
+      "redraws": 20,
+      "medianDrawMs": 25.5,
+      "totalDrawMs": 450.00000000186265
+    },
+    {
+      "width": 390,
+      "scenario": "tucked",
+      "cached": false,
+      "redraws": 20,
+      "medianDrawMs": 15.299999999813735,
+      "totalDrawMs": 298.0999999977648
+    },
+    {
+      "width": 390,
+      "scenario": "tucked",
+      "cached": true,
+      "redraws": 20,
+      "medianDrawMs": 13.599999999627471,
+      "totalDrawMs": 259.79999999981374
+    }
+  ],
+  "notes": "Same build with outline cache enabled versus original inline calculation injected only by the development test. Local shared cloud Chromium; no phone hardware or production traffic claims. Drawing timings include string construction and SVG insertion, not full paint.",
+  "geometry": [
+    {
+      "trial": 0,
+      "cached": false,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 21.699999999254942,
+      "checksum": 13015.737218159933
+    },
+    {
+      "trial": 0,
+      "cached": true,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 3,
+      "checksum": 13015.737218159933
+    },
+    {
+      "trial": 1,
+      "cached": false,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 8.700000000186265,
+      "checksum": 13015.737218159933
+    },
+    {
+      "trial": 1,
+      "cached": true,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 2.5,
+      "checksum": 13015.737218159933
+    },
+    {
+      "trial": 2,
+      "cached": false,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 10.900000000372529,
+      "checksum": 13015.737218159933
+    },
+    {
+      "trial": 2,
+      "cached": true,
+      "redraws": 300,
+      "contours": 600,
+      "elapsedMs": 3,
+      "checksum": 13015.737218159933
+    }
+  ]
+}
