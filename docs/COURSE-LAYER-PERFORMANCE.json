@@ -1,0 +1,127 @@
+{
+  "version": "17.8.0",
+  "browser": "154.0.8037.57",
+  "notes": "Paired local shared-cloud browser runs. Flat replacement versus retained layers in the same build. Redraw durations include string construction and DOM insertion, not paint. Phone width is not physical phone hardware. Native regression tests were not running during measurement.",
+  "runs": [
+    {
+      "width": 1440,
+      "scenario": "cedar",
+      "layered": false,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 21.800000000745058,
+        "totalMs": 913.5999999996275
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 27.800000000745058,
+        "totalMs": 897.1999999973923
+      }
+    },
+    {
+      "width": 1440,
+      "scenario": "cedar",
+      "layered": true,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 8.400000000372529,
+        "totalMs": 364.4999999962747
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 9.899999998509884,
+        "totalMs": 322.49999999441206
+      }
+    },
+    {
+      "width": 1440,
+      "scenario": "tucked",
+      "layered": false,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 11.200000001117587,
+        "totalMs": 470.19999999552965
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 12.800000000745058,
+        "totalMs": 409.00000000558794
+      }
+    },
+    {
+      "width": 1440,
+      "scenario": "tucked",
+      "layered": true,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 5.099999999627471,
+        "totalMs": 237.60000000335276
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 6,
+        "totalMs": 206.6999999973923
+      }
+    },
+    {
+      "width": 390,
+      "scenario": "cedar",
+      "layered": false,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 21.09999999962747,
+        "totalMs": 881.5999999977648
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 26.699999999254942,
+        "totalMs": 834.9999999944121
+      }
+    },
+    {
+      "width": 390,
+      "scenario": "cedar",
+      "layered": true,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 9,
+        "totalMs": 378.30000000074506
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 9.799999998882413,
+        "totalMs": 331.00000000186265
+      }
+    },
+    {
+      "width": 390,
+      "scenario": "tucked",
+      "layered": false,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 10.900000000372529,
+        "totalMs": 455.3999999985099
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 13.800000000745058,
+        "totalMs": 444.00000000558794
+      }
+    },
+    {
+      "width": 390,
+      "scenario": "tucked",
+      "layered": true,
+      "aim": {
+        "redraws": 40,
+        "medianMs": 5.5,
+        "totalMs": 238.69999999925494
+      },
+      "review": {
+        "redraws": 30,
+        "medianMs": 6.599999999627471,
+        "totalMs": 208.80000000074506
+      }
+    }
+  ]
+}

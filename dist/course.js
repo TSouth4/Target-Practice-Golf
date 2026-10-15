@@ -118,3 +118,19 @@ export function courseFinishHeadline(review){
  const shot=f.kind==='bunker'?'bunker shot':f.kind==='trees'?'recovery shot':f.distance>60?'approach':'chip / pitch';
  return `Simulated ${f.offGreen} ${shot}${f.offGreen===1?'':'s'} + ${f.putts} putt${f.putts===1?'':'s'} for ${result}`;
 }
+
+// Describe the starting position for the existing aggregate finish simulation.
+// It does not model individual chip landing points or subsequent putt lengths.
+export function courseFinishDistance(review){
+ if(review.retee)return '';
+ const f=review.finish;
+ if(!f||!Number.isFinite(f.distance))return '';
+ if(!f.strokes)return 'No remaining shot.';
+ const prefix=review.selected?.kind==='water'?'After the drop: ':'';
+ if(f.kind==='green'){
+  const feet=f.distance*3;
+  return `${prefix}${feet<1?'Under 1':Math.round(feet)} ft putt remaining.`;
+ }
+ const shot=f.kind==='bunker'?'bunker shot':f.kind==='trees'?'recovery shot':f.distance>60?'approach':'chip / pitch';
+ return `${prefix}${Math.max(1,Math.round(f.distance))} yd ${shot} remaining.`;
+}

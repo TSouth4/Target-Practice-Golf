@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal,courseFinishHeadline,LEGACY_COURSE_VERSION,courseDistanceRange} from '../dist/course.js';
+import {createCourse,readCourse,recordCourseShot,advanceCourse,simulateFinish,finishDistribution,courseTotal,courseFinishHeadline,courseFinishDistance,LEGACY_COURSE_VERSION,courseDistanceRange} from '../dist/course.js';
 import {SCENARIOS,basicPattern,samples,evaluate,remaining,DEFAULT_COSTS} from '../dist/model.js';import {generateScenario} from '../dist/practice.js';import {baselineStrokes} from '../dist/strokes-baseline.js';import {readRound} from '../dist/rounds.js';
 const profile={handicap:'5',limit:265},decision={kind:'balanced',label:'Strong decision',reason:'Useful room',action:'Keep room',score:98,regret:.01};
 test('finishing distributions have real variation and calibrated reference means, not rounded averages',()=>{
@@ -27,4 +27,17 @@ test('an 18-hole round finishes only after hole 18, resumes throughout, and tota
 });
 test('finish headlines describe the actual putting, recovery and penalty result',()=>{
  assert.equal(courseFinishHeadline({retee:false,strokes:3,finish:{strokes:2,putts:2,offGreen:0}}),'Simulated 2-putt for par');assert.equal(courseFinishHeadline({retee:false,strokes:4,finish:{strokes:2,putts:2,offGreen:0}}),'Simulated 2-putt for bogey');assert.match(courseFinishHeadline({retee:false,strokes:4,finish:{strokes:3,putts:2,offGreen:1,kind:'bunker',distance:12}}),/1 bunker shot \+ 2 putts for bogey/);assert.match(courseFinishHeadline({retee:true}),/re-tee/);assert.equal(courseFinishHeadline({retee:false,strokes:3,finish:{strokes:0,putts:0,offGreen:0}}),'Holed tee shot for par');
+});
+
+test('finish distance describes the selected position in feet on green and yards off green, including relief',()=>{
+ const review=(kind,distance)=>({finish:{kind,distance,strokes:2},selected:{kind}});
+ assert.equal(courseFinishDistance(review('green',6)), '18 ft putt remaining.');
+ assert.equal(courseFinishDistance(review('green',.2)), 'Under 1 ft putt remaining.');
+ assert.equal(courseFinishDistance(review('rough',12.4)), '12 yd chip / pitch remaining.');
+ assert.equal(courseFinishDistance(review('fairway',80)), '80 yd approach remaining.');
+ assert.equal(courseFinishDistance(review('bunker',10)), '10 yd bunker shot remaining.');
+ assert.equal(courseFinishDistance(review('trees',25)), '25 yd recovery shot remaining.');
+ const water=review('rough',18);water.selected.kind='water';assert.equal(courseFinishDistance(water),'After the drop: 18 yd chip / pitch remaining.');
+ assert.equal(courseFinishDistance({retee:true}), '');
+ assert.equal(courseFinishDistance({finish:{distance:0,strokes:0}}),'No remaining shot.');
 });
