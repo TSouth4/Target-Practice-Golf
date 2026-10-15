@@ -1,3 +1,11 @@
+# Progress backups and performance baseline (17.3.0)
+
+My Progress now offers Download backup and a checked, previewed Restore flow. Backups retain local histories, rounds, lesson/Introduction completion and shot settings, including an already selected par-3 ball. Restore replaces owned app data after explicit confirmation, preserves unrelated storage and attempts rollback on storage failure. A failed rollback exposes a safety download of the original in-memory data. Files are processed locally, limited to 5 MB and validated against the supported version/schema. This is manual recovery, not accounts or automatic cloud saving. See [backup instructions](docs/PROGRESS-BACKUPS.md).
+
+A repeatable Chromium performance script now measures cold home loading, commitment-to-review time and main-thread long tasks for seeded easy tee/hard approach cases. It uses three trials each on desktop and a 390px phone viewport with CPU/network slowdown, excludes deliberate reveal animations and makes no external telemetry requests. See [performance findings](docs/PERFORMANCE-BASELINE.md) for results, limits and next priorities. Model calculations, scoring and physics are unchanged. The owner's v17.0 wording-review snapshot remains frozen.
+
+Validation: all 191 automated tests and syntax checks passed. Chromium checks at 1440, 390 and 320 pixels covered real backup downloads, invalid-file rejection, preview/cancel without mutation, quota-failure rollback, confirmed restore/reload, retained custom settings and the same selected course ball. Performance evidence covers twelve completed cold-load/shot runs; actual iPhone/Android and production-load checks remain pending.
+
 # Home page (17.2.0)
 
 The app now opens on Home, with Introduction, Lessons, Practice, Par-3 Course and My Progress. Practice opens choices for unlimited practice, a five-shot learning round or a ten-shot assessment. The header logo and Home menu item return here. Active saved rounds offer Continue round; navigation home does not erase their answers or redraw a course result. The first-time Introduction recommendation appears only on Home and disappears after completion. Introduction and Lessons opened from Home return there when closed. Existing progress remains browser-local and scoring is unchanged.

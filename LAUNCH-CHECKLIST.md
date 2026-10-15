@@ -8,7 +8,7 @@ This checklist incorporates Tyler's supplied GPT launch notes (14 October 2026).
 
 ## Current starting point
 
-The current app is a private, static web prototype with browser-based simulations and local saves. It includes practice, lessons, Introduction, assessments, five-shot rounds, a three-hole par-3 pilot, custom shot profiles, wind and firmness. Current tests establish software behavior; they do not establish measured golf accuracy, subscription readiness or independent security assurance.
+The current app is a private, static web prototype with browser-based simulations and local saves. It includes practice, lessons, Introduction, assessments, five-shot rounds, 18-hole par-3 rounds, custom shot profiles, wind and firmness. Current tests establish software behavior; they do not establish measured golf accuracy, subscription readiness or independent security assurance.
 
 Accounts, cross-device member history, a production database, payment integration and secure paid-feature enforcement remain to be built. Tools presently labeled member preview are not protected paid memberships. Launch hosting capabilities and production operating costs still need confirmation. Record evidence and mark items complete only after verification.
 
@@ -58,3 +58,10 @@ Tyler requested this check after reviewing how the current wind estimate works. 
 - Evaluate and document acceptable error and known limitations. Current coefficients (at standard height, roughly 10 yd sideways or short / 6 yd longer for 10 mph at 150 yd) are illustrative estimates, not measured calibration.
 - Revisit the coefficients or model as evidence warrants; retest target rankings and teaching feedback, not just endpoint movement.
 - Until validated, describe wind yardages as training estimates. If coefficients change, version conditions/results so historical progress and competitive scores remain interpretable.
+
+## Early preparation: local recovery and performance baseline (17.3)
+
+- Implemented manual local backup download and preview/replace restore for retained histories, saved rounds, settings and learning completion. Tests include malformed imports, storage-failure rollback and preservation of the selected course ball. See [backup instructions](docs/PROGRESS-BACKUPS.md). This contributes local-recovery evidence; it does not replace production database backups or account access checks.
+- Added repeatable cold-load and shot-calculation measurements with desktop and slowed phone Chromium configurations. See [performance baseline](docs/PERFORMANCE-BASELINE.md). Slowed calculations need attention before claiming broad older-phone support; layout checks do not establish speed.
+- Next performance work: reduce long main-thread blocks during exact target search, assess background calculation with a compatible fallback, and remeasure seeded results to retain grading consistency. Validate real Safari/iPhone and Android devices. Confirm compression/CDN caching, traffic limits and rollback with the production host before running an authorized production load test.
+- Performance reports contain development timings only. No player telemetry, accounts, paid services, external monitoring or hosting changes were introduced in this round. All production gates above remain pending.
