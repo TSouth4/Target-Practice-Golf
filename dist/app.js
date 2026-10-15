@@ -1,3 +1,4 @@
+import {calculateShot} from './shot-simulation.js';
 import {makeBackup,parseBackup,backupSummary,restoreBackup,BACKUP_MAX_BYTES} from './backup.js';
 import {ROUND_HISTORY_KEY,ROUND_HISTORY_LIMIT,readRoundHistory,archiveRound,dashboardData,roundTrendSVG,difficultyOf,shotSetting} from './dashboard.js';
 import {INTRO_KEY,INTRO_VERSION,INTRO_STEPS,INTRO_PURPOSE,hasSeenIntroduction,prepareIntroduction,introductionGraphic} from './introduction.js';
@@ -594,8 +595,8 @@ async function run(newSeed=false){
  $('newShots').disabled=true;$('simulate').innerHTML='Calculating 4,000 shots…';updateLabels();drawCourse();
  const snapshot=JSON.stringify(state);await wait(30);
  try{
-  const zs=samples(4000,state.seed),r=evaluate(state.aim,state.pattern,scene(),state.costs,zs,true),b=tutorial?.guide||await optimizeTargets(state.aim,state.pattern,scene(),state.costs,zs,()=>wait(0));
-  const comparison={aim:b.aim,pattern:b.pattern,evaluated:b.evaluated,result:evaluate(b.aim,b.pattern,scene(),state.costs,zs,true)};
+  const request=structuredClone({aim:state.aim,pattern:state.pattern,scenario:scene(),costs:state.costs,seed:state.seed});
+  const {result:r,comparison}=await calculateShot(request,{guide:tutorial?.guide,yieldControl:()=>wait(0)});
   if(snapshot!==JSON.stringify(state)){toast('Settings changed. Commit the updated target.');return;}
   if(isCourse()){
    const s=scene(),feedback=decisionFeedback(state.aim,state.pattern,r,comparison,s),lesson=decisionLesson(state.aim,state.pattern,r,comparison,s,feedback),decision={kind:feedback.kind,label:feedback.label,reason:feedback.reason,action:(lesson.hazardDetail||lesson.why)+' '+(lesson.tradeoff||'')+` The comparison target on this hole is ${Math.round(comparison.pattern.carry)} yd carry, ${sided(comparison.aim.x)}. Use practice mode to try the alternative.`,score:decisionScore(r.expected,comparison.result.expected,state.aim,comparison.aim),regret:Number.isFinite(r.expected)&&Number.isFinite(comparison.result.expected)?Math.max(0,r.expected-comparison.result.expected):null};
