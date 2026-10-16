@@ -1,3 +1,4 @@
+import {createControlsTutorial} from './controls-tutorial.js';
 import {renderCourseLayers} from './course-renderer.js';
 import {createCarryOutlineCache} from './carry-outline.js';
 import {simulateShot} from './simulation-client.js';
@@ -103,7 +104,7 @@ function basic(){return {...basicPattern(state.basicHandicap,scene(),state.basic
 function elevation(){return state.elevated?scene().elevationM:0;}
 function landscape(){return LANDSCAPES[state.landscape];}
 function num(v,a,b,fallback){return Number.isFinite(Number(v))?clamp(Number(v),a,b):fallback;}
-try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.scenario=saved.scenario;state.practiceMode=saved.practiceMode==='free'?'free':'round';if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.mode=saved.mode==='advanced'?'advanced':'basic';state.difficulty=['easy','medium','hard'].includes(saved.difficulty)?saved.difficulty:'easy';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;const savedCosts=saved.memberCosts||saved.advanced?.costs;state.memberCosts=savedCosts?.baseline===DEFAULT_COSTS.baseline?savedCosts:null;if(savedCosts&&savedCosts.baseline!==DEFAULT_COSTS.baseline)state.previousMemberCosts=savedCosts;else if(saved.previousMemberCosts)state.previousMemberCosts=saved.previousMemberCosts;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
+try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&SCENARIOS.some(s=>s.id===saved.scenario)){state.controlsTutorialSeen=saved.controlsTutorialSeen===true;state.scenario=saved.scenario;state.practiceMode=saved.practiceMode==='free'?'free':'round';if(typeof saved.encounter==='string'&&saved.encounter.length>0&&saved.encounter.length<100)state.encounter=saved.encounter;state.seed=num(saved.seed,1,2147483646,7142026);state.basicHandicap=['0','5','10','20'].includes(saved.basicHandicap)?saved.basicHandicap:'5';state.mode=saved.mode==='advanced'?'advanced':'basic';state.difficulty=['easy','medium','hard'].includes(saved.difficulty)?saved.difficulty:'easy';state.advanced=saved.advanced||null;state.memberBag=saved.memberBag||null;const savedCosts=saved.memberCosts||saved.advanced?.costs;state.memberCosts=savedCosts?.baseline===DEFAULT_COSTS.baseline?savedCosts:null;if(savedCosts&&savedCosts.baseline!==DEFAULT_COSTS.baseline)state.previousMemberCosts=savedCosts;else if(saved.previousMemberCosts)state.previousMemberCosts=saved.previousMemberCosts;state.practiceFilter=['tee','approach','mixed'].includes(saved.practiceFilter)?saved.practiceFilter:'mixed';state.recent=Array.isArray(saved.recent)?saved.recent.filter(id=>SCENARIOS.some(s=>s.id===id)).slice(-6):[];state.holeSeed=num(saved.holeSeed,0,2147483646,0);state.elevated=saved.elevated!==false;state.landscape=LANDSCAPES[saved.landscape]?saved.landscape:'woodland';for(const h of ['0','5','10','20'])if(saved.basicLimits?.[h])state.basicLimits[h]=num(saved.basicLimits[h],180,330,DRIVER_LIMITS[h]);}}catch{}
 // Restore the chosen shot mode; legacy saves without a mode keep the standard profile.
 state.pattern=basic();state.aim=fitTarget({x:0,y:scene().aimY},state.pattern);
 const initialBag=defaultMemberBag(basic());
@@ -152,6 +153,7 @@ function updateLabels(){
  for(const id of ['teeTab','approachTab','mixedTab','practiceType'])$(id).disabled=working;
  $('difficultyField').hidden=isCourse();$('practiceTypeField').hidden=isCourse();$('practiceType').value=state.practiceFilter;$('practiceType').disabled=working;
  const advanced=state.mode==='advanced';
+ $('aimQuickHelp').hidden=working||!!result||!!round?.review||round?.kind==='assessment'&&roundRecorded();$('playerSetupHelp').hidden=!!tutorialReturn;
  $('basicBar').hidden=false;$('handicapField').hidden=advanced;$('aimDepthWrap').hidden=false;
  $('shotModeNote').textContent=advanced?'My shot · '+flightDescription(p):'Straight flight · automatic club for your depth';
  $('costEditor').hidden=!advanced;
@@ -205,12 +207,12 @@ function closeIntroduction(status='skipped'){
  introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
- $('homeIntroductionRecommended').hidden=!homeOpen||introductionSeen;$('introductionMenu').disabled=working;$('introductionStart').hidden=true;$('introductionScreen').hidden=!introduction;
+ $('homeIntroductionRecommended').hidden=!homeOpen||introductionSeen||state.controlsTutorialSeen===true;$('introductionMenu').disabled=working;$('introductionStart').hidden=true;$('introductionScreen').hidden=!introduction;
  if(!introduction)return;const i=introduction.step,step=i<0?INTRO_PURPOSE:INTRO_STEPS[i];
  $('introductionStep').textContent=`Introduction · ${i+2} / ${INTRO_STEPS.length+1}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
  const t=introduction.prepared?.targets[Math.min(i,2)];
  if(i===5&&introduction.prepared){const targets=introduction.prepared.targets,best=targets[2].result.expected;const cost=t=>Math.max(0,t.result.expected-best);$('introductionText').textContent+=` In this example, the balanced choice saves about ${cost(targets[0]).toFixed(2)} strokes per attempt compared with aiming at the flag (${Math.round(cost(targets[0])*100)} strokes per 100 attempts), and ${cost(targets[1]).toFixed(2)} compared with aiming far left (${Math.round(cost(targets[1])*100)} per 100). Small differences add up over repeated decisions; these are modeled averages, not guaranteed scores.`;}
- $('introductionTask').textContent=i<0?'Choose Next to explore three target choices on the same hole.':!t?'Preparing your fixed example…':i<3?(introduction.revealed?`Pattern revealed: ${Math.round((1-t.result.counts.green/t.result.n)*100)}% finished off the green. ${i===1?'The target leaves about '+Math.round(Math.hypot(t.aim.x-introduction.prepared.scene.pin.x,t.aim.y-introduction.prepared.scene.pin.y))+' yd to the flag. ':''}Choose Next to continue.`:introduction.selected?'Target selected. Choose Show shot pattern.':'Tap the blue target on the hole, or choose Select highlighted target below.'):'Choose Next to continue.';
+ $('introductionTask').textContent=i<0?'Choose Next to explore three target choices on the same hole.':!t?'Preparing your fixed example…':i<3?(introduction.revealed?`Pattern revealed: ${Math.round((1-t.result.counts.green/t.result.n)*100)}% finished off the green. ${i===1?'The target leaves about '+Math.round(Math.hypot(t.aim.x-introduction.prepared.scene.pin.x,t.aim.y-introduction.prepared.scene.pin.y))+' yd to the flag. ':''}Choose Next to continue.`:introduction.selected?'Target selected. Choose Show shot pattern.':'Tap the blue target on the hole, or choose Select highlighted target below.'):i===INTRO_STEPS.length-1?'Introduction complete. Choose Finish introduction, start a learning round, or explore the lessons.':'Choose Next to continue.';
  $('introductionSelect').hidden=i<0||i>=3||introduction.revealed;$('introductionSelect').disabled=working||!t;
  $('introductionReveal').hidden=i<0||i>=3||introduction.revealed;$('introductionReveal').disabled=working||!introduction.selected;
  $('introductionNext').hidden=i===INTRO_STEPS.length-1;$('introductionNext').disabled=working||i>=0&&i<3&&!introduction.revealed;
@@ -333,7 +335,7 @@ function updateCourseControls(){
  if(r){$('cloudBadge').textContent=phase==='course-pattern'?'Your whole pattern':phase==='course-selecting'?'Highlighted ball: your selected outcome':'Selected ball only · simulated finish';$('courseOutcomeTitle').textContent=courseFinishHeadline(r);$('courseFinishDistance').textContent=courseFinishDistance(r);$('courseFinishDistance').hidden=!$('courseFinishDistance').textContent; $('courseFinish').textContent=courseFinishText(r);$('courseDecision').textContent=`Target quality: ${r.decision.score} / 100 · ${r.decision.label}.`;$('courseDecisionReason').textContent=r.decision.reason;$('courseLearning').textContent=r.decision.action+' '+conditionsFeedback(r.aim,r.pattern)+' A lucky or unlucky ball does not change the quality of your target.';$('courseRunning').textContent=`Round total: ${scoreToPar(total.relative)}${total.holes?` through ${total.holes} completed ${total.holes===1?'hole':'holes'}`:' · no completed holes yet'}.`;$('courseNext').textContent=r.retee?`Re-tee · shot ${r.strokes+1}`:round.status==='complete'?'View scorecard':'Next hole';$('courseNext').disabled=working;}
  for(const id of ['courseScorecard','courseQuit','courseRestart','courseQuitReport','courseReplay'])$(id).disabled=working;$('courseMenu').disabled=working;$('feedbackToggle').hidden=!immersive||!r||working;
 }
-function showCourseReport(){leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;$('courseReport').hidden=false;$('roundReport').hidden=true;$('startAssessment').hidden=true;$('startLearningRound').hidden=true;$('closeRound').hidden=false;const total=courseTotal(round);$('roundTitle').textContent=round.status==='complete'?'Your par-3 scorecard':'Par-3 scorecard';$('roundDescription').textContent=`${landscape().name} · ${round.schedule.length} holes · par ${round.schedule.length*3}. ${total.holes} completed. ${round.profile.shotMode==='custom'?'Custom profile saved at round start. ':''}${round.profile.difficulty||'easy'} conditions. ${COURSE_FINISH_LABEL}; not a personal scoring prediction.`;$('courseTotal').textContent=`${scoreToPar(total.relative)}${total.holes?` through ${total.holes} ${total.holes===1?'hole':'holes'}`:' · no holes scored yet'}`;const row=(label,values,totalValue,start=0)=>`<tr><th scope="row">${label}</th>${values.map((v,i)=>`<td data-hole="${start+i+1}">${v}</td>`).join('')}<td class="scorecard-total">${totalValue}</td></tr>`;
+function showCourseReport(){$('assessmentSetup').hidden=true;leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;$('courseReport').hidden=false;$('roundReport').hidden=true;$('startAssessment').hidden=true;$('startLearningRound').hidden=true;$('closeRound').hidden=false;const total=courseTotal(round);$('roundTitle').textContent=round.status==='complete'?'Your par-3 scorecard':'Par-3 scorecard';$('roundDescription').textContent=`${landscape().name} · ${round.schedule.length} holes · par ${round.schedule.length*3}. ${total.holes} completed. ${round.profile.shotMode==='custom'?'Custom profile saved at round start. ':''}${round.profile.difficulty||'easy'} conditions. ${COURSE_FINISH_LABEL}; not a personal scoring prediction.`;$('courseTotal').textContent=`${scoreToPar(total.relative)}${total.holes?` through ${total.holes} ${total.holes===1?'hole':'holes'}`:' · no holes scored yet'}`;const row=(label,values,totalValue,start=0)=>`<tr><th scope="row">${label}</th>${values.map((v,i)=>`<td data-hole="${start+i+1}">${v}</td>`).join('')}<td class="scorecard-total">${totalValue}</td></tr>`;
  const answers=round.schedule.map((_,i)=>round.answers.find(a=>a.index===i)),yardages=round.schedule.map(slot=>{const hole=generateScenario(SCENARIOS.find(s=>s.id===slot.id),slot.holeSeed);return Math.round(Math.hypot(hole.pin.x,hole.pin.y));});
  const nine=(start,headId,bodyId)=>{const slots=round.schedule.slice(start,start+9),scores=answers.slice(start,start+9),yards=yardages.slice(start,start+9),done=scores.filter(Boolean),strokes=done.reduce((n,a)=>n+a.holeScore,0);$(headId).innerHTML=`<tr><th scope="col">Hole</th>${slots.map((_,i)=>`<th scope="col">${start+i+1}</th>`).join('')}<th scope="col">${round.schedule.length>9?(start?'In':'Out'):'Total'}</th></tr>`;$(bodyId).innerHTML=row('Yards',yards,yards.reduce((a,b)=>a+b,0),start)+row('Par',slots.map(()=>3),slots.length*3,start)+row('Score',scores.map(a=>a?`<span class="score-mark ${a.holeScore<3?'under-par':a.holeScore>3?'over-par':''}" title="${escapeHTML(scoreName(a.holeScore))}">${a.holeScore}</span>`:'—'),done.length?strokes:'—',start)+row('To par',scores.map(a=>a?scoreToPar(a.holeScore-3):'—'),scoreToPar(strokes-done.length*3),start);};
  nine(0,'courseScoreHead','courseScoreRows');$('courseBackNine').hidden=round.schedule.length<=9;if(round.schedule.length>9)nine(9,'courseBackScoreHead','courseBackScoreRows');$('courseScoreSummary').textContent=`${total.strokes} strokes · ${scoreToPar(total.relative)} through ${total.holes} completed holes · full round par ${round.schedule.length*3}`;
@@ -367,17 +369,37 @@ function refreshRoundProfile(){
  if(round?.status!=='active'||round.answers.length)return false;
  const profile=selectedPlayerProfile(),replacement=isCourse()?createCourse(round.seed,profile,round.schedule[0].landscape):createRound(round.kind,round.seed,profile);replacement.id=round.id;round=replacement;loadRoundSlot();return true;
 }
+
+function fillPlayerSetup(prefix){
+ $(prefix+'Custom').disabled=!state.memberBag;
+ $(prefix+'Profile').value=state.mode==='advanced'&&state.memberBag?'custom':state.basicHandicap;
+ $(prefix+'Difficulty').value=state.difficulty||'easy';updatePlayerSetupSummary(prefix);
+}
+function updatePlayerSetupSummary(prefix){
+ const value=$(prefix+'Profile').value;
+ $(prefix+'ProfileSummary').textContent=value==='custom'?'Uses the clubs and shot shape in Create your custom shot. Edit those settings from Menu before starting if needed.':`${value}-handicap illustrative training pattern. Choose a spread similar to your usual misses; this does not measure your handicap.`;
+}
+function applyPlayerSetup(setup){
+ if(setup.profile==='custom'&&state.memberBag)state.mode='advanced';
+ else if(['0','5','10','20'].includes(setup.profile)){state.mode='basic';state.basicHandicap=setup.profile;}
+ state.difficulty=['easy','medium','hard'].includes(setup.difficulty)?setup.difficulty:'easy';
+}
+for(const prefix of ['course','assessment'])$(prefix+'Profile').addEventListener('change',()=>updatePlayerSetupSummary(prefix));
+const controlsIntroduction=createControlsTutorial({get:$,onComplete(){
+ state.controlsTutorialSeen=true;if(tutorialReturn)tutorialReturn.state.controlsTutorialSeen=true;save();updateIntroductionControls();
+},onAssessment:()=>showRoundScreen(true),onStrategy:()=>openIntroduction()});
+function openControlsIntroduction(target){if(working||courseSetupOpen)return;leaveFullscreen();closeMenu();controlsIntroduction.open(target?.id==='controlsMenu'?$('menuToggle'):target);}
 function openCourseSetup(focusTarget){
- if(working)return;leaveFullscreen();closeMenu();courseSetupOpen=true;courseSetupFocus=focusTarget;$('courseDifficulty').value=state.difficulty||'easy';$('courseSetup').hidden=false;$('mainContent').inert=true;$('appHeader').inert=true;updateIntroductionControls();$('courseDifficulty').focus?.();
+ if(working)return;leaveFullscreen();closeMenu();courseSetupOpen=true;courseSetupFocus=focusTarget;fillPlayerSetup('course');$('courseDifficulty').value=state.difficulty||'easy';$('courseSetup').hidden=false;$('mainContent').inert=true;$('appHeader').inert=true;updateIntroductionControls();$('courseProfile').focus?.();
 }
 function closeCourseSetup(restoreFocus=true){
  if(!courseSetupOpen)return;courseSetupOpen=false;$('courseSetup').hidden=true;$('mainContent').inert=false;$('appHeader').inert=false;updateIntroductionControls();if(restoreFocus)(courseSetupFocus?.id==='courseMenu'?$('menuToggle'):courseSetupFocus)?.focus?.();
 }
 $('courseSetupCancel').addEventListener('click',()=>closeCourseSetup());
-$('courseSetupStart').addEventListener('click',()=>{if(working||!courseSetupOpen)return;const difficulty=$('courseDifficulty').value;closeCourseSetup(false);state.difficulty=['easy','medium','hard'].includes(difficulty)?difficulty:'easy';startRound('course');});
-$('courseSetup').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeCourseSetup();}if(e.key==='Tab'){const items=[$('courseDifficulty'),$('courseSetupCancel'),$('courseSetupStart')];if(e.shiftKey&&e.target===items[0]){e.preventDefault();items[2].focus?.();}else if(!e.shiftKey&&e.target===items[2]){e.preventDefault();items[0].focus?.();}}});
-function startRound(kind){
- if(!prepareNavigation())return;roundResumed=false;leaveFullscreen();closeMenu();roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;
+$('courseSetupStart').addEventListener('click',()=>{if(working||!courseSetupOpen)return;const setup={profile:$('courseProfile').value,difficulty:$('courseDifficulty').value};closeCourseSetup(false);startRound('course',setup);});
+$('courseSetup').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeCourseSetup();}if(e.key==='Tab'){const items=[$('courseProfile'),$('courseDifficulty'),$('courseSetupCancel'),$('courseSetupStart')];if(e.shiftKey&&e.target===items[0]){e.preventDefault();items.at(-1).focus?.();}else if(!e.shiftKey&&e.target===items.at(-1)){e.preventDefault();items[0].focus?.();}}});
+function startRound(kind,setup=null){
+ if(!prepareNavigation())return;if(setup)applyPlayerSetup(setup);$('assessmentSetup').hidden=true;roundResumed=false;leaveFullscreen();closeMenu();roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;
  const profile=selectedPlayerProfile();state.practiceMode='round';state.costs={...DEFAULT_COSTS};state.practiceFilter='mixed';
  const seed=(globalThis.crypto?.getRandomValues?.(new Uint32Array(1))[0]||Math.floor(Math.random()*2147483645))%2147483645+1;
  round=kind==='course'?createCourse(seed,profile,['woodland','coast','desert','mountain'][Math.floor(random(seed^0x4937)()*4)]):createRound(kind,seed,profile);round.id=makeId();loadRoundSlot();
@@ -385,8 +407,8 @@ function startRound(kind){
 function showRoundScreen(intro=false){
  if(!prepareNavigation())return;if(isCourse()&&!intro){showCourseReport();return;}$('courseReport').hidden=true;$('closeRound').textContent='Back to practice';leaveFullscreen();closeMenu();roundView=true;$('practiceScreen').hidden=true;$('roundScreen').hidden=false;
  $('roundEyebrow').textContent=intro?'BASELINE ASSESSMENT':'FIRST-ATTEMPT RECAP';$('roundTitle').textContent=intro?'Assessment Test':round.kind==='assessment'?'Your assessment report':'Your five-shot round';
- $('closeRound').hidden=!intro&&round?.kind==='assessment';$('roundReport').hidden=intro;$('startAssessment').hidden=!intro;$('startLearningRound').hidden=intro;
- $('roundDescription').textContent=intro?`Choose targets on 10 new scenarios using ${state.mode==='advanced'?'your saved custom shot profile':'your straight-shot handicap profile'} and ${state.difficulty} conditions. Wind and ground stay consistent through this test. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round.`:'First attempts only. Retries helped you experiment and did not change this recap.';
+ $('closeRound').hidden=!intro&&round?.kind==='assessment';$('assessmentSetup').hidden=!intro;if(intro)fillPlayerSetup('assessment');$('roundReport').hidden=intro;$('startAssessment').hidden=!intro;$('startLearningRound').hidden=intro;
+ $('roundDescription').textContent=intro?`Choose your shot profile and difficulty below, then choose targets on 10 new scenarios. Wind and ground stay consistent through this test. Watch example flights from ground level after each choice. Grades, coaching, comparison targets and overhead views stay hidden until the report. No retries during the test. Your report arrives after shot 10. Starting replaces the current round. This is a starting snapshot, not a precise measure of ability. Take it before strategy lessons if you want an uncoached baseline.`:'First attempts only. Retries helped you experiment and did not change this recap.';
  if(!intro){const summary=roundSummary(round);$('roundPerShot').textContent=summary.average===null?'Unavailable':'+'+summary.average.toFixed(2);$('roundPer100').textContent=summary.per100===null?'Unavailable':'+'+summary.per100.toFixed(1);$('roundScore').textContent=summary.score===null?'—':summary.score.toFixed(1)+' / 100';
  const narrative=roundNarrative(summary);$('roundTendencies').textContent=narrative.tendencies;$('roundDirections').textContent=narrative.directions;
  if(round.version==='rounds-v1-model-v3')$('roundDirections').textContent=$('roundDirections').textContent.replaceAll('intended carry','forward target depth').replaceAll('carry-target','target-position');
@@ -409,7 +431,7 @@ function nextRoundSlot(){
 $('courseMenu').addEventListener('click',()=>{if(!prepareNavigation())return;const saved=isCourse()?round:storedCourse();if(saved?.status!=='active'){openCourseSetup($('courseMenu'));return;}round=saved;roundView=false;progressOpen=false;leaveFullscreen();closeMenu();$('roundScreen').hidden=true;$('progressScreen').hidden=true;$('practiceScreen').hidden=false;restorePlayerProfile();sceneKey=null;loadRoundSlot();});
 $('practiceRoundMenu').addEventListener('click',()=>startRound('practice'));
 $('assessmentMenu').addEventListener('click',()=>{if(!working)showRoundScreen(true);});
-$('startAssessment').addEventListener('click',()=>startRound('assessment'));
+$('startAssessment').addEventListener('click',()=>startRound('assessment',{profile:$('assessmentProfile').value,difficulty:$('assessmentDifficulty').value}));
 $('startLearningRound').addEventListener('click',()=>startRound('practice'));
 $('closeRound').addEventListener('click',()=>{if(isCourse()&&round.status==='complete'){round=null;state.practiceMode='free';dirty();}roundView=false;$('roundScreen').hidden=true;$('practiceScreen').hidden=false;updateLabels();});
 $('roundContinue').addEventListener('click',nextRoundSlot);
@@ -704,7 +726,7 @@ function openHome(){
  updateIntroductionControls();$('homeScreen').scrollIntoView({behavior:'auto'});$('homeTitle').focus?.();
 }
 $('homeLogo').addEventListener('click',e=>{e.preventDefault();openHome();});$('homeMenu').addEventListener('click',openHome);
-for(const id of ['homeIntroduction','homeIntroductionRecommended'])$(id).addEventListener('click',openIntroduction);
+for(const id of ['homeIntroduction','homeIntroductionRecommended','controlsMenu','assessmentControls'])$(id).addEventListener('click',()=>openControlsIntroduction($(id)));
 $('homeLessons').addEventListener('click',openLessons);$('homeProgress').addEventListener('click',openProgress);
 for(const [id,target] of [['homePractice','freePracticeMenu'],['homeLearning','practiceRoundMenu'],['homeAssessment','assessmentMenu']])$(id).addEventListener('click',()=>$(target).dispatchEvent(new Event('click')));
 $('homeCourse').addEventListener('click',()=>{const saved=isCourse()?round:storedCourse();if(saved?.status==='active')$('courseMenu').dispatchEvent(new Event('click'));else openCourseSetup($('homeCourse'));});
