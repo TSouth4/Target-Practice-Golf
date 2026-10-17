@@ -1,3 +1,7 @@
+# Dogleg distances and feedback clarity (17.13.0)
+
+Doglegs now show an approximate corner distance and the fairway-edge distance along the current aim line. Decision scores stay visible beside the verdict, and the learning/assessment cost labels say Estimated strokes lost without a plus sign. See [details and verification](docs/DOGLEG-FEEDBACK-CLARITY.md). The visual refresh is a separate next step.
+
 # Small-pilot readiness review (17.12.1)
 
 First-visit, phone/full-screen, saved-data recovery and blocked-storage/worker checks passed. One outdated wind caption was corrected. See the [pilot tester guide](docs/PILOT-TESTER-GUIDE.md) and [review evidence and remaining manual checks](docs/PILOT-READINESS-REVIEW.md). This does not deploy the site or enable paid membership.

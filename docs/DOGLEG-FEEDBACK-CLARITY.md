@@ -1,0 +1,18 @@
+# Dogleg distances and clearer feedback — 17.13
+
+Tee scenarios in the bend and sharp-dogleg families now show a compact terrain-distance readout alongside the green/weather information. It stays available when the landing area is hidden around the bend, including on phones and in full screen.
+
+- C · Corner ≈: straight-line distance to an approximate turning landmark derived from the actual fairway polygon. It uses the first substantial change between successive polygon-row centerline segments. The approximation symbol matters: a smoothly turning fairway has no single exact corner. Both authored fallbacks and seeded left/right variants are supported.
+- E · Fairway edge: the first exit from the fairway along the current straight aim ray. Before choosing, the label says straight ahead; after aiming, it says aim line. It updates with direction, not intended carry, and ignores later re-entries into the fairway. If no forward exit exists, no edge distance is invented.
+
+Matching C/E markers identify those terrain locations on the course. The readout explicitly says to allow for wind and roll. It is not a suggested carry, a guarantee of curved-shot clearance or an optimizer target. Non-dogleg holes and assessment privacy are unchanged. The readout hides during the reveal/review so it does not compete with feedback. No authored/generated course geometry, seed mapping, physics, grading, model versions or saved formats changed.
+
+Practice feedback now shows score/100 beside its existing verdict, with the same What → Why → How and collapsed numerical detail underneath. Par-3 feedback also shows the current decision score with its label. A run with no usable sampled comparison remains ungraded rather than receiving a misleading numeric score. Assessment grades remain hidden until the report.
+
+The learning/assessment report labels now say Estimated strokes lost per shot and Estimated strokes lost per 100 shots, with Compared with the best target found in this simulation. Lower is better. The numbers have no plus sign that could imply gaining strokes. The practice detail cost metric uses the same strokes-lost wording. Existing modeled-cost caveats remain available; this is not measured real-world strokes gained.
+
+This is the usability update only. The next visual pass will start with one representative illustrated hole for review. The owner's separate wording-review documents remain frozen. Transfer the complete repository ZIP through Work; this change does not deploy the site.
+
+Verification: two geometry tests cover 66 authored/seeded left/right doglegs, exact first-exit ray distances, changed headings, scale independence, invalid/backward rays, non-doglegs and no mutation of course geometry. Ten focused result/history/ungraded-run tests passed. Browser shots at 1440×1000, 390×900, 320×800 and 844×390 verified distance changes, no pre-commit pattern, readable full-screen labels with wind retained, the visible numerical verdict and expandable detail. A separate report fixture verified unchanged 0.20/20.0 values and the clearer wording without plus signs. Final layout checks also verified that direction changes preserve the terrain DOM while updating the markers in the aim layer.
+
+The full 230-test run passed 229 checks and identified one outdated exact-label assertion expecting Too aggressive without a score. That assertion now expects 0/100 · Too aggressive for an all-OB selected target with a usable alternative, and the affected test passed on rerun. Runs without any usable comparison still pass the separate ungraded-history test. Final renderer/geometry checks (5 tests), focused history/result checks (10 tests), syntax checks and whitespace checks passed after the final changes.

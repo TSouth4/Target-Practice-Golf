@@ -28,3 +28,18 @@ export function greenYardages(s){
  const radius=1/Math.sqrt((dx/g.rx)**2+(dy/g.ry)**2);
  return [{label:'GREEN FRONT',kind:'front',x:g.x-dx*radius,y:g.y-dy*radius,distance:length-radius},{label:'FLAG',kind:'flag',...s.pin,distance:Math.hypot(s.pin.x,s.pin.y)},{label:'GREEN BACK',kind:'back',x:g.x+dx*radius,y:g.y+dy*radius,distance:length+radius}];
 }
+
+// A visible landmark from the actual polygon, not an optimized shot target.
+// Corner is the first substantial turn between fairway-center segments.
+// The authored polygon is sampled at its own vertex rows, so label it approximate.
+export function doglegFacts(s,aim){
+ if(s.type!=='tee'||!['bend','sharp-dogleg'].includes(s.id))return[];
+ const ys=[...new Set(s.fairway.map(p=>p[1]))].sort((a,b)=>a-b),centers=[];
+ for(const y of ys){const xs=[];for(let i=0;i<s.fairway.length;i++){const a=s.fairway[i],b=s.fairway[(i+1)%s.fairway.length];if(a[1]===y)xs.push(a[0]);if(a[1]!==b[1]&&y>Math.min(a[1],b[1])&&y<Math.max(a[1],b[1]))xs.push(a[0]+(b[0]-a[0])*(y-a[1])/(b[1]-a[1]));}if(xs.length>=2)centers.push({x:(Math.min(...xs)+Math.max(...xs))/2,y});}
+ let turn=0;const turns=[];
+ for(let i=1;i<centers.length-1;i++){const a=centers[i-1],b=centers[i],c=centers[i+1];if(b.y<80||b.y>s.green.y-60)continue;const change=Math.abs(Math.atan2(c.x-b.x,c.y-b.y)-Math.atan2(b.x-a.x,b.y-a.y));turns.push({point:b,change});turn=Math.max(turn,change);}
+ if(turn<.02)return[];const corner=turns.find(t=>t.change>=turn*.5)?.point;if(!corner)return[];
+ const out=[{kind:'corner',label:'C · Corner ≈',...corner,distance:Math.hypot(corner.x,corner.y)}],length=Math.hypot(aim.x,aim.y),interval=rayIntervals(s.fairway,aim).find(([near,far])=>near<.01&&far>1);
+ if(length&&interval){const distance=interval[1];out.push({kind:'runout',label:'E · Fairway edge',x:aim.x/length*distance,y:aim.y/length*distance,distance});}
+ return out;
+}
