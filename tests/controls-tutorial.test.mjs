@@ -2,10 +2,10 @@ import test from 'node:test';import assert from 'node:assert/strict';import {set
 test('controls-only tutorial requires a direction and carry change, completes without scoring, and launches assessment',async()=>{
  const dom=setupDOM(),$=dom.$;let complete=0,assess=0,strategy=0;const tutorial=createControlsTutorial({get:$,onComplete(){complete++;},onAssessment(){assess++;},onStrategy(){strategy++;}}),before=new Map(dom.storage);
  tutorial.open($('homeIntroduction'));assert.equal($('mainContent').inert,true);assert.equal($('controlsNext').disabled,true);
- await $('controlsNext').fire('click');assert.match($('controlsStep').textContent,/1 \/ 3/);
+ await $('controlsNext').fire('click');assert.match($('controlsStep').textContent,/1 \/ 6/);
  await $('controlsRange').fire('keydown',{key:'ArrowRight',preventDefault(){}});assert.equal($('controlsNext').disabled,false);assert.match($('controlsMarker').attrs.transform,/310/);
- await $('controlsNext').fire('click');assert.equal($('controlsCarry').disabled,false);await $('controlsNext').fire('click');assert.match($('controlsStep').textContent,/2 \/ 3/);
- $('controlsCarry').value='155';await $('controlsCarry').fire('input');await $('controlsNext').fire('click');assert.equal($('controlsCommit').hidden,false);await $('controlsCommit').fire('click');assert.equal(complete,1);assert.equal($('controlsStrategy').hidden,false);assert.deepEqual(dom.storage,before);
+ await $('controlsNext').fire('click');assert.equal($('controlsCarry').disabled,false);await $('controlsNext').fire('click');assert.match($('controlsStep').textContent,/2 \/ 6/);
+ $('controlsCarry').value='155';await $('controlsCarry').fire('input');await $('controlsNext').fire('click');assert.equal($('controlsCommit').hidden,false);await $('controlsCommit').fire('click');assert.equal(complete,0);assert.match($('controlsText').textContent,/dispersion/);for(let i=0;i<3;i++)await $('controlsNext').fire('click');assert.equal(complete,1);assert.equal($('controlsStrategy').hidden,false);assert.deepEqual(dom.storage,before);
  await $('controlsCommit').fire('click');assert.equal(complete,1);await $('controlsAssessment').fire('click');assert.equal(assess,1);assert.equal($('controlsDialog').hidden,true);assert.equal($('mainContent').inert,false);assert.equal(strategy,0);
 });
 test('tutorial supports tap/drag, escape and skipping, and can be reopened without hidden completion',async()=>{
