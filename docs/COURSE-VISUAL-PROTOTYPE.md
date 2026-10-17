@@ -1,4 +1,4 @@
-# Course illustration study 01
+# Course illustration study 02
 
 Open visual-prototype.html on the static site. This is a separate read-only page; the simulator's renderer, model, scoring and stored data are unchanged. It does not add a main-menu item or replace the live course graphics.
 
@@ -16,3 +16,6 @@ Review the visibility of the flag, green, water, sand and boundaries on a phone 
 Validation: syntax checks and isolated Chromium checks at 1440, 390 and 320px cover both views, compare mode, close-up, label/aim toggles, no horizontal overflow, no uncaught page errors and unchanged browser storage. No full simulation suite was rerun because no existing application files or calculations changed. The added browser check is scripts/browser-review/visual-prototype.cjs (use the same Playwright/base-URL environment variables as the other browser checks).
 
 To preview through Work, provide the complete repository ZIP and ask it to serve visual-prototype.html alongside the existing app. Do not replace index.html with the prototype. The screenshots can be reviewed on GitHub without deploying anything.
+
+
+Second refinement: irregular smooth canopy outlines now vary deterministically by existing tree position, with restrained interior foliage shading and visible branches. Sand uses a clipped inset basin and darker upper lip. Water uses broken ripples, soft reflection shapes, a shallow edge and low bank grasses. All material detail is clipped to the original hazard polygons; the cosmetic bank grasses do not change the modeled edge. Screen-coordinate paths use two-decimal precision to keep the static SVG compact. Browser verification also checks the exact hazard boundary point strings against the original scene projection and preserves the existing tree count. The simulator renderer is still unchanged.
