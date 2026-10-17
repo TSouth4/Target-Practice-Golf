@@ -1,6 +1,6 @@
 # Course illustration study 02
 
-Open visual-prototype.html on the static site. This is a separate read-only page; the simulator's renderer, model, scoring and stored data are unchanged. It does not add a main-menu item or replace the live course graphics.
+Open visual-prototype.html on the static site. This is a separate read-only page; the simulator's renderer, model, scoring and stored data are unchanged. It does not replace the live course graphics. The later playable trial is available separately from Menu → Graphics Preview.
 
 Preview images:
 

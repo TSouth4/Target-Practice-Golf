@@ -1,0 +1,18 @@
+# Playable Graphics Preview — 17.14
+
+After Work serves the complete updated dist folder, open Menu → Graphics Preview. The direct page is graphics-preview.html. The earlier visual-prototype.html also links to it. This is an isolated fixed-hole trial, not a replacement of the regular simulator's renderer.
+
+Choose a handicap profile, tap/drag on a course (or use left/right arrows while it is focused), adjust Intended carry and Commit & shoot. Switch Current/New graphics/Compare both before or after the reveal. Close-up uses the same crop for both. Adjust & compare retains the original numerical comparison and the same seed; Reset preview clears this in-memory trial. Changing profile resets its comparison. The page starts with its own 5-handicap calm/normal-ground setup rather than reading a player's saved custom settings.
+
+The trial calls the existing simulateShot worker/fallback API, uses the same 4,000 draws and club selection, and grades with decisionScore and decisionFeedback. Shared tracer and carry-outline helpers draw 36 example flights, 500 final dots per target and the landing cores. The existing What/Why/How story and first-versus-retry accounting supply feedback. Graphics toggles reuse the result, target and sample; they do not launch another calculation. Reduced-motion preferences skip flight animation. A calculation failure keeps the target selected and makes Commit available again.
+
+This uses the fixed tucked woodland approach, seed 17, and shot seed 7142026. Both views use the same world-to-screen projection. Current art is the captured course illustration; New graphics is the revised art study. The aim marker is now the selected target, distinct from the earlier optional unscored reference. The regular simulator's geometry, shot model and renderer remain unchanged.
+
+No progress, achievements, round, course, setup or backup data is read or written by the preview. Comparisons live only in memory and disappear on reload/navigation. The normal menu contains only a link to this separate page. Returning to the simulator reloads its normal saved state. Preview 100s do not enter the achievement rate.
+
+This first trial uses the elevated course view and its close-up. It does not include the main game's overhead camera transition, full-screen layout, custom-shot editor or course mode. It is intended to test initial aiming, art readability, flights/dots and feedback before broader graphics integration. Calculation timing is available in details; it is not a claim that overall frame performance on physical phones has been benchmarked.
+
+Validation: browser checks at 1440, 390 and 320px exercise choosing, committing, switching styles during/after flights, identical 500-point world-coordinate/kind arrays, no recalculation on a style/zoom change, locked review, retries, reset, overflow and exact storage preservation. A direct calculateShot comparison verifies the rendered outcomes and score independently of the preview controller. Additional Chromium touch checks verify drag direction, unchanged carry, profile reset, injected worker-error recovery and retry. Three shared-simulation tests passed. Existing art-study browser checks also passed. No full application simulation suite was rerun because the regular calculation modules and controller were not changed; main-page changes are the menu link and its style.
+
+
+Menu-entry verification also opened the trial from a saved legacy par-3 review, returned through Back to simulator and resumed the identical selected ball. Three navigation/home tests passed after adding the menu link. Browser scripts: playable-graphics.cjs, graphics-preview-touch.cjs and graphics-preview-menu.cjs.
