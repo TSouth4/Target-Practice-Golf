@@ -8,7 +8,7 @@ const out=process.env.TARGET_PRACTICE_REVIEW_OUTPUT||'/tmp/target-practice-brows
   if(fallback)await context.addInitScript(()=>{Element.prototype.requestFullscreen=()=>Promise.reject(new Error('Unavailable'));});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.TARGET_PRACTICE_BASE_URL||'http://127.0.0.1:8765');
-  await page.locator('#aimX').focus();await page.keyboard.press('ArrowRight');
+  await page.locator('#homePractice').click();await page.locator('#aimX').focus();await page.keyboard.press('ArrowRight');
   const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('golfaim101-v2')));
   await page.locator('#fullscreenToggle').click();assert.equal(await page.locator('#fullscreenToggle').getAttribute('aria-pressed'),'true');
   if(!fallback)assert.equal(await page.evaluate(()=>!!document.fullscreenElement),true);

@@ -1,3 +1,7 @@
+# Small-pilot readiness review (17.12.1)
+
+First-visit, phone/full-screen, saved-data recovery and blocked-storage/worker checks passed. One outdated wind caption was corrected. See the [pilot tester guide](docs/PILOT-TESTER-GUIDE.md) and [review evidence and remaining manual checks](docs/PILOT-READINESS-REVIEW.md). This does not deploy the site or enable paid membership.
+
 # Isolated shot calculations and background execution (17.5.0)
 
 Committed-shot calculations now live in a dedicated, deterministic module. Supported browsers run that same code in a background worker so the screen can paint and scroll while it calculates. A worker support/loading failure uses the existing page-thread calculation path. Sample count, target search, golf model, grades, feedback, mode behavior and saved data remain unchanged. The worker has bounded execution and is cleaned up after each attempt. Cached lesson guides and non-finite costs retain their existing meaning.
