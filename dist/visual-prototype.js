@@ -24,9 +24,8 @@ function hazardArt(h,i){
  const points=poly(h.poly),screen=h.poly.map(([x,y])=>project({x,y})),minX=Math.min(...screen.map(p=>p.x)),maxX=Math.max(...screen.map(p=>p.x)),minY=Math.min(...screen.map(p=>p.y)),maxY=Math.max(...screen.map(p=>p.y)),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
  let out=`<g data-study-hazard="${h.kind}"><defs><clipPath id="p-hazard${i}"><polygon points="${points}"/></clipPath></defs><polygon data-hazard-boundary="${h.kind}" points="${points}" fill="url(#p-${h.kind==='water'?'water':'sand'})"/><g clip-path="url(#p-hazard${i})">`;
  if(h.kind==='bunker'){
-  // A shaded upper face and inset sand basin, clipped to the exact hazard edge.
-  const basin=closedCurve(screen.map((p,j)=>[cx+(p.x-cx)*.79,cy+(p.y-cy)*.64+1.4+Math.sin(j)*.3]));
-  out+=`<polygon points="${points}" fill="#a48b58"/><path d="${basin}" fill="url(#p-sand)"/><path d="${basin}" fill="none" stroke="#f8edcb" stroke-width="2" opacity=".65"/><polygon points="${points}" fill="none" stroke="#4c6436" stroke-width="6" opacity=".55"/><path d="M${minX-10} ${minY+.8}Q${cx} ${minY+4.5} ${maxX+10} ${minY+1}" fill="none" stroke="#3c4e2b" stroke-width="4" opacity=".4"/><polygon points="${points}" fill="url(#p-grain)"/>`;
+  // Sand fills the complete hazard footprint; only the far lip casts a shadow.
+  out+=`<path d="M${minX-10} ${minY+.8}Q${cx} ${minY+4.5} ${maxX+10} ${minY+1}" fill="none" stroke="#76613f" stroke-width="3" opacity=".65"/><polygon points="${points}" fill="url(#p-grain)"/>`;
   for(let y=minY+5;y<maxY;y+=3.5)out+=`<path d="M${cx-14} ${y}q12 .8 27 0" fill="none" stroke="#b7a579" stroke-width=".5" opacity=".23"/>`;
  }else{
   // Shadows, reflections and a shallow shelf stay inside the playable footprint.

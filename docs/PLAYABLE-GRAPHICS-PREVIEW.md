@@ -16,3 +16,5 @@ Validation: browser checks at 1440, 390 and 320px exercise choosing, committing,
 
 
 Menu-entry verification also opened the trial from a saved legacy par-3 review, returned through Back to simulator and resumed the identical selected ball. Three navigation/home tests passed after adding the menu link. Browser scripts: playable-graphics.cjs, graphics-preview-touch.cjs and graphics-preview-menu.cjs.
+
+Bunker readability revision: sand now fills the exact bunker boundary rather than an inset basin. Removed the broad translucent inner rim and retained a narrow upper-edge shadow for depth. Art-study browser checks passed at 1440, 390 and 320px, including unchanged projected hazard boundaries, controls and storage. Syntax checks passed; scoring and simulation were not changed.
