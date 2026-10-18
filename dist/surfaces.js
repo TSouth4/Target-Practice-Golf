@@ -36,19 +36,22 @@ const greenCache=new WeakMap();
 function greenTriangles(s){if(!greenCache.has(s)){const g=s.green,rings=[1,.82,.56,.28,0],n=72,out=[],point=(r,i)=>[g.x+Math.cos(i/n*Math.PI*2)*g.rx*r,g.y+Math.sin(i/n*Math.PI*2)*g.ry*r];for(let r=0;r<rings.length-1;r++)for(let i=0;i<n;i++){const a=point(rings[r],i),b=point(rings[r],i+1),c=point(rings[r+1],i+1),d=point(rings[r+1],i);out.push([a,b,c],[a,c,d]);}greenCache.set(s,out);}return greenCache.get(s);}
 function mix(a,b,t){const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),x=rgb(a),y=rgb(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*clamp(t,0,1)).toString(16).padStart(2,'0')).join('');}
 function poly(points,project,attrs){return`<polygon points="${points.map(([x,y])=>{const p=project({x,y});return`${p.x.toFixed(2)},${p.y.toFixed(2)}`;}).join(' ')}" ${attrs}/>`;}
-export function drawRelief(s,project,theme,map=false){
+export function drawRelief(s,project,theme,map=false,illustrated=false){
  let out='<g id="surfaceRelief">';
  // Raised green shoulders, followed by progressively higher putting-surface rings.
  const g=s.green,rings=[1,.82,.56,.28,0],n=72;
  const point=(r,i)=>[g.x+Math.cos(i/n*Math.PI*2)*g.rx*r,g.y+Math.sin(i/n*Math.PI*2)*g.ry*r];
- for(let r=0;r<rings.length-1;r++)for(let i=0;i<n;i++){const shade=.22+r*.2+(Math.sin(i/n*Math.PI*2)+Math.cos(i/n*Math.PI*2))*.08;out+=poly([point(rings[r],i),point(rings[r],i+1),point(rings[r+1],i+1),point(rings[r+1],i)],project,`fill="${mix('#5f9e34','#b3eb66',shade)}" stroke="${mix('#5f9e34','#b3eb66',shade)}" stroke-width=".35"`);}
- out+=poly(Array.from({length:n},(_,i)=>point(1,i)),project,'fill="none" stroke="#50822f" stroke-width="1.5"');
- for(const h of geometry(s)){
+ for(let r=0;r<rings.length-1;r++)for(let i=0;i<n;i++){const shade=.22+r*.2+(Math.sin(i/n*Math.PI*2)+Math.cos(i/n*Math.PI*2))*.08;out+=poly([point(rings[r],i),point(rings[r],i+1),point(rings[r+1],i+1),point(rings[r+1],i)],project,`fill="${illustrated?'url(#art-green)':mix('#5f9e34','#b3eb66',shade)}" stroke="${illustrated?'url(#art-green)':mix('#5f9e34','#b3eb66',shade)}" stroke-width=".35"`);}
+ out+=poly(Array.from({length:n},(_,i)=>point(1,i)),project,`fill="none" stroke="${illustrated?'#7e9d50':'#50822f'}" stroke-width="1.5"`);
+ for(const [index,h] of geometry(s).entries()){
   hazardTriangles(h);
-  out+=`<g data-surface="${h.kind}">`;
-  for(const t of h.mesh){const z=t.reduce((sum,[x,y])=>sum-surfaceHeight(s,{x,y}),0)/3/RELIEF[h.kind],colors=h.kind==='water'?theme.water:theme.sand;out+=poly(t,project,`fill="${mix(colors[0],colors[1],h.kind==='water'?.25+z*.55:z*.8)}" stroke="${mix(colors[0],colors[1],h.kind==='water'?.25+z*.55:z*.8)}" stroke-width=".4"`);}
-  out+=poly(h.poly,project,`fill="none" stroke="${h.kind==='water'?'#2d6572':'#799342'}" stroke-width="${map?1.6:2.5}"`);
-  if(h.kind==='water')for(let y=h.minY+3;y<h.maxY;y+=5)for(let x=h.minX+3;x<h.maxX-5;x+=9){const a={x,y},b={x:x+5,y:y+.15};if(inPoly(a,h.poly)&&inPoly(b,h.poly)&&edgeDistance(a,h.poly)>2&&edgeDistance(b,h.poly)>2){const p=project(a),q=project(b);out+=`<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="#d1f0e6" stroke-width=".8" opacity=".48"/>`;}}
+  out+=`<g data-surface="${h.kind}" data-art="${illustrated?'illustrated':'original'}">`;
+  const materialId=`art-hazard-${index}`;
+  if(illustrated){const rim=h.poly.map(([x,y])=>project({x,y})),center=project({x:(h.minX+h.maxX)/2,y:(h.minY+h.maxY)/2}),top=Math.min(...rim.map(p=>p.y)),bottom=Math.max(center.y,...rim.map(p=>p.y));out+=`<defs><linearGradient id="${materialId}" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="${top}" y2="${Math.max(top+.01,bottom)}">${h.kind==='bunker'?'<stop stop-color="#ac905c"/><stop offset=".16" stop-color="#e8d6a7"/><stop offset=".65" stop-color="#faedc8"/><stop offset="1" stop-color="#e5ce99"/>':`<stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/>`}</linearGradient></defs>`;}
+  if(illustrated){const path=h.mesh.map(t=>t.map(([x,y],i)=>{const p=project({x,y});return `${i?'L':'M'}${p.x.toFixed(2)},${p.y.toFixed(2)}`;}).join('')+'Z').join('');out+=`<path data-relief-mesh="${h.kind}" d="${path}" fill="url(#${materialId})"/>`;}
+  else for(const t of h.mesh){const z=t.reduce((sum,[x,y])=>sum-surfaceHeight(s,{x,y}),0)/3/RELIEF[h.kind],colors=h.kind==='water'?theme.water:theme.sand,fill=mix(colors[0],colors[1],h.kind==='water'?.25+z*.55:z*.8);out+=poly(t,project,`fill="${fill}" stroke="${fill}" stroke-width=".4"`);}
+  out+=poly(h.poly,project,`fill="none" stroke="${h.kind==='water'?(illustrated?'#657f5d':'#2d6572'):(illustrated?'#7c7048':'#799342')}" stroke-width="${map?1.6:2.5}"`);
+  if(h.kind==='water')for(let y=h.minY+3;y<h.maxY;y+=5)for(let x=h.minX+3;x<h.maxX-5;x+=9){if(illustrated&&Math.sin(x*3+y*7)>.15)continue;const shift=illustrated?Math.sin(x+y)*1.5:0,a={x:x+shift,y},b={x:x+shift+(illustrated?2+2*Math.cos(x-y)**2:5),y:y+.15};if(inPoly(a,h.poly)&&inPoly(b,h.poly)&&edgeDistance(a,h.poly)>2&&edgeDistance(b,h.poly)>2){const p=project(a),q=project(b);out+=`<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="#d1f0e6" stroke-width=".8" opacity="${illustrated?.18+.14*Math.sin(x+y)**2:.48}"/>`;}}
   out+='</g>';
  }
  return out+'</g>';

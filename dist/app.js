@@ -24,6 +24,7 @@ import {BRAND} from './config.js';
 import {EYE_CAMERA,reviewCamera,projectReview,aimZoomBox,isDoubleAimTap} from './camera.js';
 import {nextScenario,generateScenario,nextLandscape} from './practice.js';
 import {TRACER_COLORS,tracerSample,tracerTrajectory} from './tracers.js';
+import {illustratedTheme,illustratedDefinitions,drawIllustratedPlant} from './course-art.js';
 import {LANDSCAPES,vegetation,drawPlant,drawBackdrop} from './landscape.js';
 import {projectSurface,unprojectSurface,drawRelief} from './surfaces.js';
 const $=id=>document.getElementById(id);
@@ -185,7 +186,7 @@ function updateLabels(){
  const zoomAllowed=!working&&!result&&!editorDraft&&!progressOpen;
  $('aimZoomToggle').hidden=!!result;$('aimZoomToggle').disabled=!zoomAllowed;$('aimZoomToggle').textContent=aimZoom?'Zoom out ⊖':'Zoom in ⊕';$('aimZoomToggle').setAttribute('aria-pressed',!!aimZoom);$('aimZoomToggle').setAttribute('data-mobile-label',aimZoom?'Zoom−':'Zoom+');
  updateCourseFrame(aimZoom&&zoomAllowed?aimZoom:{x:0,y:0,width:960,height:580});
- $('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('terrainToggle').setAttribute('data-mobile-label','View');$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
+ $('graphicsStyleToggle').disabled=working;$('terrainToggle').hidden=!!result;$('terrainToggle').textContent=state.elevated?'Elevated view':'Flat view';$('terrainToggle').setAttribute('aria-pressed',state.elevated);$('terrainToggle').disabled=working||!!result;$('terrainToggle').setAttribute('data-mobile-label','View');$('driverLimit').disabled=working||!!result;$('driverLimitReset').disabled=working||!!result;
  $('aimHelp').textContent=result?'Your target is locked. Compare the patterns, then take the next shot or retry this hole.':'Tap or drag on the course to aim left/right. Arrow keys work when the course is focused. Double-tap or double-click to zoom in / out. Set Intended carry below the course, or on the right in full screen. The pattern stays hidden until you commit.';
  for(const id of ['basicMode','advancedMode','courseMenu','editShotQuick'])$(id).disabled=working;const savedCourse=isCourse()?round:storedCourse();$('courseMenu').innerHTML=savedCourse?.status==='active'?`Resume par-3 course <span>${savedCourse.schedule.length} holes · score saved</span>`:'Par-3 course <span>18 holes · simulated finish</span>';
  $('menuToggle').disabled=working;$('progressMenu').disabled=working;
@@ -517,31 +518,33 @@ function polygon(points){const vertices=[];for(let i=0;i<points.length;i++){cons
 function ringPoints(cx,cy,rx,ry,n=64){return Array.from({length:n},(_,i)=>[cx+Math.cos(i/n*Math.PI*2)*rx,cy+Math.sin(i/n*Math.PI*2)*ry]);}
 function line(a,b,attrs=''){const x=project(a),y=project(b);return `<line x1="${x.x}" y1="${x.y}" x2="${y.x}" y2="${y.y}" ${attrs}/>`;}
 function textAt(x,y,label,attrs=''){const p=project({x,y});return `<text x="${p.x}" y="${p.y}" ${attrs}>${label}</text>`;}
+let illustratedGraphics=true;
 const cachedCarryOutline=createCarryOutlineCache();
 function drawCourse(){
  const course=isCourse(),showPattern=!course||['course-pattern','course-selecting'].includes(phase);
  const focus=kind=>!!tutorial&&!lessonScreenOpen&&tutorial.stage==='guided'&&lessonById(tutorial.id).focus.includes(kind);
- const s=scene(),p=state.pattern,map=state.view==='map'||phase==='zooming',theme=landscape();
- let html=`<defs><linearGradient id="sky" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="-150" y2="235"':'y2="1"'}><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="235" y2="580"':'y2="1"'}><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
+ const s=scene(),p=state.pattern,map=state.view==='map'||phase==='zooming',theme=illustratedGraphics?illustratedTheme(landscape()):landscape();
+ $('course').setAttribute('data-graphics',illustratedGraphics?'illustrated':'original');
+ let html=`<defs>${illustratedGraphics?illustratedDefinitions(theme,s,project):''}<linearGradient id="sky" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="-150" y2="235"':'y2="1"'}><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="235" y2="580"':'y2="1"'}><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
  if(map){const c=analysisCamera();html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="${theme.ground}"/><rect width="960" height="580" fill="${theme.ground}"/>`;for(let x=-140;x<=160;x+=20)html+=line({x,y:c.minY-20},{x,y:c.maxY+20},'stroke="#b4c69c" stroke-width="1"');for(let y=Math.floor(c.minY/10)*10;y<c.maxY+20;y+=10)html+=line({x:-140,y},{x:160,y},'stroke="#b4c69c" stroke-width="1"');}
  else{html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="url(#rough)"/><rect x="-3000" y="-3000" width="7000" height="${3000+EYE_CAMERA.horizon}" fill="url(#sky)"/><rect width="960" height="580" fill="url(#sky)"/><path d="M0 234Q95 212 195 225T390 221T650 224T960 234V250H0Z" fill="#bac8b0"/><rect y="${EYE_CAMERA.horizon}" width="960" height="345" fill="url(#rough)"/><g opacity=".45"><ellipse cx="169" cy="80" rx="80" ry="12" fill="#f6f2e2"/><ellipse cx="658" cy="108" rx="101" ry="11" fill="#f6f2e2"/></g>`;}
  if(!map)html+=drawBackdrop(state.landscape,s);
  html+=`<polygon points="${polygon(s.fairway)}" fill="url(#fairway)" stroke="#5b8d3e" stroke-width="1.4"/>`;
  // Alternating mowing bands are clipped to the exact fairway polygon.
- html+='<g clip-path="url(#fairwayClip)">';for(let y=0;y<s.maxY;y+=24)html+=`<polygon points="${polygon([[-150,y],[150,y],[150,y+12],[-150,y+12]])}" fill="#bcdf81" opacity=".13"/>`;html+='</g>';
+ html+='<g clip-path="url(#fairwayClip)">';for(let y=0;y<s.maxY;y+=24)html+=`<polygon points="${polygon([[-150,y],[150,y],[150,y+12],[-150,y+12]])}" fill="#bcdf81" opacity="${illustratedGraphics?.065:.13}"/>`;html+='</g>';
  for(const h of s.hazards.filter(h=>h.kind==='trees'))html+=`<polygon points="${polygon(h.poly)}" fill="${theme.recovery}" opacity="${map?.7:.42}"/>`;
  html+=`<polygon points="${polygon(ringPoints(s.green.x,s.green.y,s.green.rx+3,s.green.ry+3))}" fill="#75a747"/>`;
- html+=drawRelief(s,project,theme,map);
+ html+=drawRelief(s,project,theme,map,illustratedGraphics);
  // White-staked boundaries and wooded recovery areas.
  for(const bx of s.bounds){html+=line({x:bx,y:0},{x:bx,y:s.maxY},`stroke="${map?'#afba9f':'#e7e7d5'}" stroke-width="1.8" stroke-dasharray="6 6"`);for(let y=25;y<s.maxY;y+=40){const at=project({x:bx,y});html+=`<path d="M${at.x} ${at.y}v-${map?5:Math.max(3,14-y*.02)}" stroke="#fffef2" stroke-width="2"/>`;}}
- if(!map){html+=`<g id="vegetation" data-landscape="${state.landscape}">`;for(const plant of vegetation(s,state.landscape))html+=drawPlant(plant,project,theme);html+='</g>';}
+ if(!map){html+=`<g id="vegetation" data-landscape="${state.landscape}">`;for(const [i,plant] of vegetation(s,state.landscape).entries())html+=illustratedGraphics?drawIllustratedPlant(plant,project,theme,i):drawPlant(plant,project,theme);html+='</g>';}
  // Yardage labels and pin are above the terrain.
  if(map){const c=analysisCamera();for(let y=Math.ceil(c.minY/10)*10;y<c.maxY;y+=10){const at=project({x:c.centerX-450/c.scale,y});html+=`<text x="30" y="${at.y}" fill="#87977a" font-size="9" font-family="Arial">${y} yd</text>`;}}
  // Teaching overlays keep exact hazard edges visible without revealing shot patterns.
  html+='<g id="hazardEdges" fill="none" stroke-linejoin="round">';
  for(const h of s.hazards.filter(h=>focus(h.kind)&&['water','trees'].includes(h.kind)))html+=`<polygon data-tutorial-focus="${h.kind}" points="${polygon(h.poly)}" stroke="${h.kind==='water'?'#24cfe1':'#294f31'}" stroke-width="6"/>`;
  // Water already has a shoreline in the relief renderer; a second bright outline looks artificial.
- for(const h of s.hazards.filter(h=>h.kind==='bunker'))html+=`<polygon points="${polygon(h.poly)}" stroke="${focus('bunker')?'#c68d31':'#fff1c7'}" stroke-width="${focus('bunker')?7:map?1:3}" data-tutorial-focus="${focus('bunker')?'bunker':''}"/><polygon points="${polygon(h.poly)}" stroke="#99703d" stroke-width="1.3"/>`;
+ for(const h of s.hazards.filter(h=>h.kind==='bunker'))html+=`<polygon points="${polygon(h.poly)}" stroke="${focus('bunker')?'#c68d31':'#fff1c7'}" stroke-width="${focus('bunker')?7:illustratedGraphics?0:map?1:3}" data-tutorial-focus="${focus('bunker')?'bunker':''}"/><polygon points="${polygon(h.poly)}" stroke="#99703d" stroke-width="1.3"/>`;
  for(const bx of s.bounds)html+=line({x:bx,y:25},{x:bx,y:s.maxY},`stroke="#c15a4f" stroke-width="${focus('ob')?6:2}" stroke-dasharray="8 7" opacity=".75"`);
  html+='</g>';
  const callouts=hazardCallouts(s,state.landscape);
@@ -715,6 +718,7 @@ function retryShot(){if(working||!result)return;resetAimZoom();if(!retryValid())
 $('retryThisHole').addEventListener('click',retryShot);
 $('difficulty').addEventListener('change',()=>{if(isCourse()||working||result||tutorialReturn||round?.answers.length||round?.current?.attempts.length)return;state.difficulty=['easy','medium','hard'].includes($('difficulty').value)?$('difficulty').value:'easy';retryBaseline=null;retryHint='';if(refreshRoundProfile())return;state.pattern=state.mode==='basic'?basic():member();dirty();});
 $('basicHandicap').addEventListener('change',()=>{if(working||result||round?.answers.length||isCourse()||tutorialReturn)return;if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=$('basicHandicap').value==='custom'?'advanced':'basic';if(state.mode==='basic')state.basicHandicap=$('basicHandicap').value;state.costs=state.mode==='basic'?{...DEFAULT_COSTS}:memberCosts();if(refreshRoundProfile())return;state.pattern=state.mode==='basic'?basic():member();syncTargetDistance();updateControls();dirty();});
+$('graphicsStyleToggle').addEventListener('click',()=>{if(working)return;illustratedGraphics=!illustratedGraphics;$('graphicsStyleToggle').setAttribute('aria-pressed',illustratedGraphics);$('graphicsStyleToggle').innerHTML=(illustratedGraphics?'Graphics: Illustrated':'Graphics: Original')+' <span>Switch styles for comparison</span>';drawCourse();});
 $('terrainToggle').addEventListener('click',()=>{if(working||isCourse()&&round.review||result)return;resetAimZoom();state.elevated=!state.elevated;save();updateLabels();drawCourse();});
 $('driverLimit').addEventListener('change',()=>{if(working||isCourse()&&round.review||result||round?.answers.length||isCourse())return;state.basicLimits[state.basicHandicap]=num($('driverLimit').value,180,330,DRIVER_LIMITS[state.basicHandicap]);if(refreshRoundProfile())return;if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
 $('driverLimitReset').addEventListener('click',()=>{if(working||isCourse()&&round.review||result||round?.answers.length||isCourse())return;delete state.basicLimits[state.basicHandicap];if(refreshRoundProfile())return;if(state.mode==='basic')state.pattern=basic();updateControls();dirty();});
