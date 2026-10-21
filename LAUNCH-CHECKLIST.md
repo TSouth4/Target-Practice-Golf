@@ -12,6 +12,14 @@ The current app is a private, static web prototype with browser-based simulation
 
 Accounts, cross-device member history, a production database, payment integration and secure paid-feature enforcement remain to be built. Tools presently labeled member preview are not protected paid memberships. Launch hosting capabilities and production operating costs still need confirmation. Record evidence and mark items complete only after verification.
 
+## Product direction recorded October 21, 2026
+
+The planned free Par-3 offering is a shared daily three-hole challenge, replacing a separate static three-hole sampler and separate daily decision mode. Full explanations and unscored retries remain available; first attempts count. Paid members receive unlimited randomized 18-hole rounds, custom profiles and deeper progress tools. Introduction/core Lessons and a basic result/recent summary remain free. Exact limits for other modes, history allowances and pricing are not yet finalized. Competition/leaderboards remain later work. See [the project plan](PROJECT-PLAN.md) for the build sequence.
+
+## Ownership and operational preparation
+
+Use [OWNER-OPERATIONS-PREP.md](docs/OWNER-OPERATIONS-PREP.md) as the owner's practical preparation guide. Before paid launch, every applicable gate needs a named owner, verification evidence, unresolved issues and a go/no-go decision. Review at least account isolation/paid access, backup restore, payment lifecycle and incident response beyond the implementing developer's own checks. Choose a focused outside technical review proportionate to the final architecture; record its scope and resolve significant findings. Managed providers help with infrastructure but do not verify our permissions, policies or integration automatically. Production service ownership, alert recipients, emergency controls and recovery contacts must be in place; AI assistance is not a monitored on-call service.
+
 ## Launch gates
 
 All items below are **pending** as complete launch gates. Existing development checks contribute evidence but do not close production requirements by themselves.
