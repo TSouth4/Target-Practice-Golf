@@ -1,3 +1,7 @@
+# Introduction context (17.16.1)
+
+Two opening slides explain thoughtful target selection and why direction/carry are separate choices before the existing controls practice. See [wording and verification](docs/INTRODUCTION-CONTEXT.md).
+
 # Consistent ground rollout (17.16.0)
 
 New games share surface-based rollout across Easy, Medium and Hard. Saved earlier rounds retain their original rules, while new-model progress stays separate. See [behavior, compatibility and fixed-case checks](docs/CONSISTENT-GROUND-ROLLOUT.md).
