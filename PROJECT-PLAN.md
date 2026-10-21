@@ -10,7 +10,7 @@ Teach golfers to choose targets, understand their misses and build good course-m
 
 ## Where we are
 
-The current development version is 17.15.0. Practice, five-shot learning rounds, ten-shot assessments, Lessons, Introduction, custom shot profiles, local My Progress, backups, weather settings and randomized 18-hole Par-3 rounds already exist. The illustrated graphics are integrated, with an Original comparison option. The full 232-test suite and desktop/phone-size Chromium checks passed for that integration; owner testing on the deployed site and physical phones remains pending.
+The current development version is 17.15.1. The mobile full-screen foreground now continues the short grass behind the ball instead of exposing a rough-colored block. Practice, five-shot learning rounds, ten-shot assessments, Lessons, Introduction, custom shot profiles, local My Progress, backups, weather settings and randomized 18-hole Par-3 rounds already exist. The illustrated graphics are integrated, with an Original comparison option. The full 232-test suite and desktop/phone-size Chromium checks passed for that integration; owner testing on the deployed site and physical phones remains pending.
 
 A read-only [model audit](docs/MODEL-VALIDATION-REVIEW.md) passed 14 focused checks and prepared six reproducible cases. Distance-and-lie costs use a cited historical Tour reference; spreads, weather and finishing distributions include teaching assumptions. The rollout inconsistency is documented and not fixed yet.
 

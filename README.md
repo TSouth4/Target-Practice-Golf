@@ -1,3 +1,7 @@
+# Mobile full-screen foreground (17.15.1)
+
+Short grass now continues behind the ball instead of exposing a large rough-colored block on tall phone screens. The extra rough strip under the tee is removed. See [scope and checks](docs/MOBILE-FOREGROUND-FIX.md).
+
 # Integrated course graphics (17.15.0)
 
 The approved illustrated style is now used in the main simulator. Menu → Graphics switches between Illustrated and Original for the same hole and result. Reload defaults to Illustrated. See [scope and verification](docs/INTEGRATED-COURSE-GRAPHICS.md).

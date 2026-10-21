@@ -528,7 +528,12 @@ function drawCourse(){
  let html=`<defs>${illustratedGraphics?illustratedDefinitions(theme,s,project):''}<linearGradient id="sky" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="-150" y2="235"':'y2="1"'}><stop stop-color="${theme.sky[0]}"/><stop offset="1" stop-color="${theme.sky[1]}"/></linearGradient><linearGradient id="rough" x2="0" ${immersive?'gradientUnits="userSpaceOnUse" y1="235" y2="580"':'y2="1"'}><stop stop-color="${theme.rough[0]}"/><stop offset="1" stop-color="${theme.rough[1]}"/></linearGradient><linearGradient id="fairway" x2="0" y2="1"><stop stop-color="${theme.fairway[0]}"/><stop offset="1" stop-color="${theme.fairway[1]}"/></linearGradient><linearGradient id="water" x2="0" y2="1"><stop stop-color="${theme.water[0]}"/><stop offset="1" stop-color="${theme.water[1]}"/></linearGradient><radialGradient id="ball"><stop stop-color="#fffef8"/><stop offset=".8" stop-color="#e8e8dd"/><stop offset="1" stop-color="#b0baa7"/></radialGradient><clipPath id="fairwayClip"><polygon points="${polygon(s.fairway)}"/></clipPath></defs>`;
  if(map){const c=analysisCamera();html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="${theme.ground}"/><rect width="960" height="580" fill="${theme.ground}"/>`;for(let x=-140;x<=160;x+=20)html+=line({x,y:c.minY-20},{x,y:c.maxY+20},'stroke="#b4c69c" stroke-width="1"');for(let y=Math.floor(c.minY/10)*10;y<c.maxY+20;y+=10)html+=line({x:-140,y},{x:160,y},'stroke="#b4c69c" stroke-width="1"');}
  else{html+=`<rect x="-3000" y="-3000" width="7000" height="7000" fill="url(#rough)"/><rect x="-3000" y="-3000" width="7000" height="${3000+EYE_CAMERA.horizon}" fill="url(#sky)"/><rect width="960" height="580" fill="url(#sky)"/><path d="M0 234Q95 212 195 225T390 221T650 224T960 234V250H0Z" fill="#bac8b0"/><rect y="${EYE_CAMERA.horizon}" width="960" height="345" fill="url(#rough)"/><g opacity=".45"><ellipse cx="169" cy="80" rx="80" ry="12" fill="#f6f2e2"/><ellipse cx="658" cy="108" rx="101" ry="11" fill="#f6f2e2"/></g>`;}
- if(!map)html+=drawBackdrop(state.landscape,s);
+ if(!map){
+  html+=drawBackdrop(state.landscape,s);
+  // Portrait full screen exposes ground behind the origin. Continue the near
+  // short grass visually; this is scenery, not new playable/scored geometry.
+  const near=project({x:0,y:0});html+=`<rect id="courseForeground" x="-3000" y="${near.y}" width="7000" height="7000" fill="${theme.fairway[1]}" pointer-events="none"/>`;
+ }
  html+=`<polygon points="${polygon(s.fairway)}" fill="url(#fairway)" stroke="#5b8d3e" stroke-width="1.4"/>`;
  // Alternating mowing bands are clipped to the exact fairway polygon.
  html+='<g clip-path="url(#fairwayClip)">';for(let y=0;y<s.maxY;y+=24)html+=`<polygon points="${polygon([[-150,y],[150,y],[150,y+12],[-150,y+12]])}" fill="#bcdf81" opacity="${illustratedGraphics?.065:.13}"/>`;html+='</g>';
@@ -594,7 +599,7 @@ function drawCourse(){
  if(oneShot){const o=project(oneShot);html+=`<circle cx="${o.x}" cy="${o.y}" r="10" fill="#f9f4df" stroke="#c76849" stroke-width="3"/><text x="${o.x+14}" y="${o.y-10}" font-size="11" fill="#fffef2" paint-order="stroke" stroke="#365340" stroke-width="3">${NAMES[oneShot.kind]}</text>`;}
  if(achievement&&performance.now()<achievement.until&&!tutorial&&!introduction&&(phase==='review'||phase==='course-review'))html+=goldPulseMarkup(a);
  if(hasAim&&(!course||!round.review))html+=`<g id="aimMarker" transform="translate(${a.x},${a.y})"><circle r="12" fill="#254c3a99" stroke="#ebc782" stroke-width="2"/><circle r="3" fill="#ebc782"/><path d="M-18 0h8M10 0h8M0-18v8M0 10v8" stroke="#ebc782" stroke-width="1.5"/></g>`;
- if(!map){html+=`<path d="M0 552Q220 541 430 551T960 547V580H0Z" fill="${theme.rough[1]}" opacity=".55"/><ellipse cx="480" cy="549" rx="9" ry="2.5" fill="#29493055"/><circle cx="480" cy="545" r="4.5" fill="url(#ball)"/><path d="M480 549v5" stroke="#e0d2ab" stroke-width="1.5"/>`;}
+ if(!map){html+=`<ellipse cx="480" cy="549" rx="9" ry="2.5" fill="#29493055"/><circle cx="480" cy="545" r="4.5" fill="url(#ball)"/><path d="M480 549v5" stroke="#e0d2ab" stroke-width="1.5"/>`;}
  else if(!course||!round.review){const z=project(zero);html+=`<circle cx="${z.x}" cy="${z.y}" r="5" fill="#fffdf0" stroke="#557c50"/><text x="${z.x+12}" y="${z.y+4}" font-size="10" fill="#6f8565">YOUR BALL</text>`;}
  renderCourseLayers($('course'),{terrain:terrainMarkup,aim:aimMarkup,flights:flightMarkup,feedback:html});
 }
