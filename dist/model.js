@@ -1,4 +1,4 @@
-import {windEffect,rolloutDistance} from './conditions.js';
+import {windEffect,rolloutDistance,usesSurfaceRollout,LEGACY_ROLLOUT} from './conditions.js';
 import {DRIVER_LIMITS,clubPattern,reachLimit} from './bag.js';
 import {EXTRA_HOLES} from './holes.js';
 import {BASELINE_ID,baselineStrokes,baselineLookup} from './strokes-baseline.js';
@@ -85,8 +85,11 @@ export function shotAt(aim,p,z,s=null){
  const carry=Math.max(1,p.carry+longitudinal);
  const offset=carry*Math.tan(p.start*Math.PI/180)+p.curve+p.bias+p.sdSide*z.z1*factor+(big?sign*p.bigShift:0);
  const wind=windEffect(aim,p,carry),landing={x:sin*carry+cos*offset+wind.x,y:cos*carry-sin*offset+wind.y};
- const roll=rolloutDistance(p,s?lie(landing,s):'fairway');let end=p.conditions&&p.conditions.difficulty!=='easy'?{x:landing.x+sin*roll,y:landing.y+cos*roll}:{x:sin*(carry+p.roll)+cos*offset,y:cos*(carry+p.roll)-sin*offset};
- if(s&&p.conditions?.difficulty&&p.conditions.difficulty!=='easy'){
+ const roll=rolloutDistance(p,s?lie(landing,s):'fairway'),stock={x:sin*(carry+p.roll)+cos*offset,y:cos*(carry+p.roll)-sin*offset};
+ // Preserve old round samples exactly; new neutral weather shares identical ground rules.
+ const legacy=p.rolloutRules===LEGACY_ROLLOUT,stockPath=legacy?(!p.conditions||p.conditions.difficulty==='easy'):roll===p.roll&&wind.x===0&&wind.y===0;
+ let end=stockPath?stock:{x:landing.x+sin*roll,y:landing.y+cos*roll};
+ if(s&&usesSurfaceRollout(p)){
   let contact=null;for(const h of s.hazards)if(['bunker','trees'].includes(h.kind)){const entry=segmentPolyEntry(landing,end,h.poly);if(entry&&(!contact||Math.hypot(entry.x-landing.x,entry.y-landing.y)<Math.hypot(contact.x-landing.x,contact.y-landing.y)))contact=entry;}if(contact)end={x:contact.x+(end.x-contact.x)*1e-6,y:contact.y+(end.y-contact.y)*1e-6};
  }
  return {...end,landing,big};

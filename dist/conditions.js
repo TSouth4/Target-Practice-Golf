@@ -1,5 +1,9 @@
 // Illustrative, bounded teaching estimates; not a measured aerodynamic model.
 export const CONDITIONS_VERSION='wind-firmness-v1';
+export const LEGACY_ROLLOUT='legacy-v1';
+export const SURFACE_ROLLOUT='surface-v2';
+// Only resumed older rounds opt into the former Easy behavior.
+export const usesSurfaceRollout=p=>p.rolloutRules!==LEGACY_ROLLOUT||!!(p.conditions&&p.conditions.difficulty!=='easy');
 export const CALM={version:CONDITIONS_VERSION,difficulty:'easy',windX:0,windY:0,firmness:'normal'};
 export function validConditions(c,difficulty=c?.difficulty){return !!c&&c.version===CONDITIONS_VERSION&&['easy','medium','hard'].includes(c.difficulty)&&c.difficulty===difficulty&&Number.isFinite(c.windX)&&Number.isFinite(c.windY)&&Math.hypot(c.windX,c.windY)<=15.01&&['soft','normal','firm'].includes(c.firmness)&&(difficulty!=='easy'||c.windX===0&&c.windY===0&&c.firmness==='normal');}
 export function conditionsFor(difficulty='easy',seed=1){
@@ -15,7 +19,8 @@ export function windEffect(aim,p,carry=p.carry){
  return{x:cos*side+sin*forward,y:-sin*side+cos*forward,side,forward};
 }
 export function rolloutDistance(p,kind='fairway'){
- const c=p.conditions;if(!c||c.difficulty==='easy'||!validConditions(c))return p.roll;
+ const saved=p.conditions;if(p.rolloutRules===LEGACY_ROLLOUT&&(!saved||saved.difficulty==='easy'||!validConditions(saved)))return p.roll;
+ const c=validConditions(saved)?saved:CALM;
  if(['bunker','trees','water','ob'].includes(kind))return 0;
  const height=Math.max(.5,Math.min(1.7,(p.height||25)/25)),extra=p.roll===0&&c.firmness==='firm'?Math.min(8,p.carry*.03)/height:0;
  return(p.roll*(c.firmness==='soft'?.35:c.firmness==='firm'?1.6:1)+extra)*(kind==='rough'?.35:1);

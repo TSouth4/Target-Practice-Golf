@@ -1,3 +1,7 @@
+# Consistent ground rollout (17.16.0)
+
+New games share surface-based rollout across Easy, Medium and Hard. Saved earlier rounds retain their original rules, while new-model progress stays separate. See [behavior, compatibility and fixed-case checks](docs/CONSISTENT-GROUND-ROLLOUT.md).
+
 # Mobile full-screen foreground (17.15.1)
 
 Short grass now continues behind the ball instead of exposing a large rough-colored block on tall phone screens. The extra rough strip under the tee is removed. See [scope and checks](docs/MOBILE-FOREGROUND-FIX.md).

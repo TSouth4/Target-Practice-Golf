@@ -1,10 +1,10 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {CALM,CONDITIONS_VERSION,conditionsFor,windEffect,rolloutDistance,conditionsFeedback} from '../dist/conditions.js';
+import {CALM,LEGACY_ROLLOUT,CONDITIONS_VERSION,conditionsFor,windEffect,rolloutDistance,conditionsFeedback} from '../dist/conditions.js';
 import {SCENARIOS,preset,shotAt,samples,evaluate,DEFAULT_COSTS,patternAtTarget,optimizeTargets} from '../dist/model.js';
 import {centerFlight} from '../dist/rollout.js';import {createRound,readRound} from '../dist/rounds.js';import {createCourse,readCourse} from '../dist/course.js';
 const z={z1:0,z2:0,u:1,sign:1},aim={x:0,y:150},base={...preset('5','approach'),carry:150,sdSide:0,sdLong:0,start:0,curve:0,bias:0},weather=(x,y,firmness='normal')=>({...CALM,difficulty:'hard',windX:x,windY:y,firmness});
-test('Easy reproduces original outcomes exactly, including every miss and stock rollout',()=>{
- for(const type of ['tee','approach']){const p=preset('10',type),s=SCENARIOS[type==='tee'?0:2],zs=samples(60,745);assert.deepEqual(evaluate(aim,p,s,DEFAULT_COSTS,zs,true),evaluate(aim,{...p,conditions:CALM},s,DEFAULT_COSTS,zs,true));
+test('explicit legacy rules preserve original Easy outcomes exactly, including misses and stock rollout',()=>{
+ for(const type of ['tee','approach']){const p={...preset('10',type),rolloutRules:LEGACY_ROLLOUT},s=SCENARIOS[type==='tee'?0:2],zs=samples(60,745);assert.deepEqual(evaluate(aim,p,s,DEFAULT_COSTS,zs,true),evaluate(aim,{...p,conditions:CALM},s,DEFAULT_COSTS,zs,true));
  for(const draw of zs){const theta=Math.atan2(aim.x,aim.y),sin=Math.sin(theta),cos=Math.cos(theta),big=draw.u<p.bigPct/100,f=big?2:1,sign=p.bigDirection==='left'?-1:p.bigDirection==='right'?1:draw.sign,carry=Math.max(1,p.carry+p.sdLong*(p.rho*draw.z1+Math.sqrt(1-p.rho*p.rho)*draw.z2)*f-(big?p.bigShort:0)),offset=carry*Math.tan(p.start*Math.PI/180)+p.curve+p.bias+p.sdSide*draw.z1*f+(big?sign*p.bigShift:0);assert.deepEqual(shotAt(aim,{...p,conditions:CALM},draw),{x:sin*(carry+p.roll)+cos*offset,y:cos*(carry+p.roll)-sin*offset,landing:{x:sin*carry+cos*offset,y:cos*carry-sin*offset},big});}}
 });
 test('wind adds to shape without moving the target; opposing wind reduces a fade and height changes sensitivity',()=>{

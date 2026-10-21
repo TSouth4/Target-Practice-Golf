@@ -2,6 +2,8 @@
 
 Prepared October 18, 2026 against app 17.15.0, application commit `686e907`, scoring model `decision-model-v7`. This is a read-only audit: no app, scoring or saved-data changes. It complements [the existing scoring reference](../STROKES-BASELINE.md).
 
+Update: the rollout consistency issue is addressed in [17.16](CONSISTENT-GROUND-ROLLOUT.md), with a separate v8 case report. The observations and numbers below retain the original audit snapshot.
+
 ## Main finding
 
 The app has a statistical foundation, but not every part is measured golf data. Its next-shot costs use a cited historical PGA TOUR reference. Handicap shot patterns, wind, ground response, forest severity and the probabilities used to finish a Par-3 hole contain teaching assumptions.
