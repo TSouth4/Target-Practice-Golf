@@ -1,6 +1,6 @@
 # Target Practice — project plan
 
-Updated October 21, 2026. This is the working order for remaining work; the [launch checklist](LAUNCH-CHECKLIST.md) tracks evidence for the final launch decision.
+Updated October 22, 2026. This is the working order for remaining work; the [launch checklist](LAUNCH-CHECKLIST.md) tracks evidence for the final launch decision.
 
 ## Goal and release path
 
@@ -58,11 +58,25 @@ Before implementation, specify the daily reset timezone, incomplete-round/resume
 
 ## Later roadmap — does not block the planned launch
 
-- **Daily/all-time leaderboards and weekend tournaments:** Shared event setup, fair profile/condition divisions, attempt/tie rules, timezone windows and trusted server-side eligibility/results. Keep incompatible scoring versions separate. No entry fees or prizes are currently planned.
+- **Open-entry scheduled tournaments and leaderboards:** Use the event format below, after accounts and trusted scoring are ready. This is a later engagement feature, not a launch blocker.
 - **GHIN and handicap trends:** Begin with optional dated self-reports if useful. Investigate authorized USGA/GHIN access, agreements, permitted uses and fees before promising integration. Obtain consent and support unlinking/deletion. Correlation with app usage is not proof the app caused improvement.
 - **Elevation physics:** Make height effects on carry, landing, rollout and recommendations agree; decorative elevation is not physical calibration.
 - **Full multi-shot courses, real-course recreation and uploaded-hole conversion:** Exploratory scope. Future multi-shot courses should preserve a single generated hole and advance from the actual shot result; no launch commitment.
 - **Phone installation/native apps:** Start with the mobile-friendly web app. Consider PWA installation/offline behavior or app-store releases only when users establish a need; none is currently promised.
+
+## Planned open-entry tournaments — added October 22, 2026
+
+**Purpose:** Attract golfers to the app and encourage return visits. Tournament entry is available without a paid membership or entry fee. This changes the tournament proposal, not the planned free/paid membership offering. Paid-entry prize pools and a hosting cut are not the chosen format.
+
+- **Fixed event setup:** Publish one repeatable course, a standard shot profile, difficulty and per-hole conditions shared by all entrants. Settings can change between events (for example, this week's event uses a particular handicap profile and Easy conditions), but remain locked within an event. Lock the scoring/generator versions too; custom profiles cannot alter competitive play. A 15-handicap profile was an example, not an existing preset or a committed addition; current presets are 0, 5, 10 and 20.
+- **Two separate leaderboards/award categories:** Lowest simulated golf score and highest average decision score. Explain that golf score includes sampled-shot/finish luck, while the decision score evaluates target selection. Define eligible completed rounds, calculation/rounding and tie handling before launch; do not silently combine the categories into one ranking.
+- **One eligible attempt:** No restart or optional retry that can replace a committed tournament choice or resample its outcome. Mandatory OB retees and penalties remain part of the same hole. Keep learning retries separate and unranked; decide when they become available to avoid undermining the event's fairness.
+- **Reconnect, not reroll:** Save accepted commitments and selected outcomes on the server. A disconnected golfer resumes that same round; refreshes, duplicate requests or another device must not create another outcome. Define when an attempt starts, interrupted-submit handling, the resumption deadline and treatment of unfinished rounds. Entrants should not lose progress solely because a phone connection drops.
+- **Scheduled events:** Start with a one-day event with clear opening/closing times and timezone. Two- or four-day events can follow once the foundation works; specify whether each day has a new round, which rounds count and how totals/averages are calculated. Those details remain open.
+- **Trusted results:** Require suitable accounts/identity and enforce attempt limits, commitments and score eligibility on trusted server services. Address altered browser results, repeated accounts, shared answers and reporting/disputes. Browser-local scores are not sufficient for valuable prizes; public leaderboard names also need appropriate privacy/moderation choices.
+- **Prizes later:** Pilot the event without prizes first. Potential later prizes can recognize each category, subject to a defined budget, official rules, eligibility/jurisdiction review, provider compatibility and any applicable prize/tax obligations. No prize amount, funding arrangement or promise is approved. Free entry alone does not remove the need for this review.
+
+**Dependency order:** Accounts and secure storage → server-verified tournament scoring/attempt recovery → private no-prize event test → approved open event → prizes after the required review. This complements the daily three-hole challenge and does not replace it. Public access and awarding prizes require Tyler's explicit approval; this roadmap addition does not authorize either.
 
 ## Ownership and launch controls
 
