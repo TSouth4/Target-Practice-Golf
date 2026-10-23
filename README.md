@@ -1,3 +1,7 @@
+# Beginner wording review (17.16.2)
+
+Targeted Introduction and Lessons edits explain golf terms and make instructions more conversational. Scoring, examples and lesson flow are unchanged. See [review and checks](docs/BEGINNER-WORDING-REVIEW.md).
+
 # Introduction context (17.16.1)
 
 Two opening slides explain thoughtful target selection and why direction/carry are separate choices before the existing controls practice. See [wording and verification](docs/INTRODUCTION-CONTEXT.md).

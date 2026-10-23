@@ -4,18 +4,18 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
  const $=get;
  function render(){
   $('controlsStep').textContent=step===6?'INTRODUCTION COMPLETE':`INTRODUCTION · ${step+3} / 8`;
-  $('controlsTitle').textContent=step<0?['Your target is a choice','Build a better pre-shot habit'][step+2]:['Choose direction','Set intended carry','Commit your choice','Why we use shot dispersion','Why we use carry','What makes a good decision?','Ready for your baseline'][step];
+  $('controlsTitle').textContent=step<0?['Your target is a choice','Build a better pre-shot habit'][step+2]:['Choose direction','Set intended carry','Commit your choice','Why we use shot dispersion','Why we use carry','What makes a good decision?','Ready for your starting assessment'][step];
   $('controlsText').textContent=step<0?[
    'It is easy to aim at the flag or the middle of the fairway out of habit. But the obvious target is not always the best fit for your shot pattern and the trouble around it. Before each shot, pause to choose where you want the ball to land.',
    'Target Practice helps you learn what to look for, test different targets, and build a routine you can take onto the course. Each target has two parts: direction and carry distance. We ask you to set them separately so you think through both—not just where to aim, but how far the ball should carry. Next, try each control.'
   ][step+2]:[
    'First, choose direction. Tap or drag left or right on the practice range. This chooses direction; tapping farther up does not change distance. You can also focus the range and use the arrow keys.',
    'Next, choose distance. Move the Intended carry bar to change distance. Carry is the distance before the ball first lands. Roll depends on the ground, so we choose carry separately.',
-   'Choose Commit practice click. In a game, Commit & shoot locks your choice and reveals example shot flights. This exercise does not judge your target.',
+   'Choose Try Commit & shoot. In a game, this button locks in your target and shows the simulated shots. Here, you are just practicing the controls—your target is not graded.',
    'Your target is one point, but normal shots finish across an area. This is your shot pattern, or dispersion. We simulate thousands of shots to show the range of possible outcomes—not where your next ball is guaranteed to finish.',
    'Carry is the distance before the ball first lands. It gives us a more consistent starting point than total distance, because rollout changes with the ground and conditions. Wind can change carry too, so read the conditions before choosing.',
-   'We judge the choice, not one lucky or unlucky ball. Too much risk brings trouble into your pattern; too much caution can leave an unnecessarily hard next shot. Practice comparing these tradeoffs to build habits you can take onto the course.',
-   'You know the controls. The 10-shot assessment captures your starting choices without coaching between shots. Its report appears at the end. Strategy lessons can follow.'
+   'We judge the choice, not one lucky or unlucky ball. Too much risk brings trouble into your pattern; too much caution can leave an unnecessarily hard next shot. Try different targets to learn when the extra risk is worth it. That is a habit you can take onto the course.',
+   'You know the controls. The 10-shot assessment gives you a starting point to compare with later. Make your choices without hints, then see your results at the end. After that, try the lessons.'
   ][step];
   $('controlsMarker').setAttribute('transform',`translate(${300+side*2},${220-(carry-50)/180*150})`);
   $('controlsRange').setAttribute('tabindex',step===0?'0':'-1');$('controlsCarry').value=String(carry);$('controlsCarryOut').textContent=`${carry} yd`;$('controlsCarry').disabled=step!==1;
@@ -23,7 +23,7 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
   $('controlsRange').style.display=step<0||step>=3?'none':'';$('controlsCarry').hidden=step<0||step>=3;$('controlsCarryOut').parentElement?.toggleAttribute('hidden',step<0||step>=3);
   $('controlsAssessment').textContent=step===6?'Go to 10-shot assessment':'Skip tutorial and view assessment setup';$('controlsAssessment').classList.toggle('primary',step===6);$('controlsAssessment').classList.toggle('secondary',step!==6);
   $('controlsBack').hidden=step===-2||step===6;$('controlsCommit').hidden=step!==2;$('controlsStrategy').hidden=step!==6;
-  $('controlsStatus').textContent=step<0?'Choose Next to continue, or view assessment setup if you already know the app.':step===0?(aimed?'Direction selected. Choose Next.':'Choose a direction to continue, or go straight to the assessment.'):step===1?(moved?'Carry changed. Choose Next.':'Move the carry bar to practice changing distance.'):step===2?'No ideal target or score will be shown.':step<6?'Choose Next to continue.':'Introduction complete. No scored decision was recorded.';
+  $('controlsStatus').textContent=step<0?'Choose Next to continue, or view assessment setup if you already know the app.':step===0?(aimed?'Direction selected. Choose Next.':'Choose a direction to continue, or go straight to the assessment.'):step===1?(moved?'Carry changed. Choose Next.':'Move the carry bar to practice changing distance.'):step===2?'This is just button practice. Your target will not be graded.':step<6?'Choose Next to continue.':'Introduction complete. This practice does not affect your scores.';
   for(const [id,on]of [['controlsRange',step===0],['controlsCarry',step===1],['controlsCommit',step===2]])$(id).classList.toggle('control-highlight',on);
  }
  function close(restore=true){if(!opened)return;opened=false;drag=null;$('controlsDialog').hidden=true;$('mainContent').inert=false;$('appHeader').inert=false;if(restore)focusTarget?.focus?.();}
