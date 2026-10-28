@@ -1,0 +1,112 @@
+{
+  "freshStart": {
+    "scenario": "cedar",
+    "holeSeed": 0,
+    "shotSeed": 7142026
+  },
+  "reenterPreservesLayout": true,
+  "familyCount": 16,
+  "filters": {
+    "mixed": {
+      "samples": 1000,
+      "counts": {
+        "creek-par3": 63,
+        "drivable": 65,
+        "water": 56,
+        "narrow": 61,
+        "split": 66,
+        "creek-tee": 63,
+        "bowl": 62,
+        "squeeze-par4": 58,
+        "par5-carry": 59,
+        "shore-tee": 63,
+        "tucked": 64,
+        "cedar": 64,
+        "bend": 64,
+        "shore-green": 63,
+        "par5-open": 67,
+        "sharp-dogleg": 62
+      },
+      "uniqueGeometry": 1000,
+      "adjacentRepeats": 0,
+      "sameTypePairs": 0,
+      "fallbacks": 0,
+      "firstTwelve": [
+        "creek-par3",
+        "drivable",
+        "water",
+        "narrow",
+        "split",
+        "creek-tee",
+        "bowl",
+        "squeeze-par4",
+        "par5-carry",
+        "drivable",
+        "water",
+        "narrow"
+      ]
+    },
+    "tee": {
+      "samples": 1000,
+      "counts": {
+        "shore-tee": 124,
+        "drivable": 124,
+        "cedar": 124,
+        "sharp-dogleg": 126,
+        "narrow": 124,
+        "creek-tee": 127,
+        "bend": 125,
+        "squeeze-par4": 126
+      },
+      "uniqueGeometry": 1000,
+      "adjacentRepeats": 0,
+      "sameTypePairs": 999,
+      "fallbacks": 0,
+      "firstTwelve": [
+        "shore-tee",
+        "drivable",
+        "cedar",
+        "sharp-dogleg",
+        "narrow",
+        "creek-tee",
+        "bend",
+        "shore-tee",
+        "drivable",
+        "cedar",
+        "sharp-dogleg",
+        "squeeze-par4"
+      ]
+    },
+    "approach": {
+      "samples": 1000,
+      "counts": {
+        "creek-par3": 127,
+        "bowl": 124,
+        "water": 124,
+        "par5-open": 126,
+        "split": 124,
+        "par5-carry": 127,
+        "tucked": 125,
+        "shore-green": 123
+      },
+      "uniqueGeometry": 1000,
+      "adjacentRepeats": 0,
+      "sameTypePairs": 999,
+      "fallbacks": 0,
+      "firstTwelve": [
+        "creek-par3",
+        "bowl",
+        "water",
+        "par5-open",
+        "split",
+        "par5-carry",
+        "tucked",
+        "shore-green",
+        "bowl",
+        "water",
+        "par5-open",
+        "creek-par3"
+      ]
+    }
+  }
+}

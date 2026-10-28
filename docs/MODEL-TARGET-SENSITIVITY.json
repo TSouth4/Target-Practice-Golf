@@ -1,0 +1,422 @@
+[
+  {
+    "key": "front-water",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.5973613143579466
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.4457763522313014
+          },
+          {
+            "label": "short layup from regression example",
+            "expected": 3.6199517595126953
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.447357420220106
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.589214554692393
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.452820928205548
+          },
+          {
+            "label": "short layup from regression example",
+            "expected": 3.62619287079432
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.4405096866866294
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.586765736206402
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.4575801616409643
+          },
+          {
+            "label": "short layup from regression example",
+            "expected": 3.6216117362953475
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.454155528313986
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "tucked-flag",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.2875213648549475
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.0687999962715824
+          },
+          {
+            "label": "far safe-side green target",
+            "expected": 3.380518261996296
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.021114336157658
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.3125381867297836
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.065258828190846
+          },
+          {
+            "label": "far safe-side green target",
+            "expected": 3.38069949378155
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.0311468964495716
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.30935379091415
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.0663562220608003
+          },
+          {
+            "label": "far safe-side green target",
+            "expected": 3.3771811997552152
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.018548072231428
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "crossing-creek-longer",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.840268125222744
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.8542347422612946
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 3.9806971233842954
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 3.8793357792520435
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.7829155773878784
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.844407516779387
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.8549163472712586
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 3.986456005559061
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 3.89012270403582
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.7880850761362397
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.842735412075062
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.850387407379558
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 3.980459957333768
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 3.8810729496938037
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.7821046759173305
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "crossing-creek-shorter",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.732098219662407
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.737654822247842
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 4.395177249701416
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 4.661779103120272
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.09941911595728
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.773607880696484
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.773967747737391
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 4.41175646367733
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 4.694425687732719
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.103974586116925
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.766730444793812
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.769896353661125
+          },
+          {
+            "label": "before creek (capped if unreachable)",
+            "expected": 4.399081410180341
+          },
+          {
+            "label": "beyond creek (capped if unreachable)",
+            "expected": 4.694636800431125
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.098860783144107
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "sharp-dogleg",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.828094765915408
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.891740156260281
+          },
+          {
+            "label": "straight at selected depth",
+            "expected": 5.2163160807782285
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.464038484856353
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.822721470603539
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.87927029645174
+          },
+          {
+            "label": "straight at selected depth",
+            "expected": 5.225118436269377
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.467182125669963
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 4.81451941441742
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 4.869944022696047
+          },
+          {
+            "label": "straight at selected depth",
+            "expected": 5.225824627482773
+          },
+          {
+            "label": "best sampled target",
+            "expected": 4.467908263582833
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "long-par3",
+    "runs": [
+      {
+        "seed": 112358,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.7503272274672845
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.575963053488239
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.53540602055107
+          }
+        ]
+      },
+      {
+        "seed": 271828,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.760169944525478
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.5815929866444307
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.5344155461581557
+          }
+        ]
+      },
+      {
+        "seed": 314159,
+        "targets": [
+          {
+            "label": "flag direction/carry (capped if unreachable)",
+            "expected": 3.762569338335678
+          },
+          {
+            "label": "green center (capped if unreachable)",
+            "expected": 3.575798387286109
+          },
+          {
+            "label": "best sampled target",
+            "expected": 3.5340909508965286
+          }
+        ]
+      }
+    ]
+  }
+]
