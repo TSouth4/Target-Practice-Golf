@@ -1,3 +1,7 @@
+# Optional assessment shot review (17.18.0)
+
+Completed assessments have a collapsed View shot results section with expandable explanations. High-score verdicts acknowledge small adjustments, and play-screen essentials remain available across phone/desktop and fullscreen layouts. See [behavior and checks](docs/ASSESSMENT-SHOT-REVIEW.md).
+
 # Fresh Practice sessions (17.17.0)
 
 New practice starts a fresh layout; Continue practice restores your saved hole and target. Mixed varies shot order, and switching to Practice preserves an active round. See [behavior, checks and integration notes](docs/FRESH-PRACTICE-SESSIONS.md).

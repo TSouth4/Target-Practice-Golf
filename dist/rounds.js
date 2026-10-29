@@ -1,3 +1,4 @@
+import {validAssessmentNote} from './assessment-review.js';
 import {MODEL_VERSION} from './progress.js';
 import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
@@ -33,7 +34,7 @@ export function readRound(raw){
   if(!Array.isArray(r.schedule)||r.schedule.length!==count||!Number.isInteger(r.index)||r.index<0||r.index>=count||!Array.isArray(r.answers)||r.answers.length>count)return null;
   if(!validPlayerProfile(r.profile)||!validConditionSchedule(r.profile,r.schedule,r.kind==='assessment'))return null;
   if(r.schedule.some(s=>!SCENARIOS.some(b=>b.id===s.id)||!Number.isInteger(s.holeSeed)||s.holeSeed<=0||!Number.isInteger(s.drawSeed)||s.drawSeed<=0))return null;
-  if(r.answers.some((a,i)=>!a||a.index!==i||!['balanced','aggressive','conservative','refine'].includes(a.kind)||!Number.isFinite(a.score)||a.score<0||a.score>100||!(a.regret===null||Number.isFinite(a.regret)&&a.regret>=0)||!Number.isFinite(a.dx)||!Number.isFinite(a.dy)))return null;
+  if(r.answers.some((a,i)=>!a||a.index!==i||!['balanced','aggressive','conservative','refine'].includes(a.kind)||!Number.isFinite(a.score)||a.score<0||a.score>100||!(a.regret===null||Number.isFinite(a.regret)&&a.regret>=0)||!Number.isFinite(a.dx)||!Number.isFinite(a.dy)||!validAssessmentNote(a.review)))return null;
   if(r.answers.length<r.index||r.answers.length>r.index+1||r.status==='complete'&&r.answers.length!==count)return null;
   return r;
  }catch{return null;}
