@@ -1,3 +1,7 @@
+# Fresh Practice sessions (17.17.0)
+
+New practice starts a fresh layout; Continue practice restores your saved hole and target. Mixed varies shot order, and switching to Practice preserves an active round. See [behavior, checks and integration notes](docs/FRESH-PRACTICE-SESSIONS.md).
+
 # Beginner wording review (17.16.2)
 
 Targeted Introduction and Lessons edits explain golf terms and make instructions more conversational. Scoring, examples and lesson flow are unchanged. See [review and checks](docs/BEGINNER-WORDING-REVIEW.md).

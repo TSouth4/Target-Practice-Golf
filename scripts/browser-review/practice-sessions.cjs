@@ -1,0 +1,12 @@
+const {chromium}=require(process.env.TARGET_PRACTICE_PLAYWRIGHT||'playwright-core');const assert=require('node:assert/strict');
+(async()=>{const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{for(const width of [1440,390,320]){const c=await b.newContext({viewport:{width,height:844},reducedMotion:'reduce'}),p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(process.env.TARGET_PRACTICE_BASE_URL||'http://127.0.0.1:8810');
+const snapshot=()=>p.evaluate(()=>JSON.parse(localStorage.getItem('target-practice-free-session-v1')));
+await p.locator('#homePractice').click();const first=await snapshot();assert.ok(first.holeSeed>0);
+await p.locator('#aimY').fill('180');const selected=await snapshot();assert.ok(selected.hasAim);
+await p.locator('#homeLogo').click();await p.locator('#homeLearning').click();const round=await p.evaluate(()=>localStorage.getItem('target-practice-round-v1'));
+await p.locator('#homeLogo').click();await p.locator('#homeContinuePractice').click();assert.deepEqual((await snapshot()).aim,selected.aim);
+await p.reload();await p.locator('#homeContinuePractice').click();assert.equal((await snapshot()).holeSeed,selected.holeSeed);
+await p.locator('#homeLogo').click();await p.locator('#homeContinue').click();assert.equal(await p.evaluate(()=>localStorage.getItem('target-practice-round-v1')),round);
+await p.locator('#homeLogo').click();await p.locator('#homePractice').click();const fresh=await snapshot();assert.notEqual(fresh.scenario,first.scenario);assert.notEqual(fresh.holeSeed,first.holeSeed);
+await p.locator('#aimY').fill('180');const commitSeed=(await snapshot()).seed;await p.locator('#simulate').click();await p.locator('#results').waitFor({state:'visible',timeout:60000});await p.locator('#retryThisHole').click();assert.equal((await snapshot()).seed,commitSeed);assert.equal((await snapshot()).holeSeed,fresh.holeSeed);
+assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);assert.deepEqual(errors,[]);console.log('Fresh/continue, reload, paused round, Retry, width',width,'passed');await c.close();}}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

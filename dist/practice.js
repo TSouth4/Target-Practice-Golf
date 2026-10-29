@@ -6,9 +6,9 @@ export const PRACTICE_SEQUENCE=['cedar','water','bend','tucked','drivable','bowl
 export function nextScenario(id,filter='mixed',seed=1,recent=[]){
  const typeOf=key=>SCENARIOS.find(s=>s.id===key)?.type;
  const allowed=PRACTICE_SEQUENCE.filter(key=>(filter==='mixed'||typeOf(key)===filter)&&key!==id);
- // Keep a short history, then prefer the other shot type in mixed practice.
+ // Avoid recent families. Mixed can repeat a shot type, but not four in a row.
  let fresh=allowed.filter(key=>!recent.includes(key));if(!fresh.length)fresh=allowed;
- if(filter==='mixed'){const opposite=fresh.filter(key=>typeOf(key)!==typeOf(id));if(opposite.length)fresh=opposite;}
+ if(filter==='mixed'&&recent.length>=3&&recent.slice(-3).every(key=>typeOf(key)===typeOf(id))){const opposite=fresh.filter(key=>typeOf(key)!==typeOf(id));if(opposite.length)fresh=opposite;}
  return fresh[Math.floor(random(seed)()*fresh.length)];
 }
 export function generateScenario(base,seed=0){

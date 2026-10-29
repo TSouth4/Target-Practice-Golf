@@ -12,3 +12,11 @@ test('storage failure rolls back touched keys, including missing keys, and repor
 test('empty backup is valid and invalid restore inputs never overwrite existing data',()=>{const empty=makeBackup({},at),storage=memory([[PROGRESS_KEY,'keep']]);assert.equal(backupSummary(empty).activeRound,null);assert.equal(backupSummary(empty).decisions,0);assert.throws(()=>restoreBackup(storage,{...empty,version:99}));assert.equal(storage.getItem(PROGRESS_KEY),'keep');});
 
 test('controls completion survives backups without requiring it in older files',()=>{const b=fixture();b.data[SETTINGS_KEY].controlsTutorialSeen=true;assert.equal(parseBackup(JSON.stringify(b)).data[SETTINGS_KEY].controlsTutorialSeen,true);delete b.data[SETTINGS_KEY].controlsTutorialSeen;assert.equal(parseBackup(JSON.stringify(b)).data[SETTINGS_KEY].controlsTutorialSeen,undefined);b.data[SETTINGS_KEY].controlsTutorialSeen='yes';assert.throws(()=>parseBackup(JSON.stringify(b)));});
+
+test('new Practice and paused-round slots round-trip while older backups remain accepted',async()=>{
+ const {PRACTICE_KEY,PAUSED_ROUND_KEY}=await import('../dist/practice-session.js');const b=fixture();
+ b.data[PRACTICE_KEY]={version:1,scenario:'water',holeSeed:578,seed:1234,landscape:'woodland',aim:{x:0,y:130},hasAim:true,practiceFilter:'approach',recent:['water'],encounter:'saved-practice'};
+ b.data[PAUSED_ROUND_KEY]=b.data[ROUND_KEY];const copy=parseBackup(JSON.stringify(b));assert.deepEqual(copy.data[PRACTICE_KEY],b.data[PRACTICE_KEY]);assert.deepEqual(copy.data[PAUSED_ROUND_KEY],b.data[ROUND_KEY]);
+ const storage=memory();restoreBackup(storage,copy);assert.deepEqual(JSON.parse(storage.getItem(PRACTICE_KEY)),b.data[PRACTICE_KEY]);
+ delete b.data[PRACTICE_KEY];delete b.data[PAUSED_ROUND_KEY];const legacy=parseBackup(JSON.stringify(b));assert.equal(legacy.data[PRACTICE_KEY],null);assert.equal(legacy.data[PAUSED_ROUND_KEY],null);
+});

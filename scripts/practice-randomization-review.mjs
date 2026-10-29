@@ -7,7 +7,7 @@ const dom=setupDOM();dom.storage.delete('golfaim101-v2');
 await import('../dist/app.js?practice-randomization-review');
 await dom.$('homePractice').fire('click');
 const saved=()=>JSON.parse(dom.storage.get('golfaim101-v2'));
-const first=saved();await dom.$('homeLogo').fire('click',{preventDefault(){}});await dom.$('homePractice').fire('click');
+const first=saved();await dom.$('homeLogo').fire('click',{preventDefault(){}});await dom.$('homeContinuePractice').fire('click');
 assert.equal(saved().scenario,first.scenario);assert.equal(saved().holeSeed,first.holeSeed);
 const report={freshStart:{scenario:first.scenario,holeSeed:first.holeSeed,shotSeed:first.seed},reenterPreservesLayout:true,familyCount:PRACTICE_SEQUENCE.length,filters:{}};
 for(const filter of ['mixed','tee','approach']){

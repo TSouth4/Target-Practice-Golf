@@ -23,7 +23,7 @@ test('a long mixed session visits every architecture without exact layout repeti
  const seen=new Set(),families=new Set();let id='cedar',recent=[id];
  for(let i=1;i<=240;i++){
   const seed=7142026+i*7919,next=nextScenario(id,'mixed',seed,recent),base=SCENARIOS.find(s=>s.id===next),s=generateScenario(base,seed);
-  assert.notEqual(next,id);assert.notEqual(base.type,SCENARIOS.find(b=>b.id===id).type);
+  assert.notEqual(next,id);
   if(i>6)assert.ok(!recent.includes(next));
   const signature=createHash('sha256').update(JSON.stringify({fairway:s.fairway,green:s.green,pin:s.pin,hazards:s.hazards})).digest('hex');
   assert.ok(!seen.has(signature));seen.add(signature);families.add(next);id=next;recent=[...recent,id].slice(-6);

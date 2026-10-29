@@ -1,3 +1,4 @@
+import {PRACTICE_KEY,PAUSED_ROUND_KEY,readPractice} from './practice-session.js';
 import {PROGRESS_KEY,readProgress,HISTORY_LIMIT} from './progress.js';
 import {ROUND_HISTORY_KEY,readRoundHistory,ROUND_HISTORY_LIMIT} from './dashboard.js';
 import {ROUND_KEY,readRound} from './rounds.js';
@@ -8,7 +9,8 @@ import {SCENARIOS,DEFAULT_COSTS} from './model.js';
 import {validPlayerProfile,SHOT_FIELDS} from './shot-editor.js';
 import {LANDSCAPES} from './landscape.js';
 export const SETTINGS_KEY='golfaim101-v2',BACKUP_VERSION=1,BACKUP_MAX_BYTES=5*1024*1024;
-const keys=[SETTINGS_KEY,PROGRESS_KEY,ROUND_HISTORY_KEY,ROUND_KEY,COURSE_KEY,LESSON_KEY,INTRO_KEY];
+const requiredKeys=[SETTINGS_KEY,PROGRESS_KEY,ROUND_HISTORY_KEY,ROUND_KEY,COURSE_KEY,LESSON_KEY,INTRO_KEY];
+const keys=[...requiredKeys,PRACTICE_KEY,PAUSED_ROUND_KEY];
 const fail=()=>{throw Error('This file is not a complete, supported Target Practice backup. Your current data has not been changed.');};
 const json=value=>JSON.stringify(value);
 function safeTree(value,depth=0){if(depth>32)fail();if(typeof value==='number'&&!Number.isFinite(value)||typeof value==='string'&&value.includes('<'))fail();if(value&&typeof value==='object')for(const[k,v]of Object.entries(value)){if(['__proto__','prototype','constructor'].includes(k))fail();safeTree(v,depth+1);}}
@@ -24,16 +26,17 @@ function settings(s){
 }
 export function validateBackup(value){
  if(!value||value.format!=='target-practice-backup'||value.version!==BACKUP_VERSION||!Number.isFinite(Date.parse(value.createdAt))||!value.data||typeof value.data!=='object')fail();safeTree(value);
- const d=value.data;if(keys.some(k=>!Object.hasOwn(d,k))||Object.keys(d).some(k=>!keys.includes(k)))fail();
+ const d=value.data;if(requiredKeys.some(k=>!Object.hasOwn(d,k))||Object.keys(d).some(k=>!keys.includes(k)))fail();
  const progress=readProgress(d[PROGRESS_KEY]),history=readRoundHistory(d[ROUND_HISTORY_KEY]);
  if(!Array.isArray(d[PROGRESS_KEY])||d[PROGRESS_KEY].length>HISTORY_LIMIT||progress.length!==d[PROGRESS_KEY].length||!Array.isArray(d[ROUND_HISTORY_KEY])||d[ROUND_HISTORY_KEY].length>ROUND_HISTORY_LIMIT||history.length!==d[ROUND_HISTORY_KEY].length)fail();
  const round=d[ROUND_KEY]===null?null:readRound(json(d[ROUND_KEY])),course=d[COURSE_KEY]===null?null:readCourse(d[COURSE_KEY]);if(d[ROUND_KEY]!==null&&!round||d[COURSE_KEY]!==null&&!course)fail();
  const lesson=d[LESSON_KEY];if(!lesson||lesson.version!==CURRICULUM_VERSION||!Array.isArray(lesson.completed)||readLessonCompletion(json(lesson)).length!==lesson.completed.length)fail();
+ const free=d[PRACTICE_KEY]==null?null:readPractice(json(d[PRACTICE_KEY])),paused=d[PAUSED_ROUND_KEY]==null?null:readRound(json(d[PAUSED_ROUND_KEY]));if(d[PRACTICE_KEY]!=null&&!free||d[PAUSED_ROUND_KEY]!=null&&!paused)fail();
  const intro=d[INTRO_KEY];if(intro!==null&&(!intro||intro.version!==INTRO_VERSION||!['completed','skipped'].includes(intro.status)))fail();
- return {format:value.format,version:BACKUP_VERSION,createdAt:value.createdAt,data:{[SETTINGS_KEY]:settings(d[SETTINGS_KEY]),[PROGRESS_KEY]:progress,[ROUND_HISTORY_KEY]:history,[ROUND_KEY]:round,[COURSE_KEY]:course,[LESSON_KEY]:{version:CURRICULUM_VERSION,completed:lesson.completed},[INTRO_KEY]:intro}};
+ return {format:value.format,version:BACKUP_VERSION,createdAt:value.createdAt,data:{[SETTINGS_KEY]:settings(d[SETTINGS_KEY]),[PROGRESS_KEY]:progress,[ROUND_HISTORY_KEY]:history,[ROUND_KEY]:round,[COURSE_KEY]:course,[LESSON_KEY]:{version:CURRICULUM_VERSION,completed:lesson.completed},[INTRO_KEY]:intro,[PRACTICE_KEY]:free,[PAUSED_ROUND_KEY]:paused}};
 }
-export function makeBackup({state=null,progress=[],completedRounds=[],round=null,course=null,lessons=[],introductionSeen=false},createdAt=new Date().toISOString()){
- return validateBackup({format:'target-practice-backup',version:BACKUP_VERSION,createdAt,data:{[SETTINGS_KEY]:state,[PROGRESS_KEY]:progress,[ROUND_HISTORY_KEY]:completedRounds,[ROUND_KEY]:round,[COURSE_KEY]:course,[LESSON_KEY]:{version:CURRICULUM_VERSION,completed:lessons},[INTRO_KEY]:introductionSeen?{version:INTRO_VERSION,status:'completed'}:null}});
+export function makeBackup({state=null,progress=[],completedRounds=[],round=null,course=null,freeSession=null,pausedRound=null,lessons=[],introductionSeen=false},createdAt=new Date().toISOString()){
+ return validateBackup({format:'target-practice-backup',version:BACKUP_VERSION,createdAt,data:{[PRACTICE_KEY]:freeSession,[PAUSED_ROUND_KEY]:pausedRound,[SETTINGS_KEY]:state,[PROGRESS_KEY]:progress,[ROUND_HISTORY_KEY]:completedRounds,[ROUND_KEY]:round,[COURSE_KEY]:course,[LESSON_KEY]:{version:CURRICULUM_VERSION,completed:lessons},[INTRO_KEY]:introductionSeen?{version:INTRO_VERSION,status:'completed'}:null}});
 }
 export function parseBackup(text){if(typeof text!=='string'||new TextEncoder().encode(text).length>BACKUP_MAX_BYTES)throw Error('Choose a backup file smaller than 5 MB.');try{return validateBackup(JSON.parse(text));}catch(error){if(error instanceof SyntaxError)fail();throw error;}}
 export function backupSummary(backup){const d=backup.data,r=d[ROUND_KEY]?.status==='active'?d[ROUND_KEY]:d[COURSE_KEY]?.status==='active'?d[COURSE_KEY]:null;return {decisions:d[PROGRESS_KEY].length,rounds:d[ROUND_HISTORY_KEY].length,lessons:d[LESSON_KEY].completed.length,customShot:!!d[SETTINGS_KEY]?.memberBag,activeRound:r?`${r.kind==='course'?'Par-3 course':r.kind==='assessment'?'Assessment':'Learning round'} · ${r.index+1} of ${r.schedule.length}`:null};}
