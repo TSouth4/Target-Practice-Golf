@@ -37,3 +37,15 @@ Browser scripts: `scripts/browser-review/assessment-shot-review.cjs` and `script
 ## Work integration
 
 Based on repository 17.17.0. The separately discussed dark/light navigation mockups and newer external Work changes are not included. Merge these changes into Work's latest app rather than replacing its newer UI wholesale. No app hosting, billing or production deployment was changed.
+
+## Work integration verification (2026-10-29)
+
+Merged into the hosted 17.17.0 source. Existing branding/navigation, fresh-session and backup modules, startup diagnostics, heavy-rough appearance trial and hosting identity were preserved. Alternate dark/light navigation designs remain mockups only. Published assets include the entire matching dist and a 44-file versioned release.
+
+The full merged suite ran 254 tests: 253 passed; the saved-practice test failed solely on x-coordinate floating-point roundoff (12.000000000000007 versus 12.000000000000005). Its target assertion now allows less than 1e-9 yards of numeric roundoff, while exact seed, family and history assertions remain. All 14 focused tests subsequently passed, including the affected session test, new assessment tests and hosted module/Commit/Retry regressions. This is a full-suite run plus affected-file reruns, not a second complete suite run. Syntax and asset checks passed.
+
+Managed Chrome completed an actual ten-shot assessment using the real controls. Individual coaching and shot review remained hidden during play. Completion produced ten collapsed disclosures with original per-shot explanations. Report reopening after Home/reload retained the same aggregate score and ten notes. Report expansion passed in 320×740 and 390×844 embedded phone viewports without horizontal overflow. App-origin console inspection returned no errors.
+
+The 320-pixel full-screen check exposed overlapping heading, yardages and assessment progress after adding the profile summary. Portrait spacing was adjusted; final measured header/yardage/progress regions no longer overlap. Landscape assessment progress was moved beside the yardages; 844×390 preview checked visible profile, green yardages and progress without horizontal overflow. Screenshots were reviewed. Phone full-screen testing used the page-filling fallback, not physical-device native fullscreen. Physical-phone and Safari testing remain unverified. Temporary QA pages were removed before packaging.
+
+Model/scoring modules are unchanged. Current private access and invited viewers are retained. Detailed report retention remains limited to the current saved assessment as described above.

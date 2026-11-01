@@ -1,3 +1,5 @@
+> Run `npm run prepare:assets` before starting the static preview server. Repeat after modifying root modules or `dist/styles.css` so the preview loads the updated release.
+
 # Target Practice — first browser review
 
 ## Update: v12.7 intended carry and observed assessment flights

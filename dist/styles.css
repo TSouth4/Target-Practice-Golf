@@ -333,3 +333,27 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 }
 @media(prefers-reduced-motion:reduce){button{transition:none}.primary:not(:disabled):active,.secondary:not(:disabled):active{transform:none}}
 .controls-heading .eyebrow{letter-spacing:1.2px;white-space:nowrap}
+
+/* Leave room for wrapped par/shot/profile headings on narrow full-screen views. */
+@media(max-width:760px) and (orientation:portrait){
+ .immersive-mode .course-readouts{top:108px}
+ .immersive-mode #roundStatus{top:166px;line-height:1.4}
+ .immersive-mode #courseBar{top:166px}
+ .immersive-mode.review-mode:not(.course-mode) #results{top:166px}
+ .immersive-mode.review-mode.learning-round-mode #results{top:212px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .immersive-mode #roundStatus{top:86px;left:auto;right:80px;max-width:calc(100% - 420px)}
+}
+
+/* Keep the modal heading and paired actions inside very narrow viewports. */
+@media(max-width:360px){
+ .controls-dialog .course-setup-card{padding:14px}
+ .controls-heading{gap:8px}
+ .controls-heading .eyebrow{font-size:9px;letter-spacing:.7px}
+ .controls-heading #controlsClose{padding:10px 12px}
+}
+@media(max-width:360px){
+ .controls-actions #controlsBack{flex:1 1 100px;min-width:100px;padding-inline:14px}
+ .controls-actions #controlsNext{flex:2 1 112px;min-width:112px;padding-inline:14px}
+}

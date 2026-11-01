@@ -25,3 +25,6 @@ Only wording changed. Model calculations, fixtures, completion storage, lesson s
 ## Applying alongside Work's preview
 
 The recovery-area preview created separately in Work is not present in this repository checkout. Preserve that preview when applying these changes; do not replace Work's newer app wholesale with this branch. Merge the wording changes from `dist/controls-tutorial.js`, `dist/curriculum.js`, `dist/introduction.js` and the relevant sections of `dist/index.html` into the latest Work version.
+
+
+Work validation: 11 targeted native tests passed, including complete guided-lesson flows through the hashed deployment modules. Browser-sized iframe checks at 320×740 and 390×844 inspected Introduction opening text, revised catalog copy, approach and laying-back explanations, scrollable content and no horizontal page overflow. These are sampled layout checks, not physical-device or every-slide visual coverage. Heavy rough preview assets and menu entry were preserved.

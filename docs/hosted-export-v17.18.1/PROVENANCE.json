@@ -1,0 +1,16 @@
+{
+  "app_version": "17.18.1",
+  "sites_version_number": 57,
+  "source_commit": "ece336dbe9980bf05c4acad6cfd86742c9044b1f",
+  "project_id": "appgprj_6ac9a3e7317c8191b1a10027146d39c8",
+  "saved_version_id": "appgprj_6ac9a3e7317c8191b1a10027146d39c8~appgver_0927606b0970819190e06100807b6b6f",
+  "deployment_id": "appgdep_6ae7a3db248c8191adc8231e14d27cb4",
+  "deployed_url": "https://scratch-decision-lab.tsouthcott.chatgpt.site",
+  "asset_release": "f33a66debce6ec84",
+  "sites_archive_content_hash": "sha256:43e0e0c052a08ad6c2d958cfcb98fd2fed3d489d0a453a477946c11d23cc0039",
+  "local_packaged_archive_sha256": "e84773c6e9bd61659dd3db4342e5e9426496058c42dfa9c47228273e66c45389",
+  "deployment_file_count": 1421,
+  "tracked_source_files": 248,
+  "source_and_deployed_files": 1614,
+  "comparison_baseline": "Uploaded feature/button-polish ZIP; current remote GitHub state was not inspected"
+}

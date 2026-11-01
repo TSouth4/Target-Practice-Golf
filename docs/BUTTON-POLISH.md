@@ -18,3 +18,11 @@ Reproduce browser checks using `scripts/browser-review/button-polish.cjs` with `
 ## Work integration
 
 Based on repository 17.18.0. Merge into Work's latest app, preserving any newer UI/theme work; this branch does not contain the separately discussed dark mockup. No deployment has been performed.
+
+## Work integration verification (2026-11-01)
+
+Merged the CSS polish into the hosted 17.18.0 source while preserving its portrait/landscape full-screen spacing fixes, startup loader, heavy-rough trial, assessment review and fresh practice sessions. All application JavaScript remained byte-for-byte unchanged. Only CSS, release references, documentation and the package version changed.
+
+Syntax checks passed. Eight focused tests passed across controls-tutorial, beginner-setup, tutorial-ui and introduction-ui. Managed Chrome sampled desktop button appearance/keyboard focus and actual embedded 320×740 and 390×844 layouts. The narrowest modal initially clipped its heading and stacked Previous/Next; scoped padding/type/flex refinements corrected that. Final 320-pixel Previous/Next buttons shared the same y-coordinate, measured approximately 101/115 pixels wide and 46 pixels high, and the dialog had no internal horizontal overflow. The 390-pixel pair also measured 46 pixels high and remained aligned.
+
+The 320-pixel Introduction passed actual direction/carry gates and reached completion; full-screen entry/exit preserved component-specific icon labels. Browser console inspection found no app-origin errors. Final phone screenshots were reviewed. Native tests and real input checks cover behavior; the branch's separate hover/pressed-state browser script was not rerun in Work. Physical-phone, Safari and reduced-motion runtime checks remain unverified here. Temporary QA markup was removed before packaging. Existing private invited-viewer access is preserved.

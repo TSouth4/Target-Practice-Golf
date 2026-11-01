@@ -1,3 +1,7 @@
+# Hosted source reconciled (17.18.1)
+
+The GitHub source now includes Work’s startup/cache safeguards, heavy-rough visual preview and phone/full-screen spacing fixes. Before local preview or packaging, run `npm run prepare:assets` to generate the complete matching module release; `npm test` does this automatically. No dependencies need installing. See [comparison, provenance and checks](docs/HOSTED-SOURCE-RECONCILIATION.md).
+
 # Button polish (17.18.1)
 
 Understated shared action styling and clearer Introduction Previous/Next controls, with comfortable tap targets and unchanged navigation. See [scope and checks](docs/BUTTON-POLISH.md).

@@ -81,3 +81,6 @@ Committed shots now use a shared pure calculation core, with background module-w
 ## Later tournament proposal — October 22, 2026
 
 The roadmap now includes open-entry events with no paid membership or entry fee required, a fixed shared course/profile/conditions, and separate lowest-golf-score and highest-average-decision categories. One eligible attempt may resume after disconnection using server-saved commitments/outcomes; it cannot restart or reroll. Begin with a no-prize event test. Any later prizes require explicit approval, official rules/eligibility/tie/deadline decisions, a budget and applicable legal/tax/provider review. Two- or four-day formats remain later extensions. These events depend on trusted accounts/scoring and do not block the combined free-and-paid membership launch. See [the tournament plan](PROJECT-PLAN.md#planned-open-entry-tournaments--added-october-22-2026).
+
+
+Tournament access clarification: event participants must be able to play the entire event course without a purchase or paid membership, regardless of normal free-play hole limits. A free account may be required. Validate this access path before any event; prizes require the existing review and approval gates.

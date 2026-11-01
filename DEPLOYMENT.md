@@ -1,12 +1,12 @@
-# Publish v16.3.0 in the existing Work project
+# Deployment and asset preparation — v17.18.1
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
 Suggested instruction for Work:
 
-> Update the existing private Target Practice site from this complete archive. Deploy the entire `dist/` directory together, including `rounds.js`, `approach-generator.js`, `tee-generator.js`, and the matching HTML, CSS, and application modules. Preserve the existing project identity and owner-only access. Before publishing, check that the course actually renders, the browser has no missing-module errors, Commit & shoot appears immediately below the course, and Next shot and Retry work for both tee and approach scenarios.
+> Update the existing private Target Practice site from this complete archive. Deploy the entire `dist/` directory together, including `rounds.js`, `approach-generator.js`, `tee-generator.js`, and the matching HTML, CSS, and application modules. Preserve the existing project identity and current private audience, including invited testers. Before publishing, check that the course actually renders, the browser has no missing-module errors, Commit & shoot appears immediately below the course, and Next shot and Retry work for both tee and approach scenarios.
 
-Keep `.openai/hosting.json` with project ID `appgprj_6ac9a3e7317c8191b1a10027146d39c8` and static directory `dist`. Do not create a replacement public site. There is no build step or runtime dependency installation.
+Keep `.openai/hosting.json` with project ID `appgprj_6ac9a3e7317c8191b1a10027146d39c8` and static directory `dist`. Do not create a replacement public site. No runtime dependencies need installing. Run `npm run prepare:assets` before preview or publication to generate the complete matched release.
 
 An incomplete upload can leave the selectors visible while the course is blank green. In particular, the new approach module must be published alongside the rest of the files. Check the rendered course after deployment, rather than treating an uploaded archive as proof that the site works.
 
@@ -75,3 +75,33 @@ Validation for 16.2.0: syntax checks and all 172 automated tests passed. After t
 For 16.3.0, deploy the entire matching dist. Check phone normal/fullscreen hazard distances inside the enlarged course, green yardages, overlay carry and compact header controls. Verify that the golf viewport fills full screen, with no label/control overlap at 320 px and 390 px. Test both Easy and Hard, shot commitment and feedback/Hide. In Par-3 course, the highlighted selected ball must stay the same through the full pattern, fading and overhead camera. Inspect the horizontal scorecard after completed holes, including strokes, relative scores, totals, empty slots and separate decision grades. Introduction, saved round resume and Quit/Restart must still work.
 
 Validation for 16.3.0: syntax checks and all 172 automated tests passed. Chromium checked normal/fullscreen mobile layouts at 390×900 and 320×740 and phone landscape at 844×390, including readable water/bunker distances, removed duplicate boxes/banner, compact aligned header controls, full-height course rendering, Easy/Hard conditions, scorecard layout and available Quit/Restart. An animated desktop check verified the identical persisted selected-ball coordinates over 14 frames spanning pattern, fade and overhead transition, with no competing center/aim marker. Complete rounds at 1440×900, 390×900 and 844×390 passed saved-review/resume, scorecard and fullscreen feedback checks. Screenshots were reviewed, and viewport/header overlaps were corrected and rechecked. Physical-device and Safari/Firefox testing remain outstanding.
+
+
+Work hosting v17.16.1: preserve current private access and invited viewers. Run prepare:assets and publish the entire matching dist. Retain boot.js startup error reporting. Includes v17.16 surface rollout and legacy saved-round compatibility. Browser QA is unverified in Work because the preview browser timed out.
+
+
+Heavy rough trial v17.16.2: publish the complete dist including heavy-rough-preview.html, CSS, JS, rough-study-hole.svg and heavy-rough-patch.svg. Preserve current private viewers. No heavy-rough behavior is enabled.
+
+
+Beginner lesson wording update: three wording modules and HTML merged into Work source. Preserve the Heavy rough preview menu link and assets, startup loader, complete hashed release, private audience and saved data.
+
+
+## Work merge: fresh practice sessions (17.17.0)
+
+Merge the session/navigation behavior into the latest hosted source. Preserve the heavy-rough visual trial, current interface, startup diagnostics and versioned asset preparation. Include practice-session.js and the complete matching dist directory. Preserve the existing private audience, including its invited viewers. The alternate UI designs remain mockups only. See docs/FRESH-PRACTICE-SESSIONS.md for behavior and verification.
+
+
+## Work merge: assessment shot review (17.18.0)
+
+Preserve the current interface, recovery-area preview, startup loader and versioned assets. Include assessment-review.js and the full matching dist. Test completed-only nested shot disclosures, saved report reopening and phone/full-screen information. Preserve the current private invited-viewer audience. Alternate UI designs remain mockups only. See docs/ASSESSMENT-SHOT-REVIEW.md.
+
+
+## Work merge: button polish (17.18.1)
+
+Merge the button CSS while preserving the existing full-screen header/readout/progress spacing, all behavior and previews. Prepare and publish the complete matching dist with the existing private audience. Dark UI remains a mockup. See docs/BUTTON-POLISH.md.
+
+## Reconciled-source packaging note — November 1, 2026
+
+The current source and hosted export are reconciled; see docs/HOSTED-SOURCE-RECONCILIATION.md. Run `npm run prepare:assets` after editing root modules/styles and before preview or publication. Generated `dist/releases/` files are ignored by Git; a fresh clone must prepare them. `npm test` prepares them automatically. Publish the complete prepared `dist/`, not individual changed modules. Do not delete previous deployed release directories when updating an existing hosting workspace: cached older documents may still request those URLs. The uploaded hosted export retains those historical artifacts; Git records editable source and provenance rather than all generated releases.
+
+This reconciliation does not publish anything or change the Site's audience/project identity. Do not assume source files alone establish private access.

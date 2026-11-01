@@ -1,3 +1,5 @@
+> **Current startup note:** run `npm run prepare:assets` before serving `dist/`. Generated releases are not stored in Git. `npm test` prepares them automatically. See `docs/HOSTED-SOURCE-RECONCILIATION.md`.
+
 Treat the existing code as a working baseline, not something you must defend. Explain what should be retained, improved, or replaced and why.
 
 # Target Practice — start here

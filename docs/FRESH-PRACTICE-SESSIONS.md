@@ -27,3 +27,13 @@ Reproduce the selection audit using `node scripts/practice-randomization-review.
 This branch is based on repository version 17.16.2 plus the diagnostic review. The newer navigation mockup and separately created recovery-area preview are not present here. Merge this change into Work's latest code rather than replacing newer Work files wholesale. New buttons need wiring in any redesigned Home/Menu as well.
 
 Implementation: `dist/practice-session.js`, Practice selection in `dist/practice.js`, navigation/storage in `dist/app.js`, Home/Menu labels in `dist/index.html`, and optional backup slots in `dist/backup.js`. No model-version or history migration is needed because numerical scoring and existing round schedules are unchanged.
+
+## Work integration verification
+
+Merged into the hosted 17.16.2 source, preserving the exact existing styles, startup-error loader, heavy-rough appearance trial and hosting identity. Home/Menu gained New practice and Continue practice without applying the alternate navigation or dark-interface mockups.
+
+Work ran syntax checks and the complete merged regression suite: 249 tests passed, none failed or skipped. Asset preparation produced a matching 43-file release including practice-session.js and boot.js.
+
+Managed Chrome preview checks verified a generated tee layout, target restoration after switching to a learning round and browser reload, resuming the paused learning round, Commit feedback and Retry clearing patterns. Actual embedded 320×740 and 390×844 browser layouts rendered the course; checks sampled Continue practice target restoration, approach Commit/Retry, full-screen fallback entry/exit and Home navigation with no horizontal overflow. No app-origin console errors were reported in the phone preview. These are browser-sized checks, not physical-phone or Safari verification. A preview hot reload interrupted the initial desktop Commit check when the temporary phone fixture was created; repeating the flow after fixture creation completed successfully. Temporary QA pages were removed before packaging.
+
+Practice resumes the saved target for another attempt; it does not persist the result panel or animation. Saving remains browser-local. Existing invited-viewer access is preserved.

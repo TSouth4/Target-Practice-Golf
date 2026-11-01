@@ -1,6 +1,6 @@
 # Target Practice — project plan
 
-Updated October 22, 2026. This is the working order for remaining work; the [launch checklist](LAUNCH-CHECKLIST.md) tracks evidence for the final launch decision.
+Updated November 1, 2026. This is the working order for remaining work; the [launch checklist](LAUNCH-CHECKLIST.md) tracks evidence for the final launch decision.
 
 ## Goal and release path
 
@@ -14,7 +14,7 @@ The current development version is 17.18.1. Shared buttons and Introduction Prev
 
 A read-only [model audit](docs/MODEL-VALIDATION-REVIEW.md) passed 14 focused checks and prepared six reproducible cases. Distance-and-lie costs use a cited historical Tour reference; spreads, weather and finishing distributions include teaching assumptions. The rollout fix is implemented; owner testing of the corrected behavior and the broader model review remain pending.
 
-The app is now with pilot testers; feedback collection is underway. Work has created a separate heavy-rough visual preview tab, but that implementation is not in this checkout yet. Its latest ZIP is needed before editing that tab here. Accounts, cloud member history, paid permissions, subscriptions and the daily three-hole challenge are not implemented. A private GitHub repository does not by itself protect a deployed website. Earlier development details are retained in [the implementation history](docs/IMPLEMENTATION-HISTORY-THROUGH-17-5.md).
+The app is now with pilot testers; feedback collection is underway. Work’s isolated heavy-rough appearance preview and its loading/cache/spacing fixes are now reconciled into this checkout; see [source reconciliation](docs/HOSTED-SOURCE-RECONCILIATION.md). Heavy-rough scoring is still not implemented. Accounts, cloud member history, paid permissions, subscriptions and the daily three-hole challenge are not implemented. A private GitHub repository does not by itself protect a deployed website. Earlier development details are retained in [the implementation history](docs/IMPLEMENTATION-HISTORY-THROUGH-17-5.md).
 
 ## Remaining work, in dependency order
 
@@ -119,3 +119,12 @@ The supplied external launch notes inform the checklist; their proposed public f
 - Use GitHub branches and appropriate tests. Do not treat historical passing checks as evidence for untested new changes.
 - Describe teaching estimates honestly; do not promise handicap improvement, personal scoring accuracy or a proven optimal target.
 - Keep the [pilot guide](docs/PILOT-TESTER-GUIDE.md), model review and launch checklist aligned as scope changes.
+
+
+## Tournament access clarification — November 1, 2026
+
+Event entry requires no purchase or paid membership. Nonmembers can play the full event course even when it exceeds the ordinary free three-hole allowance; that exception applies only to the event. A free account may be required for identification and saved scores. Begin with no-prize tests. Prize events still require published rules, eligibility and applicable legal/tax/provider review and explicit approval before promotion. Free entry is not a blanket legal exemption.
+
+A simple owner-only shared results table and CSV export is a proposed first administration step before a public leaderboard. Record player/event/round identity, course and scoring-model versions, profile/conditions, timestamps/completion, golf score and average decision score. Requires managed account/database access rules, duplicate-safe submissions and later score verification for prizes; none is implemented by this reconciliation.
+
+Pending UI request: reposition desktop full-screen Front / Flag / Back distances into a balanced top strip, rather than the narrow upper-left group. Work’s imported spacing fixes are preserved, but this separate desktop-layout request is not implemented by the reconciliation.

@@ -1,0 +1,7 @@
+# Heavy rough appearance trial — 17.16.2
+
+Open Menu → Heavy rough preview, or heavy-rough-preview.html. This is a standalone, visual-only page on the existing private Site. A frozen illustrated woodland approach (tucked family, hole seed 17, 5 handicap, woodland) provides the backdrop. Its near-right decorative verge has normal short green rough beside a taller olive/golden-green patch with 572 tufts, tapered bent blades, low shadows and an irregular edge. The verge and patch exist only in the frozen artwork, not live playable geometry.
+
+The prototype has a patch on/off comparison, close-up and full-screen control. Native full screen uses a page-filling fallback when unavailable; Escape exits the fallback. Phone widths use a tighter crop and larger SVG label type. All state is in memory. The page imports no game module and never reads/writes localStorage, IndexedDB, round or progress data. No scoring, generation, lies or physics changed. The intended future behavior is ball found, harder recovery, with no lost balls; that behavior is not implemented or approved by this trial.
+
+Work browser review checked the actual page at desktop and inside real 320×740, 390×844 and 844×390 iframe viewports, including phone full-screen fallback, close-up, patch toggle and exit. Label clipping was corrected, 44 px control heights and no horizontal overflow were confirmed. These are browser-sized checks, not physical-device certification. The temporary iframe QA page is excluded from deployment.
