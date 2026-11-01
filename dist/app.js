@@ -52,7 +52,7 @@ function storedCourse(){try{return readCourse(localStorage.getItem(COURSE_KEY));
 function retryValid(){return retryBaseline&&retryBaseline.encounter===state.encounter&&retryBaseline.profile===currentProfile()&&retryBaseline.seed===state.seed&&JSON.stringify(retryBaseline.conditions||null)===JSON.stringify(state.pattern.conditions||null);}
 let aimZoom=null,lastCourseTap=null,lastDoubleAimTap=null;
 function resetAimZoom(){aimZoom=null;lastCourseTap=null;lastDoubleAimTap=null;}
-function toggleAimZoom(point){if(working||isCourse()&&round.review||result||editorDraft||progressOpen)return;lastCourseTap=null;lastDoubleAimTap=null;aimZoom=aimZoom?null:aimZoomBox(point||projectSurface(scene(),state.aim,elevation()));updateLabels();}
+function toggleAimZoom(point){if(working||isCourse()&&round.review||result||editorDraft||progressOpen)return;lastCourseTap=null;lastDoubleAimTap=null;aimZoom=aimZoom?null:aimZoomBox(point||projectSurface(scene(),state.aim,elevation()));updateLabels();drawCourse();}
 const storeKey='golfaim101-v2';
 let idCounter=0;
 const makeId=()=>globalThis.crypto?.randomUUID?.()||`${Date.now().toString(36)}-${(++idCounter).toString(36)}-${Math.random().toString(36).slice(2,10)}`;
@@ -496,7 +496,7 @@ $('fullscreenToggle').addEventListener('click',async()=>{
 $('feedbackToggle').addEventListener('click',()=>{feedbackExpanded=!feedbackExpanded;updateFullscreenControls();});
 document.addEventListener?.('fullscreenchange',()=>{if(nativeFullscreen&&!document.fullscreenElement)leaveFullscreen();else if(immersive)updateLabels();});
 document.addEventListener?.('keydown',event=>{if(event.key==='Escape'&&immersive){event.preventDefault();leaveFullscreen();}});
-globalThis.addEventListener?.('resize',()=>{if(immersive)updateLabels();});
+globalThis.addEventListener?.('resize',()=>{if(immersive){updateLabels();drawCourse();}});
 function dirty(){achievement=null;lastCourseTap=null;$('decisionLesson').hidden=true;$('decisionVerdict').setAttribute('aria-expanded',false);progressMessage='';landingCamera=null;syncTargetDistance();phase='choose';traceShots=[];transition=null;result=null;best=null;oneShot=null;state.view='pov';$('results').hidden=true;save();updateLabels();drawCourse();}
 function setScenario(id,holeSeed=0,setting=null){if(working)return;resetAimZoom();retryBaseline=null;retryHint='';state.encounter=makeId();state.scenario=id;state.holeSeed=holeSeed;state.landscape=Object.hasOwn(LANDSCAPES,setting)?setting:nextLandscape(state.landscape,holeSeed,scene());state.recent=[...state.recent,id].slice(-6);hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=state.mode==='basic'?basic():member();updateControls();dirty();}
 function setMode(mode,allowAssessmentExit=false){if(!prepareNavigation())return;round=null;state.practiceMode='free';resetAimZoom();if(state.mode==='advanced')state.memberCosts={...state.costs};state.mode=mode;hasAim=false;state.aim={x:0,y:scene().aimY};state.pattern=mode==='basic'?basic():member();state.costs=mode==='basic'?{...DEFAULT_COSTS}:memberCosts();updateControls();dirty();closeMenu();}
@@ -583,8 +583,9 @@ function drawCourse(){
  $('mobileCourseDistances').innerHTML=callouts.filter(l=>l.kind!=='ob').map((l,i)=>`<span class="mobile-hazard-chip" data-kind="${l.kind}"><strong>${escapeHTML(terrainHazards[i]?.label||l.label)}</strong><small>${escapeHTML(l.distance.replace('forward','fwd'))}</small></span>`).join('')+`<span class="mobile-boundary-chip">OB: ${callouts.filter(l=>l.kind==='ob').map(l=>escapeHTML(l.distance.replace(' of center',''))).join(' · ')}</span>`;
  $('mobileHazardList').innerHTML=callouts.map((l,i)=>`<li><strong>${escapeHTML(terrainHazards[i]?.label||l.label)}</strong><span>${escapeHTML(l.distance)}</span></li>`).join('');
  if(map){for(const l of s.labels)html+=textAt(l.x,l.y,l.text==='TREES'&&state.landscape==='desert'?'SCRUB':l.text,'fill="#425d48" font-family="Arial" font-size="11" font-weight="700" text-anchor="middle"');}
- else{let left=0,right=0;for(const l of callouts){const at=project(l),side=l.x<0?'left':'right',index=side==='left'?left++:right++,labelX=side==='left'?100:860,top=112+index*52;
- html+=`<g class="hazard-callout" data-kind="${l.kind}"><line x1="${at.x}" y1="${at.y}" x2="${labelX}" y2="${top+25}" stroke="${l.color}" stroke-width="1.5"/><circle cx="${at.x}" cy="${at.y}" r="4" fill="${l.color}" stroke="#fffef0"/><rect x="${labelX-78}" y="${top-6}" width="156" height="42" rx="5" fill="#203f32ee" stroke="${l.color}"/><text x="${labelX}" y="${top+9}" fill="#fffef0" font-family="Arial" font-size="12" font-weight="700" text-anchor="middle">${l.label}</text><text x="${labelX}" y="${top+25}" fill="#e2e8cf" font-family="Arial" font-size="10" text-anchor="middle">${l.distance}</text></g>`;}}
+ else{let rightLabelX=860;const carryBox=immersive?$('aimDepthWrap').getBoundingClientRect?.():null;if(carryBox?.width>0){const edge=coursePoint({clientX:carryBox.left-12,clientY:carryBox.top});if(Number.isFinite(edge?.x))rightLabelX=Math.min(rightLabelX,edge.x-78);}
+ let left=0,right=0;for(const l of callouts){const at=project(l),side=l.x<0?'left':'right',index=side==='left'?left++:right++,labelX=side==='left'?100:rightLabelX,top=112+index*52;
+ html+=`<g class="hazard-callout" data-kind="${l.kind}" data-side="${side}"><line x1="${at.x}" y1="${at.y}" x2="${labelX}" y2="${top+25}" stroke="${l.color}" stroke-width="1.5"/><circle cx="${at.x}" cy="${at.y}" r="4" fill="${l.color}" stroke="#fffef0"/><rect x="${labelX-78}" y="${top-6}" width="156" height="42" rx="5" fill="#203f32ee" stroke="${l.color}"/><text x="${labelX}" y="${top+9}" fill="#fffef0" font-family="Arial" font-size="12" font-weight="700" text-anchor="middle">${l.label}</text><text x="${labelX}" y="${top+25}" fill="#e2e8cf" font-family="Arial" font-size="10" text-anchor="middle">${l.distance}</text></g>`;}}
 
  if(!map){
   const positions=greenYardages(s);let labels='';

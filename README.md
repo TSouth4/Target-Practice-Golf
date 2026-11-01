@@ -1,3 +1,7 @@
+# Fullscreen hazard-label clearance (17.18.3)
+
+Right-side hazard labels now stay clear of the Intended Carry bar on desktop fullscreen views, including after resize or target zoom. Distances, targets and scoring are unchanged. See [scope and checks](docs/FULLSCREEN-HAZARD-CLEARANCE.md).
+
 # Desktop fullscreen yardages (17.18.2)
 
 Front / Flag / Back now form a balanced top strip on desktop fullscreen views. Dogleg corner/runout facts have a separate row, preserving legible green distances. Phone layouts and normal views stay unchanged. See [scope and checks](docs/DESKTOP-FULLSCREEN-YARDAGES.md).
