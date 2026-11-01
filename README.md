@@ -1,3 +1,7 @@
+# Button polish (17.18.1)
+
+Understated shared action styling and clearer Introduction Previous/Next controls, with comfortable tap targets and unchanged navigation. See [scope and checks](docs/BUTTON-POLISH.md).
+
 # Optional assessment shot review (17.18.0)
 
 Completed assessments have a collapsed View shot results section with expandable explanations. High-score verdicts acknowledge small adjustments, and play-screen essentials remain available across phone/desktop and fullscreen layouts. See [behavior and checks](docs/ASSESSMENT-SHOT-REVIEW.md).
