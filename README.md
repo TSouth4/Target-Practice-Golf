@@ -1,3 +1,7 @@
+# Desktop fullscreen yardages (17.18.2)
+
+Front / Flag / Back now form a balanced top strip on desktop fullscreen views. Dogleg corner/runout facts have a separate row, preserving legible green distances. Phone layouts and normal views stay unchanged. See [scope and checks](docs/DESKTOP-FULLSCREEN-YARDAGES.md).
+
 # Hosted source reconciled (17.18.1)
 
 The GitHub source now includes Work’s startup/cache safeguards, heavy-rough visual preview and phone/full-screen spacing fixes. Before local preview or packaging, run `npm run prepare:assets` to generate the complete matching module release; `npm test` does this automatically. No dependencies need installing. See [comparison, provenance and checks](docs/HOSTED-SOURCE-RECONCILIATION.md).

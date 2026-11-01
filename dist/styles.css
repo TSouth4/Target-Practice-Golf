@@ -357,3 +357,12 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
  .controls-actions #controlsBack{flex:1 1 100px;min-width:100px;padding-inline:14px}
  .controls-actions #controlsNext{flex:2 1 112px;min-width:112px;padding-inline:14px}
 }
+
+/* Desktop fullscreen: a balanced top strip, with dogleg facts on their own row. */
+@media(min-width:1024px) and (min-height:501px){
+ .immersive-mode .course-readouts,.immersive-mode .course-readouts:has(.dogleg-readout:not([hidden])){top:14px;left:50%;right:auto;width:min(760px,calc(100% - 720px));max-width:none;transform:translateX(-50%);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:stretch}
+ .immersive-mode .course-readouts #greenYardageList{grid-column:1;grid-row:1}
+ .immersive-mode .course-readouts #greenYardageList strong{white-space:nowrap}
+ .immersive-mode .course-readouts #conditionsBar{grid-column:2;grid-row:1}
+ .immersive-mode .course-readouts .dogleg-readout{grid-column:1/-1;grid-row:2;justify-self:center;width:100%;max-width:440px}
+}

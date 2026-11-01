@@ -1,4 +1,4 @@
-# Deployment and asset preparation — v17.18.1
+# Deployment and asset preparation — v17.18.2
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.
 
