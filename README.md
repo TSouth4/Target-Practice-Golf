@@ -1,3 +1,7 @@
+# Two owner model-review examples (17.18.4)
+
+An isolated read-only page compares fixed long Par-3 and sharp-dogleg targets. Open `model-owner-review.html` on the preview/host, without changing normal game modes or saved progress. See [findings and questions](docs/TWO-MODEL-EXAMPLES.md). No scoring changes were made.
+
 # Fullscreen hazard-label clearance (17.18.3)
 
 Right-side hazard labels now stay clear of the Intended Carry bar on desktop fullscreen views, including after resize or target zoom. Distances, targets and scoring are unchanged. See [scope and checks](docs/FULLSCREEN-HAZARD-CLEARANCE.md).
