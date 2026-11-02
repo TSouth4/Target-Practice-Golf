@@ -164,3 +164,36 @@ The owner reports many scenarios feel straight or sharply doglegged, with repeat
 Approve a small set of fixed examples before expanding random generation. Inspect both eye-level and overhead geometry; check playable areas, hazard priority/relief, profile reach, optimizer targets, explanations and saved-round compatibility. Then choose frequency in Practice, learning/assessment schedules and Par-3 mixes so the new families are noticeable without dominating. Do not alter the fixed Introduction/Lessons examples unintentionally. Numerical score changes require deliberate model/history version handling.
 
 Current action: added to roadmap only; no new hole geometry or runtime code was implemented in this update. Continue the two fixed model reviews and pilot feedback alongside this planning.
+
+## Additional hole and green-shape backlog
+
+The owner approved adding the following ideas to the roadmap, not implementing all of them at once. Prioritize recognizably different decisions, keep some open/inviting holes, and avoid turning every scenario into maximum danger.
+
+| Variation | Learning purpose / implementation boundary |
+| --- | --- |
+| Diagonal creek | Carry requirement changes across the hole; compare a shorter crossing with a longer, more rewarding line. |
+| Split fairway | Wider longer route versus narrower shortcut; actual playable geometry and meaningful target costs. |
+| Fairway that ends | Account for landing and rollout before running through into recovery/trouble; do not score artwork as fairway when it is not. |
+| Staggered bunkers | Different trouble distances on opposite sides make the best direction depend on the chosen carry/club. |
+| Angled green | Direction changes available landing depth; rotate the actual playable boundary, not only the illustration. |
+| Long narrow versus wide shallow green | Emphasize lateral versus depth misses; some variation already exists through ellipse width/depth, but compositions should be more distinctive. |
+| Offset green | Break the assumption that fairway centerline points toward the sensible approach target. Some offset already exists; improve its strategic effect rather than calling every offset a new family. |
+| Generous bailout with a cost | Compare safety with the longer putt/next shot; no automatic assumption that safer is always better. |
+| Reachable Par-5 with angled entrance | Improve existing Par-5 families with going-for-it, close-layup and farther-layup choices; avoid duplicating current content under new names. |
+| Double dogleg | Later batch; requires care with route feasibility and the model's current lack of explicit future-shot obstacle handling. |
+| Elevated / downhill valley greens | Later batch; validate carry, landing and rollout effects before implying full elevation physics through the artwork. |
+
+### Green shapes
+
+Current scoring uses an axis-aligned ellipse (`x`, `y`, `rx`, `ry`); width and depth vary but there are no genuine rotated, kidney-shaped, L-shaped or polygonal playable greens. First candidates are rotated ovals and kidney-shaped greens, followed by selected irregular/L-shaped examples if they teach useful decisions.
+
+Implement the shared geometric foundation before broad generation: rendered edges, lie classification, front/flag/back yardages, hazard clearance checks, pin placement, target search, close-up/scout views and course simulation must agree. Preserve the intended meaning of front/back distances. Legacy circles/ellipses and saved rounds must retain their original geometry and scoring, with default rotation/shape behavior or an explicit versioned compatibility path. Shape changes must not silently alter fixed tutorial examples or existing seeded rounds.
+
+### Practical order while tester feedback is pending
+
+1. Finish the branch-consolidation **audit** and prepare a reviewable baseline; merging main/deleting branches still needs explicit authorization.
+2. Review the already-prepared long Par-3 and sharp-dogleg examples with the owner, documenting club-switch and tree-clearance assumptions before changing the model. Expand the reference cases and source checks afterward.
+3. Prototype a small fixed variety pack: a clearly gentle/moderate dogleg, rear-green trouble with a bailout, a diagonal creek, and contrasting/angled green shapes. Approve the shared shape foundation before kidney/irregular generation. Peninsula and continuous-water families follow in reviewed batches.
+4. Continue collecting pilot feedback without blocking all development. Offer one short observed session with specific tasks rather than relying only on open-ended written feedback. Test prototypes before expanding random generation; final public/paid launch still requires real-user/device evidence.
+
+This update changes the plan only. It does not add playable holes, change scoring or begin account/payment implementation.
