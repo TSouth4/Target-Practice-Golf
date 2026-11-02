@@ -197,3 +197,8 @@ Implement the shared geometric foundation before broad generation: rendered edge
 4. Continue collecting pilot feedback without blocking all development. Offer one short observed session with specific tasks rather than relying only on open-ended written feedback. Test prototypes before expanding random generation; final public/paid launch still requires real-user/device evidence.
 
 This update changes the plan only. It does not add playable holes, change scoring or begin account/payment implementation.
+
+
+### Branch audit completed — promotion still pending
+
+The [branch audit](docs/BRANCH-AUDIT.md) found 71 remote branches, all included in the latest cumulative planning/source baseline. Main remains the v12 import, 79 commits behind; 69 older refs are potential retirement candidates after promotion and approval. There is no unique remote commit work to integrate in this snapshot. Confirm the latest deployed Work source and active branch usage before preparing an authorized main update. No merge, tag creation, branch deletion or deployment was performed. See the [Excel inventory](docs/BRANCH-AUDIT.csv) and [pinned snapshot](docs/BRANCH-AUDIT.json).

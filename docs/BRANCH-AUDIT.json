@@ -1,0 +1,1010 @@
+{
+  "baselineRef": "origin/docs/consolidation-and-hole-variety",
+  "baseline": "aed5fcfe07c2ea8a770d3fe2b4e3be2d1181e866",
+  "main": "2460ecf1501aaa45a548ebc2a9f04fd2850655e9",
+  "mainBehind": 79,
+  "mainUnique": 0,
+  "filesChangedFromMain": 255,
+  "remoteCount": 71,
+  "includedCount": 71,
+  "uniqueBranchCount": 0,
+  "local": [
+    {
+      "name": "docs/consolidation-and-hole-variety",
+      "sha": "aed5fcfe07c2ea8a770d3fe2b4e3be2d1181e866",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/assessment-shot-review",
+      "sha": "b5d352593e17695ab43d2ca2e5849dba1d857512",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/background-simulation",
+      "sha": "80a13747fb384f43bf7e75dc049d2c3a76e4fbb0",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/backups-performance",
+      "sha": "6a88656acd284219c6fb6b1ecd82d907affb550a",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/beginner-lesson-wording",
+      "sha": "7ae5c11f6ce54962e7f435e0303bfeb703debb6a",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/beginner-setup",
+      "sha": "edc4554a51ea8342fb1997da8b5e189fbdd8058b",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/button-polish",
+      "sha": "ef1c3481c27fbb6c36847aad2c413787d95a9811",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/carry-and-assessment-flights",
+      "sha": "b1b3a14a679d1d8e02647aaaa9da43912dbfd201",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/carry-outline-cache",
+      "sha": "1864e9fcf03d4c269ed45738b47090902dbe4c66",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/clean-play-layout",
+      "sha": "1931309f8523a89e3b438d677bea35f39055a7b3",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/clearer-guided-lessons",
+      "sha": "c7b0c9cc54723abacf707a753bc7936143034311",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/consistent-ground-rollout",
+      "sha": "3cc854ea356861d5f967e7e9bad1923b989248b3",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/course-render-layers",
+      "sha": "9e8aae34b1ceded93376021bcdd5f0a45a8208fd",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/course-setup-intro-purpose",
+      "sha": "a58a7aa4a9eb812c4490d4d3fb5e3d84c1b2e983",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/course-visual-prototype",
+      "sha": "03317b342e87d87845859746c3fd8b2eafc0bc9b",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/course-visual-refinement",
+      "sha": "f7cd632ff085875c44183ee17f0621571f1e5743",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/custom-shot-navigation",
+      "sha": "c4b45a0d6c3596ffec7eed12c5717eb3c53c466f",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/decision-feedback",
+      "sha": "1c109ce8ac2e1432f1d0bd96894a41daf9535726",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/decision-tradeoff-feedback",
+      "sha": "c0864d754ee2d591416a9ba703030cd26fa7a8ba",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/desktop-fullscreen-yardages",
+      "sha": "0b0b6546731fed6b323bafa7fc5f32c5cbe435cb",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/distance-and-lie-baseline",
+      "sha": "764446adfeeef44354ff9a54963694a8f9e8a762",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/dogleg-feedback-clarity",
+      "sha": "c2432b9f2070902af703dd1b67c55dfd01e2288b",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/eighteen-hole-par3",
+      "sha": "7641ce215e53522e7205b49218f720ed3cf668ec",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/engagement-roadmap",
+      "sha": "2e3f47732cc43b79273814f20dd557a974d9fb23",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/estimated-distances",
+      "sha": "2bce6a7506a522ac9f8c7448a05343b67f83cdd4",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/fresh-practice-sessions",
+      "sha": "2c41313e559a7262848b674a6c4165e6b1be0a87",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/fullscreen-practice",
+      "sha": "6249a9fbec9f494cc82b86de0bc50c9330afdfc8",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/guarded-approach-lessons",
+      "sha": "cd819037608259f0234e9f0fbc54b61042c2f471",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/guided-introduction",
+      "sha": "f842200f5ea58f97073bf088bca1a3795e6dd599",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/guided-lessons",
+      "sha": "6a66bcdaf73891e4bc1fa6faf901a20d3f59f1f1",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/header-logo",
+      "sha": "f098f121d0b6ec4a687249367f1a061f1ef6a81a",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/home-option-order",
+      "sha": "87db3cb41bdef73b3d10287dc142137ae1c0be36",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/home-page",
+      "sha": "96817b6c85f9b4b5cef8b1e6228ed08e555c6bba",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/integrated-course-graphics",
+      "sha": "da839a87255230c2a521e216a520bcbe006eb3f9",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/introduction",
+      "sha": "6ec152f6671c8a456d73167202abe336ae286a35",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/introduction-context",
+      "sha": "d87f9b82f48b706743ac400976b03021f59a35a2",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/introduction-lessons-profile",
+      "sha": "ddae8095a38a20217d77a1683ad64b659599d97f",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/landing-and-rollout-markers",
+      "sha": "86b3f8d3813d735128aa3f95673f69cf63a59e2b",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/larger-course-flag",
+      "sha": "64bb760cc8d13ed207a8b20ca06ed96c13441570",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/launch-readiness-plan",
+      "sha": "479750f3593ae92940a713da07188f74fbbc42b6",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/learning-feedback",
+      "sha": "696c1cb453597e490390b7213f360fab2519f1fa",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/learning-journey-achievements",
+      "sha": "8526ea4497882410b500d9fc1d1c245f2325486c",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/learning-rounds-assessment",
+      "sha": "9f99f7e1e16596ab1829f8d861d89c8567c2473f",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/lesson-target-comparisons",
+      "sha": "586fe92c647aad2762a350cb3c72ce77807a52d6",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/long-par3-mix",
+      "sha": "7f7bb316e87022fa617ce0a68942c92981a357ab",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/mobile-course-cleanup",
+      "sha": "dc4ca79808f6831030ac3b833bec72e82cce218d",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/mobile-foreground-fix",
+      "sha": "bb4ca27c0892b24403919e2da9e555453fa55a3d",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/mobile-tee-practice",
+      "sha": "669f21cae836dab2154e8cc4c279eef89e1799a4",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/par3-course",
+      "sha": "a146fb951081e0500b44463b2e587b1e6a9bf7fc",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/par3-score-controls",
+      "sha": "c14fdc4100bed1b6489d4bf0dc0303df8caf719c",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/pilot-readiness-review",
+      "sha": "ffd4355adda9e2eaaf85a9417c33fcdb1251c415",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/playable-graphics-preview",
+      "sha": "720a6baee16368314c6edb1d7c3a9a0c3c1e4013",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/progress-dashboard",
+      "sha": "60cd343d1e9a8a470b4cf728332c4a4301292137",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/scenic-environments",
+      "sha": "e8d08fc5d339ba7901efb890c706040fc03bdcd0",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/simple-shot-profile",
+      "sha": "837f333093f68a5c00c4026aeb423b0ef99d290a",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/simulation-core",
+      "sha": "bb67389a436e49da171744e3cbaf1b42af0e8d2d",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/site-wording-review",
+      "sha": "e0fb4fdf65cd7db19a610ddef703542c52f5d285",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/smooth-guides-shoreline",
+      "sha": "b9fe5d0b15fe12cb78f152126b9ded537cd86151",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/strategic-scenarios",
+      "sha": "21c519818dde9c00af6afb0b2f595c5bc4ff14a7",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/tutorial-mobile-polish",
+      "sha": "dd55c1fc24f9a81f1207ab6c50280affbd4c5034",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/tutorial-mobile-refinements",
+      "sha": "956e06c32d65ee11e12bb74839529030bd0ea685",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/wind-firmness",
+      "sha": "4a13ed449b060dd36d37d0aa0ee453045bd932cf",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/wind-validation-checklist",
+      "sha": "2c773d3a4aae3363b25954b763b42e9a1e64ae08",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "feature/yardages-and-asymmetric-woods",
+      "sha": "3aa9f1f6e33e402aa4089a52635834956b177810",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "fix/approach-layup-scoring",
+      "sha": "102892fc3568017a5d3650b6f802168178511633",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "fix/fullscreen-hazard-label-clearance",
+      "sha": "0a582d7cff87fd13dd08729b0df2c62c1dcd0e44",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "fix/lesson-menu-navigation",
+      "sha": "c57f52adac1d105ce4b4c55dbcbf548b1c03b9e9",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "review/practice-randomization-model",
+      "sha": "e38a82efe3be48defb73d0e810eafa69891db760",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "review/reconcile-hosted-v17.18.1",
+      "sha": "936c79d9db53105251cf0fee2b1ba0f61741e54f",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "review/two-model-examples",
+      "sha": "7a2176d4b99a6ad92bcca966050ef3efa6c0f30c",
+      "uniqueCommits": 0,
+      "remoteNamePresent": true
+    },
+    {
+      "name": "work",
+      "sha": "2460ecf1501aaa45a548ebc2a9f04fd2850655e9",
+      "uniqueCommits": 0,
+      "remoteNamePresent": false
+    }
+  ],
+  "tags": [],
+  "branches": [
+    {
+      "name": "docs/consolidation-and-hole-variety",
+      "sha": "aed5fcfe07c2ea8a770d3fe2b4e3be2d1181e866",
+      "uniqueCommits": 0,
+      "behindBaseline": 0,
+      "included": true,
+      "recommendation": "Keep candidate / active planning branch"
+    },
+    {
+      "name": "feature/assessment-shot-review",
+      "sha": "b5d352593e17695ab43d2ca2e5849dba1d857512",
+      "uniqueCommits": 0,
+      "behindBaseline": 7,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/background-simulation",
+      "sha": "80a13747fb384f43bf7e75dc049d2c3a76e4fbb0",
+      "uniqueCommits": 0,
+      "behindBaseline": 34,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/backups-performance",
+      "sha": "6a88656acd284219c6fb6b1ecd82d907affb550a",
+      "uniqueCommits": 0,
+      "behindBaseline": 37,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/beginner-lesson-wording",
+      "sha": "7ae5c11f6ce54962e7f435e0303bfeb703debb6a",
+      "uniqueCommits": 0,
+      "behindBaseline": 10,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/beginner-setup",
+      "sha": "edc4554a51ea8342fb1997da8b5e189fbdd8058b",
+      "uniqueCommits": 0,
+      "behindBaseline": 29,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/button-polish",
+      "sha": "ef1c3481c27fbb6c36847aad2c413787d95a9811",
+      "uniqueCommits": 0,
+      "behindBaseline": 6,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/carry-and-assessment-flights",
+      "sha": "b1b3a14a679d1d8e02647aaaa9da43912dbfd201",
+      "uniqueCommits": 0,
+      "behindBaseline": 70,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/carry-outline-cache",
+      "sha": "1864e9fcf03d4c269ed45738b47090902dbe4c66",
+      "uniqueCommits": 0,
+      "behindBaseline": 32,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/clean-play-layout",
+      "sha": "1931309f8523a89e3b438d677bea35f39055a7b3",
+      "uniqueCommits": 0,
+      "behindBaseline": 50,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/clearer-guided-lessons",
+      "sha": "c7b0c9cc54723abacf707a753bc7936143034311",
+      "uniqueCommits": 0,
+      "behindBaseline": 63,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/consistent-ground-rollout",
+      "sha": "3cc854ea356861d5f967e7e9bad1923b989248b3",
+      "uniqueCommits": 0,
+      "behindBaseline": 14,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/course-render-layers",
+      "sha": "9e8aae34b1ceded93376021bcdd5f0a45a8208fd",
+      "uniqueCommits": 0,
+      "behindBaseline": 31,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/course-setup-intro-purpose",
+      "sha": "a58a7aa4a9eb812c4490d4d3fb5e3d84c1b2e983",
+      "uniqueCommits": 0,
+      "behindBaseline": 47,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/course-visual-prototype",
+      "sha": "03317b342e87d87845859746c3fd8b2eafc0bc9b",
+      "uniqueCommits": 0,
+      "behindBaseline": 23,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/course-visual-refinement",
+      "sha": "f7cd632ff085875c44183ee17f0621571f1e5743",
+      "uniqueCommits": 0,
+      "behindBaseline": 22,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/custom-shot-navigation",
+      "sha": "c4b45a0d6c3596ffec7eed12c5717eb3c53c466f",
+      "uniqueCommits": 0,
+      "behindBaseline": 57,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/decision-feedback",
+      "sha": "1c109ce8ac2e1432f1d0bd96894a41daf9535726",
+      "uniqueCommits": 0,
+      "behindBaseline": 28,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/decision-tradeoff-feedback",
+      "sha": "c0864d754ee2d591416a9ba703030cd26fa7a8ba",
+      "uniqueCommits": 0,
+      "behindBaseline": 67,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/desktop-fullscreen-yardages",
+      "sha": "0b0b6546731fed6b323bafa7fc5f32c5cbe435cb",
+      "uniqueCommits": 0,
+      "behindBaseline": 4,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/distance-and-lie-baseline",
+      "sha": "764446adfeeef44354ff9a54963694a8f9e8a762",
+      "uniqueCommits": 0,
+      "behindBaseline": 66,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/dogleg-feedback-clarity",
+      "sha": "c2432b9f2070902af703dd1b67c55dfd01e2288b",
+      "uniqueCommits": 0,
+      "behindBaseline": 24,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/eighteen-hole-par3",
+      "sha": "7641ce215e53522e7205b49218f720ed3cf668ec",
+      "uniqueCommits": 0,
+      "behindBaseline": 43,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/engagement-roadmap",
+      "sha": "2e3f47732cc43b79273814f20dd557a974d9fb23",
+      "uniqueCommits": 0,
+      "behindBaseline": 44,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/estimated-distances",
+      "sha": "2bce6a7506a522ac9f8c7448a05343b67f83cdd4",
+      "uniqueCommits": 0,
+      "behindBaseline": 68,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/fresh-practice-sessions",
+      "sha": "2c41313e559a7262848b674a6c4165e6b1be0a87",
+      "uniqueCommits": 0,
+      "behindBaseline": 8,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/fullscreen-practice",
+      "sha": "6249a9fbec9f494cc82b86de0bc50c9330afdfc8",
+      "uniqueCommits": 0,
+      "behindBaseline": 73,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/guarded-approach-lessons",
+      "sha": "cd819037608259f0234e9f0fbc54b61042c2f471",
+      "uniqueCommits": 0,
+      "behindBaseline": 74,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/guided-introduction",
+      "sha": "f842200f5ea58f97073bf088bca1a3795e6dd599",
+      "uniqueCommits": 0,
+      "behindBaseline": 51,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/guided-lessons",
+      "sha": "6a66bcdaf73891e4bc1fa6faf901a20d3f59f1f1",
+      "uniqueCommits": 0,
+      "behindBaseline": 64,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/header-logo",
+      "sha": "f098f121d0b6ec4a687249367f1a061f1ef6a81a",
+      "uniqueCommits": 0,
+      "behindBaseline": 45,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/home-option-order",
+      "sha": "87db3cb41bdef73b3d10287dc142137ae1c0be36",
+      "uniqueCommits": 0,
+      "behindBaseline": 30,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/home-page",
+      "sha": "96817b6c85f9b4b5cef8b1e6228ed08e555c6bba",
+      "uniqueCommits": 0,
+      "behindBaseline": 38,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/integrated-course-graphics",
+      "sha": "da839a87255230c2a521e216a520bcbe006eb3f9",
+      "uniqueCommits": 0,
+      "behindBaseline": 16,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/introduction",
+      "sha": "6ec152f6671c8a456d73167202abe336ae286a35",
+      "uniqueCommits": 0,
+      "behindBaseline": 53,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/introduction-context",
+      "sha": "d87f9b82f48b706743ac400976b03021f59a35a2",
+      "uniqueCommits": 0,
+      "behindBaseline": 11,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/introduction-lessons-profile",
+      "sha": "ddae8095a38a20217d77a1683ad64b659599d97f",
+      "uniqueCommits": 0,
+      "behindBaseline": 27,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/landing-and-rollout-markers",
+      "sha": "86b3f8d3813d735128aa3f95673f69cf63a59e2b",
+      "uniqueCommits": 0,
+      "behindBaseline": 65,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/larger-course-flag",
+      "sha": "64bb760cc8d13ed207a8b20ca06ed96c13441570",
+      "uniqueCommits": 0,
+      "behindBaseline": 46,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/launch-readiness-plan",
+      "sha": "479750f3593ae92940a713da07188f74fbbc42b6",
+      "uniqueCommits": 0,
+      "behindBaseline": 49,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/learning-feedback",
+      "sha": "696c1cb453597e490390b7213f360fab2519f1fa",
+      "uniqueCommits": 0,
+      "behindBaseline": 75,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/learning-journey-achievements",
+      "sha": "8526ea4497882410b500d9fc1d1c245f2325486c",
+      "uniqueCommits": 0,
+      "behindBaseline": 26,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/learning-rounds-assessment",
+      "sha": "9f99f7e1e16596ab1829f8d861d89c8567c2473f",
+      "uniqueCommits": 0,
+      "behindBaseline": 71,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/lesson-target-comparisons",
+      "sha": "586fe92c647aad2762a350cb3c72ce77807a52d6",
+      "uniqueCommits": 0,
+      "behindBaseline": 62,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/long-par3-mix",
+      "sha": "7f7bb316e87022fa617ce0a68942c92981a357ab",
+      "uniqueCommits": 0,
+      "behindBaseline": 36,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/mobile-course-cleanup",
+      "sha": "dc4ca79808f6831030ac3b833bec72e82cce218d",
+      "uniqueCommits": 0,
+      "behindBaseline": 52,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/mobile-foreground-fix",
+      "sha": "bb4ca27c0892b24403919e2da9e555453fa55a3d",
+      "uniqueCommits": 0,
+      "behindBaseline": 15,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/mobile-tee-practice",
+      "sha": "669f21cae836dab2154e8cc4c279eef89e1799a4",
+      "uniqueCommits": 0,
+      "behindBaseline": 78,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/par3-course",
+      "sha": "a146fb951081e0500b44463b2e587b1e6a9bf7fc",
+      "uniqueCommits": 0,
+      "behindBaseline": 59,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/par3-score-controls",
+      "sha": "c14fdc4100bed1b6489d4bf0dc0303df8caf719c",
+      "uniqueCommits": 0,
+      "behindBaseline": 56,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/pilot-readiness-review",
+      "sha": "ffd4355adda9e2eaaf85a9417c33fcdb1251c415",
+      "uniqueCommits": 0,
+      "behindBaseline": 25,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/playable-graphics-preview",
+      "sha": "720a6baee16368314c6edb1d7c3a9a0c3c1e4013",
+      "uniqueCommits": 0,
+      "behindBaseline": 20,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/progress-dashboard",
+      "sha": "60cd343d1e9a8a470b4cf728332c4a4301292137",
+      "uniqueCommits": 0,
+      "behindBaseline": 39,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/scenic-environments",
+      "sha": "e8d08fc5d339ba7901efb890c706040fc03bdcd0",
+      "uniqueCommits": 0,
+      "behindBaseline": 60,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/simple-shot-profile",
+      "sha": "837f333093f68a5c00c4026aeb423b0ef99d290a",
+      "uniqueCommits": 0,
+      "behindBaseline": 58,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/simulation-core",
+      "sha": "bb67389a436e49da171744e3cbaf1b42af0e8d2d",
+      "uniqueCommits": 0,
+      "behindBaseline": 35,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/site-wording-review",
+      "sha": "e0fb4fdf65cd7db19a610ddef703542c52f5d285",
+      "uniqueCommits": 0,
+      "behindBaseline": 42,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/smooth-guides-shoreline",
+      "sha": "b9fe5d0b15fe12cb78f152126b9ded537cd86151",
+      "uniqueCommits": 0,
+      "behindBaseline": 54,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/strategic-scenarios",
+      "sha": "21c519818dde9c00af6afb0b2f595c5bc4ff14a7",
+      "uniqueCommits": 0,
+      "behindBaseline": 77,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/tutorial-mobile-polish",
+      "sha": "dd55c1fc24f9a81f1207ab6c50280affbd4c5034",
+      "uniqueCommits": 0,
+      "behindBaseline": 33,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/tutorial-mobile-refinements",
+      "sha": "956e06c32d65ee11e12bb74839529030bd0ea685",
+      "uniqueCommits": 0,
+      "behindBaseline": 48,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/wind-firmness",
+      "sha": "4a13ed449b060dd36d37d0aa0ee453045bd932cf",
+      "uniqueCommits": 0,
+      "behindBaseline": 55,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/wind-validation-checklist",
+      "sha": "2c773d3a4aae3363b25954b763b42e9a1e64ae08",
+      "uniqueCommits": 0,
+      "behindBaseline": 41,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "feature/yardages-and-asymmetric-woods",
+      "sha": "3aa9f1f6e33e402aa4089a52635834956b177810",
+      "uniqueCommits": 0,
+      "behindBaseline": 72,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "fix/approach-layup-scoring",
+      "sha": "102892fc3568017a5d3650b6f802168178511633",
+      "uniqueCommits": 0,
+      "behindBaseline": 69,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "fix/fullscreen-hazard-label-clearance",
+      "sha": "0a582d7cff87fd13dd08729b0df2c62c1dcd0e44",
+      "uniqueCommits": 0,
+      "behindBaseline": 3,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "fix/lesson-menu-navigation",
+      "sha": "c57f52adac1d105ce4b4c55dbcbf548b1c03b9e9",
+      "uniqueCommits": 0,
+      "behindBaseline": 61,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "main",
+      "sha": "2460ecf1501aaa45a548ebc2a9f04fd2850655e9",
+      "uniqueCommits": 0,
+      "behindBaseline": 79,
+      "included": true,
+      "recommendation": "Keep main; candidate promotion pending"
+    },
+    {
+      "name": "review/practice-randomization-model",
+      "sha": "e38a82efe3be48defb73d0e810eafa69891db760",
+      "uniqueCommits": 0,
+      "behindBaseline": 9,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "review/reconcile-hosted-v17.18.1",
+      "sha": "936c79d9db53105251cf0fee2b1ba0f61741e54f",
+      "uniqueCommits": 0,
+      "behindBaseline": 5,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    },
+    {
+      "name": "review/two-model-examples",
+      "sha": "7a2176d4b99a6ad92bcca966050ef3efa6c0f30c",
+      "uniqueCommits": 0,
+      "behindBaseline": 2,
+      "included": true,
+      "recommendation": "Potential retirement only after promotion, backup and approval"
+    }
+  ]
+}
