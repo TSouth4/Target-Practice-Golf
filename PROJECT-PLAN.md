@@ -128,3 +128,39 @@ Event entry requires no purchase or paid membership. Nonmembers can play the ful
 A simple owner-only shared results table and CSV export is a proposed first administration step before a public leaderboard. Record player/event/round identity, course and scoring-model versions, profile/conditions, timestamps/completion, golf score and average decision score. Requires managed account/database access rules, duplicate-safe submissions and later score verification for prizes; none is implemented by this reconciliation.
 
 Completed in 17.18.2: desktop full-screen Front / Flag / Back distances use a centered top strip, with dogleg facts on a separate row. Work’s imported phone and short-landscape spacing fixes remain intact.
+
+
+## Consolidate development branches — added November 1, 2026
+
+There were 70 remote branches at the last count. After the latest hosted/reconciled version is confirmed, establish one verified baseline in `main` and use short-lived feature/review branches for subsequent work. This is planned maintenance, not completed by this document update.
+
+1. Inventory remote branches and identify the exact hosted source/version. Compare it with the latest cumulative development branch; preserve any newer Work or GitHub changes.
+2. Verify ancestry and file differences, retain useful unmerged work, and create a named backup/tag of the chosen baseline before consolidation. Never infer that an older branch is redundant from its name alone.
+3. Prepare a reviewable change into `main`, run appropriate validation, and obtain the owner's explicit authorization before merging main or deleting remote branches. This plan entry is not that authorization.
+4. Retire only branches whose work is preserved and whose deletion was authorized. Commit history and release references remain available; retain baseline tags and deployment artifacts needed for rollback/cached releases.
+5. Document the current source branch, hosted version and deployment handoff. Future work branches from the verified main, is reviewed/tested, then merges back rather than accumulating another chain of permanent branches.
+
+Do not deploy or change site access as part of branch cleanup.
+
+## Hole-variety refinement — owner feedback, November 1, 2026
+
+The owner reports many scenarios feel straight or sharply doglegged, with repeated compositions despite changing seeds. Geometry variety must change both the view and the target-selection decision. This refines stage 3 above; it does not authorize immediate changes to scoring or saved round schedules.
+
+### Current implementation findings
+
+- The 16-family Practice bank includes eight tee and eight approach families. Regular tee families have small lateral movement, `bend` is a moderate gradual dogleg, and `sharp-dogleg` makes a sharper turn. Gentle bend may occur beyond the landing area, so a mathematically different fairway can still feel straight. Numeric lateral offsets are yards, not dogleg angles.
+- Generated woodland hazards predominantly flank the fairway/green. Authored baselines include some back recovery patches, but the normal nonzero-seed approach generator rebuilds hazards and does not deliberately add a central rear-green tree belt. Side woods extending beyond a green are not the same as trouble directly behind it.
+- `bowl` already places water behind the green and sand short. This gives one depth-risk composition, not a broad family of varied rear hazards.
+- `shore-tee` and `shore-green` already add actual water along one side from roughly 45 yd forward through the green area, with the water side varying by seed. These are only two of the 16 families, reuse existing base geometry and do not constitute a purpose-built peninsula green. Background lake/ocean scenery alone is not a playable water boundary.
+- Peninsula/island greens were already proposed, but are not implemented families yet.
+
+### Prioritized content batch proposal
+
+1. **Visible gentle-to-moderate doglegs:** Both left and right, with gradual, medium and sharp turns. Vary the bend's onset, length, fairway width and location relative to useful landing areas—not only the far end of the hole. Some should favor distance and some should favor laying back.
+2. **Purposeful danger behind greens:** On selected wooded holes, add distinguishable rear recovery woods at varied setbacks, density and height, keeping a plausible bailout. Include some rear-bunker/water compositions too. Rear trees must be actual recovery geometry with matching art, not just background scenery; the existing model still does not simulate airborne tree strikes. Not every hole should have rear danger.
+3. **Peninsula greens:** Water wraps two/three sides, with a defined land connection and at least one meaningful safer miss/route. Review reachable strategies for different profiles, drops and recommended targets. Keep this distinct from a full island green.
+4. **More distinctive continuous-water layouts:** A coastal-style Par-3 with water along the green edge and longer water-lined tee/approach holes with varied shoreline shape, green angle and bailout side. Pebble Beach 7 / Bay Hill 18 are owner-provided inspiration for different water decisions, not a commitment to recreate the real courses. Preserve the existing shoreline families while improving their visual and strategic variety.
+
+Approve a small set of fixed examples before expanding random generation. Inspect both eye-level and overhead geometry; check playable areas, hazard priority/relief, profile reach, optimizer targets, explanations and saved-round compatibility. Then choose frequency in Practice, learning/assessment schedules and Par-3 mixes so the new families are noticeable without dominating. Do not alter the fixed Introduction/Lessons examples unintentionally. Numerical score changes require deliberate model/history version handling.
+
+Current action: added to roadmap only; no new hole geometry or runtime code was implemented in this update. Continue the two fixed model reviews and pilot feedback alongside this planning.
