@@ -202,3 +202,7 @@ This update changes the plan only. It does not add playable holes, change scorin
 ### Branch audit completed — promotion still pending
 
 The [branch audit](docs/BRANCH-AUDIT.md) found 71 remote branches, all included in the latest cumulative planning/source baseline. Main remains the v12 import, 79 commits behind; 69 older refs are potential retirement candidates after promotion and approval. There is no unique remote commit work to integrate in this snapshot. Confirm the latest deployed Work source and active branch usage before preparing an authorized main update. No merge, tag creation, branch deletion or deployment was performed. See the [Excel inventory](docs/BRANCH-AUDIT.csv) and [pinned snapshot](docs/BRANCH-AUDIT.json).
+
+### Owner review follow-up: dispersion realism and dogleg routes
+
+Owner feedback on the two examples is recorded in [OWNER-MODEL-FEEDBACK.md](docs/OWNER-MODEL-FEEDBACK.md). Prioritize intended-carry semantics, measured execution-error distributions (especially short mishits and long tails), the automatic club switch, and future-route/tree-clearance assumptions before expanding scored content. The 179.6-yard sample is currently about 50/50 short/long with no rollout; 0.8% finish over 40 yd long. Owner favors green center and provisionally favors extra dogleg distance conditional on tree clearance. Reconcile the mentioned short-right water with the fixed case (which has no water). No distribution or grading change was implemented by this diagnostic; evidence and compatibility review remain required.

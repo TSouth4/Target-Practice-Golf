@@ -1,0 +1,10 @@
+// Read-only diagnostic for the owner's fixed approach example.
+import fs from 'node:fs';
+import {SCENARIOS,basicPattern,patternAtTarget,samples,shotAt} from '../dist/model.js';
+import {generateScenario} from '../dist/practice.js';
+import {CALM,SURFACE_ROLLOUT} from '../dist/conditions.js';
+const data=JSON.parse(fs.readFileSync(new URL('../docs/TWO-MODEL-EXAMPLES.json',import.meta.url))),c=data.cases.find(c=>c.key==='long-par3'),s=generateScenario(SCENARIOS.find(x=>x.id===c.family),c.holeSeed),base={...basicPattern(c.handicap,s),aimMode:'carry',conditions:{...CALM},rolloutRules:SURFACE_ROLLOUT},draws=samples(4000,data.drawSeed);
+const targets=c.targets.map(t=>{const p=patternAtTarget(t.aim,base),theta=Math.atan2(t.aim.x,t.aim.y),shots=draws.map(z=>{const q=shotAt(t.aim,p,z,s);return{forward:q.y,along:q.x*Math.sin(theta)+q.y*Math.cos(theta),roll:Math.hypot(q.x-q.landing.x,q.y-q.landing.y)};}),ordered=shots.map(x=>x.along).sort((a,b)=>a-b),longBy=y=>shots.filter(x=>x.along>=p.carry+y).length;
+ return{target:t.label,carry:p.carry,club:p.club,sdLong:p.sdLong,sdSide:p.sdSide,shortMishitMixture:p.bigPct,nominalRoll:p.roll,shortCount:shots.filter(x=>x.along<p.carry).length,longCount:shots.filter(x=>x.along>p.carry).length,moreThan20Long:longBy(20),moreThan40Long:longBy(40),moreThan60Long:longBy(60),atLeast250Forward:shots.filter(x=>x.forward>=250).length,minAlong:ordered[0],maxAlong:ordered.at(-1),maxForward:Math.max(...shots.map(x=>x.forward)),p10Along:ordered[400],p90Along:ordered[3599],maxActualRoll:Math.max(...shots.map(x=>x.roll)),displayedSampleMaxForward:Math.max(...t.points.map(x=>x.y))};});
+const report={model:data.model,n:4000,drawSeed:data.drawSeed,scope:'Internal distribution diagnostic, not measured golfer calibration',measurement:'Distance along intended aiming line, not radial distance or green-miss direction',targets};
+fs.writeFileSync(new URL('../docs/DISPERSION-DISTANCE-REVIEW.json',import.meta.url),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
