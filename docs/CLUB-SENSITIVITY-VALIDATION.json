@@ -1,0 +1,355 @@
+{
+  "cases": 24,
+  "boundaries": 68,
+  "boundariesWithOver5PercentAxisJump": 20,
+  "primaryBestWithin2YdOfSwitch": [
+    {
+      "key": "front-water",
+      "handicap": "10",
+      "distance": 0.6231352395662384
+    },
+    {
+      "key": "tucked",
+      "handicap": "0",
+      "distance": 0.7540787586804925
+    },
+    {
+      "key": "long-approach",
+      "handicap": "0",
+      "distance": 0.5678696370179068
+    },
+    {
+      "key": "long-approach",
+      "handicap": "20",
+      "distance": 0.5327412856898661
+    },
+    {
+      "key": "creek",
+      "handicap": "10",
+      "distance": 1.5457083164280334
+    }
+  ],
+  "feasibleFixedSetWinnerFlips": [
+    {
+      "key": "front-water",
+      "handicap": "10"
+    },
+    {
+      "key": "front-water",
+      "handicap": "20"
+    },
+    {
+      "key": "tucked",
+      "handicap": "0"
+    },
+    {
+      "key": "tucked",
+      "handicap": "5"
+    },
+    {
+      "key": "tucked",
+      "handicap": "10"
+    },
+    {
+      "key": "long-approach",
+      "handicap": "20"
+    },
+    {
+      "key": "creek",
+      "handicap": "10"
+    },
+    {
+      "key": "shoreline",
+      "handicap": "5"
+    }
+  ],
+  "maxFixedSetSelectedGap": 0.016867033261322106,
+  "stockReductionMakesSelectedUnreachable": [
+    {
+      "key": "dogleg",
+      "handicap": "0"
+    },
+    {
+      "key": "dogleg",
+      "handicap": "5"
+    },
+    {
+      "key": "dogleg",
+      "handicap": "10"
+    },
+    {
+      "key": "dogleg",
+      "handicap": "20"
+    },
+    {
+      "key": "creek",
+      "handicap": "0"
+    },
+    {
+      "key": "creek",
+      "handicap": "5"
+    }
+  ],
+  "reoptimizationValidation": [
+    {
+      "key": "long-approach",
+      "variant": "default",
+      "carry": 167.96725871431013,
+      "club": "Hybrid",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 3.5383705373881953,
+          "originalTargetCost": 3.5383705373881953,
+          "originalExtra": 0
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 3.53540602055107,
+          "originalTargetCost": 3.53540602055107,
+          "originalExtra": 0
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 3.5344155461581557,
+          "originalTargetCost": 3.5344155461581557,
+          "originalExtra": 0
+        }
+      ]
+    },
+    {
+      "key": "long-approach",
+      "variant": "both-0.8",
+      "carry": 176.13914953808535,
+      "club": "3 wood",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 3.418539548430606,
+          "originalTargetCost": 3.4302005673323706,
+          "originalExtra": 0.011661018901764741
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 3.4155358820774606,
+          "originalTargetCost": 3.430705922208103,
+          "originalExtra": 0.01517004013064227
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 3.422791371682055,
+          "originalTargetCost": 3.4301669294996073,
+          "originalExtra": 0.007375557817552281
+        }
+      ]
+    },
+    {
+      "key": "long-approach",
+      "variant": "both-1.2",
+      "carry": 155.46382215808282,
+      "club": "5 iron",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 3.641646415291665,
+          "originalTargetCost": 3.652988093557098,
+          "originalExtra": 0.011341678265432975
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 3.6387871363878674,
+          "originalTargetCost": 3.6402963785407576,
+          "originalExtra": 0.0015092421528901667
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 3.6463810019823684,
+          "originalTargetCost": 3.6478822915531532,
+          "originalExtra": 0.0015012895707848806
+        }
+      ]
+    },
+    {
+      "key": "long-approach",
+      "variant": "stock-0.98",
+      "carry": 175.72990639046048,
+      "club": "3 wood",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 3.5780355063488605,
+          "originalTargetCost": 3.6088642278628957,
+          "originalExtra": 0.030828721514035262
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 3.5769694952667677,
+          "originalTargetCost": 3.6000959373186516,
+          "originalExtra": 0.023126442051883966
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 3.5773622716272624,
+          "originalTargetCost": 3.603830452624526,
+          "originalExtra": 0.02646818099726378
+        }
+      ]
+    },
+    {
+      "key": "long-approach",
+      "variant": "stock-1.02",
+      "carry": 171.9447585708852,
+      "club": "Hybrid",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 3.4990474182576157,
+          "originalTargetCost": 3.528858281723031,
+          "originalExtra": 0.029810863465415505
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 3.4999827526886573,
+          "originalTargetCost": 3.522871326465927,
+          "originalExtra": 0.022888573777269716
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 3.4940338861273337,
+          "originalTargetCost": 3.5258448813128163,
+          "originalExtra": 0.03181099518548258
+        }
+      ]
+    },
+    {
+      "key": "dogleg",
+      "variant": "default",
+      "carry": 209.46837470128995,
+      "club": "Driver",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 4.465733819688764,
+          "originalTargetCost": 4.465733819688764,
+          "originalExtra": 0
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 4.464038484856353,
+          "originalTargetCost": 4.464038484856353,
+          "originalExtra": 0
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 4.467182125669963,
+          "originalTargetCost": 4.467182125669963,
+          "originalExtra": 0
+        }
+      ]
+    },
+    {
+      "key": "dogleg",
+      "variant": "both-0.8",
+      "carry": 209.46837470128995,
+      "club": "Driver",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 4.379659687440423,
+          "originalTargetCost": 4.379659687440423,
+          "originalExtra": 0
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 4.377195690492914,
+          "originalTargetCost": 4.377195690492914,
+          "originalExtra": 0
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 4.3807097403005475,
+          "originalTargetCost": 4.3807097403005475,
+          "originalExtra": 0
+        }
+      ]
+    },
+    {
+      "key": "dogleg",
+      "variant": "both-1.2",
+      "carry": 209.46837470128995,
+      "club": "Driver",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 4.558151835739168,
+          "originalTargetCost": 4.558151835739168,
+          "originalExtra": 0
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 4.54444250916366,
+          "originalTargetCost": 4.54444250916366,
+          "originalExtra": 0
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 4.556129624472524,
+          "originalTargetCost": 4.556129624472524,
+          "originalExtra": 0
+        }
+      ]
+    },
+    {
+      "key": "dogleg",
+      "variant": "stock-0.98",
+      "carry": 205,
+      "club": "Driver",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 4.493009298755659,
+          "originalTargetCost": null,
+          "originalExtra": null
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 4.491019782307296,
+          "originalTargetCost": null,
+          "originalExtra": null
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 4.493218273884886,
+          "originalTargetCost": null,
+          "originalExtra": null
+        }
+      ]
+    },
+    {
+      "key": "dogleg",
+      "variant": "stock-1.02",
+      "carry": 213.9369065869655,
+      "club": "Driver",
+      "runs": [
+        {
+          "seed": 7142026,
+          "newTargetCost": 4.4397074154276215,
+          "originalTargetCost": 4.4558654040095655,
+          "originalExtra": 0.01615798858194406
+        },
+        {
+          "seed": 112358,
+          "newTargetCost": 4.438976911416392,
+          "originalTargetCost": 4.454659188832016,
+          "originalExtra": 0.01568227741562378
+        },
+        {
+          "seed": 271828,
+          "newTargetCost": 4.444109744253394,
+          "originalTargetCost": 4.459051171389142,
+          "originalExtra": 0.014941427135747531
+        }
+      ]
+    }
+  ]
+}
