@@ -1,0 +1,5 @@
+"Source","Attempted URL","Access outcome","Evidence read","Next step"
+"Google discovery","https://www.google.com/search?q=Trackman+amateur+carry+distance+dispersion+short+long+stock+distance","Workspace proxy tunnel denied 403","None","Retry after environment network configuration is applied"
+"TrackMan","https://www.trackman.com/blog/golf","Workspace proxy tunnel denied 403","None","Find official carry definitions and amateur shot-level dispersion methodology"
+"Arccos","https://www.arccosgolf.com/blogs/community","Workspace proxy tunnel denied 403","None","Verify club-distance reference, filters and whether usable distances are carry or finish"
+"Shot Scope","https://shotscope.com/blog/stats/","Workspace proxy tunnel denied 403","None","Verify distance methodology and whether public samples establish carry-error shape"
