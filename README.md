@@ -1,3 +1,7 @@
+# Experimental dispersion comparison (17.18.6)
+
+Open `dispersion-prototype.html` to compare the current symmetric carry pattern, a shifted reference, and an illustrative good-contact/short-mishit mixture. Six hole/profile combinations hold club choice and random samples fixed. Switch between the same target and each pattern's best sampled target. Links are on the existing model-review and club-comparison pages. Normal gameplay/scoring is unchanged. See [review instructions](docs/DISPERSION-PROTOTYPE.md).
+
 # Saved club assumptions and comparison prototype (17.18.5)
 
 Standard learning rounds, assessments and Par-3 rounds now save their stock club distances, spreads and flight assumptions. Legacy rounds receive a frozen compatibility snapshot when loaded. The modeled club is named beside the player settings. Current scoring and automatic club selection are unchanged.
