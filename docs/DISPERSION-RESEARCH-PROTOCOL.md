@@ -1,6 +1,6 @@
 # Carry-dispersion research — protocol and access status
 
-**Status: preparatory work, not a completed literature review.** No public TrackMan, Arccos, Shot Scope or PGA page content was retrieved in this session. The workspace proxy denied the attempted research requests before their content could be read. Do not cite this document as empirical support for a new distribution.
+**Status: public-source review resumed after environment publication.** TrackMan, Arccos and Shot Scope support material has now been read. See [findings](DISPERSION-RESEARCH-FINDINGS.md), [evidence extraction](DISPERSION-EVIDENCE.csv) and the source register. No qualifying representative amateur shot-level carry dataset was acquired and no calibrated default is claimed. The access diagnosis below records the earlier blocked stage; it is historical, not the current overall access status.
 
 ## Owner's hypothesis
 
@@ -22,7 +22,7 @@ The owner also wants the displayed shot pattern to represent average real play r
 
 | Source type | Useful evidence | Critical qualification |
 | --- | --- | --- |
-| TrackMan / launch-monitor studies | Shot-level carry, lateral carry, total, launch/spin/contact and measured dispersion, preferably amateurs with club/ability context | Public averages do not supply distribution shape. Verify normalization, range-ball corrections, indoor/outdoor setting and filtered mishits. No source content verified yet. |
+| TrackMan / launch-monitor studies | Shot-level carry, lateral carry, total, launch/spin/contact and measured dispersion, preferably amateurs with club/ability context | Public averages do not supply distribution shape. Verify normalization, range-ball corrections, indoor/outdoor setting and filtered mishits. Definitions and product workflow now verified; representative amateur error distributions still unavailable. |
 | Arccos / Shot Scope | On-course club outcomes, golfers' distance-reference definitions, handicap/lie/context and filtering methodology | GPS start/end positions alone give finish displacement, not the landing point. Verify any carry field rather than treating total as carry. Do not assume access to proprietary shot data/API. |
 | PGA / ShotLink / USGA / R&A | Definitions, measured pro context and published reports/data | Professional results are a useful cross-check, not an amateur 20-handicap distribution. Separate final-position datasets from actual tracked flight. |
 | Peer-reviewed/public datasets | Methods, sample sizes, raw distributions and uncertainty | Check participant selection, shot intent, clubs, units, ball type, lie, weather and excluded shots. |
@@ -56,18 +56,20 @@ Analyze player-relative errors (carry minus stated stock carry), normalized erro
 - Preserve nominal intended carry as the user's decision variable. Explain how real contact shifts outcomes without turning the aiming aid into a reveal of the answer before commitment.
 - Any adopted scoring-distribution change needs versioned historical compatibility, updated coaching, coverage/tail tests, all handicap/club checks and owner review before deployment.
 
-## Access diagnosis and prepared configuration
+## Historical access diagnosis and prepared configuration
 
 A session-level network permission was granted, but the managed environment's separate enforced policy remains restricted to its configured domains. Four attempts—Google search, TrackMan blog, Arccos community and Shot Scope statistics—failed with `Tunnel connection failed: 403 Forbidden`. These are workspace proxy denials, not verified provider paywalls or refusals to share data.
 
-A network-only configuration draft was successfully saved, adding the named public research/search domains below while preserving package-manager presets and all repository/script/credential settings. The tool returned `requires_publish: true`; it has not been applied or published. The owner must review/save/publish the environment configuration before the blocked web research can continue. This is environment publication, not website publication.
+A network-only configuration draft was successfully saved, adding the named public research/search domains below while preserving package-manager presets and all repository/script/credential settings. At that preparatory stage the tool returned `requires_publish: true`; the owner subsequently saved/published it and research hosts became accessible. The owner must review/save/publish the environment configuration before the blocked web research can continue. This is environment publication, not website publication.
 
 Prepared domains: Google/Bing/Scholar; TrackMan main/blog; Arccos main/support; Shot Scope main/support; USGA, R&A and PGA TOUR; Columbia's published golf research; Crossref, PubMed and PMC; MyGolfSpy, Practical Golf, Golf Digest and Golf Monthly. Additional publisher hosts may need narrow additions as actual sources are identified. No credentials were requested or saved.
 
 The saved draft ID is `3e2b2752-8bb8-4606-8dea-5baa51344753~cecfgdraft_6aeb2e4103848197ada467e3cd209ca9`. Runtime access must be retested after a meaningful configuration change; saving a draft does not establish source accessibility.
 
-## Deliverable after access is available
+## Deliverable and remaining empirical work
 
 A source-linked evidence report with extracted carry/total definitions, measured distributions or explicit data gaps, source quality/filters, support or contradiction for the stock-percentile hypothesis, and a justified model recommendation. Distinguish observed data, mathematical implications and teaching assumptions. If public data cannot establish amateur carry tails, specify a realistic data-collection/licensing path rather than inventing calibration.
 
 No gameplay, grading, probability defaults or saved progress changed in this preparatory update.
+
+The initial source-linked review is now in DISPERSION-RESEARCH-FINDINGS.md. Representative amateur carry tails and club-specific calibration remain open; public documentation is not a substitute for raw observations.

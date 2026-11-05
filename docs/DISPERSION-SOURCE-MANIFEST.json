@@ -1,0 +1,214 @@
+{
+  "scope": "Public source review; source pages retained only in temporary research workspace, no raw golfer dataset acquired",
+  "sources": [
+    {
+      "key": "tm-carry",
+      "url": "https://www.trackman.com/blog/what-is-carry",
+      "title": "What Is Carry in Golf? Trackman Explains the Concept",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "0f6f4eed5583cf8508747cab8b8ce6a6bc9eb9dd79dcd92675f0ddb938e46627",
+      "htmlBytes": 238732,
+      "claim": "Carry-flat definition separates carry from finish; not always identical to actual landing on elevated terrain.",
+      "limitations": "Definition; no amateur error distribution.",
+      "pagePublicationOrUpdateDate": "March 25, 2024"
+    },
+    {
+      "key": "tm-map",
+      "url": "https://www.trackman.com/blog/know-your-numbers-introducing-map-my-bag-in-tps-10-1",
+      "title": "Map My Bag: Your new golf club selection and practice tool",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "9ce27c319a8e3d75b6f83c2d6187b90ddf474a1595468ee4cc1f1671a122ee90",
+      "htmlBytes": 248283,
+      "claim": "Maps carry and total separately, rolling average of up to 30 shots per club; suggests six to start.",
+      "limitations": "Product workflow; no stock percentile or mishit filter specification; 30 cannot establish rare tails.",
+      "pagePublicationOrUpdateDate": "May 6, 2025"
+    },
+    {
+      "key": "tm-save",
+      "url": "https://www.trackman.com/blog/know-your-numbers-how-map-my-bag-can-save-you-strokes",
+      "title": "Know your numbers: How Map My Bag can save you strokes",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "4180b620e8257d003041294615c48c7d59c224a64654908f25fced0ab31f4aad",
+      "htmlBytes": 258390,
+      "claim": "Expert reports golfers often overestimate yardages by 10\u201315 yd.",
+      "limitations": "Expert/marketing statement without sample or study method; cannot impose a 10\u201315 yd correction.",
+      "pagePublicationOrUpdateDate": "October 15, 2025"
+    },
+    {
+      "key": "tm-consistency",
+      "url": "https://www.trackman.com/blog/how-to-utilize-the-consistency-number",
+      "title": "Use the Consistency Number for Better Golf Performance",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "c8af883cb9d7c4510466480b06af5db4b9c0f77fa6ad061330c59c84951cf9de",
+      "htmlBytes": 248048,
+      "claim": "Consistency is standard deviation; one competitive junior example gives carry SD 4.8 yd at 70 yd and 3.5 yd at 80 yd.",
+      "limitations": "Single student and partial wedge targets; not a full-iron 20-handicap sample; no raw shots/count.",
+      "pagePublicationOrUpdateDate": "September 23, 2024"
+    },
+    {
+      "key": "tm-averages",
+      "url": "https://www.trackman.com/blog/introducing-updated-tour-averages",
+      "title": "New PGA & LPGA Tour Averages | Trackman Insights 2024",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "83333c06aeddd6d4fdda00a5b5a26716dc89a5543b17bacbf306af0ee45a3962",
+      "htmlBytes": 234362,
+      "claim": "Tour means have broad professional sampling and mixed competition/range context.",
+      "limitations": "Means across golfers are not within-player error distributions; not amateur calibration.",
+      "pagePublicationOrUpdateDate": "May 2, 2024"
+    },
+    {
+      "key": "arccos-new",
+      "url": "https://www.arccosgolf.com/blogs/community/arccos-launches-new-smart-club-distances",
+      "title": "Introducing Arccos' New Smart Club Distances \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "7048a7d0371b76dd16b5bad540dd9dbbd0f70941c4c8295b054dd17a2a48a5a0",
+      "htmlBytes": 274304,
+      "claim": "Good-strike distance excludes mishits, abnormally long and recovery shots.",
+      "limitations": "Historical product definition; not whole-shot carry distribution; no filtering thresholds.",
+      "pagePublicationOrUpdateDate": "Not displayed in extracted article text"
+    },
+    {
+      "key": "arccos-definition",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/360036475132-What-is-Smart-Distance-Smart-Range-and-Longest",
+      "title": "What is Smart Distance, Smart Range, and Longest? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "f294ed5484c6b84ee33efd4ca18fa708614e2199a9a1b0d47ccd1928f53886a2",
+      "htmlBytes": 42681,
+      "claim": "Smart Distance estimates well-struck outcomes with excluded mishits/long/chip/recovery shots; sparse data can be AI-predicted.",
+      "limitations": "Support page has ambiguous 20+/30-shot wording and variable filters; no exact percentiles.",
+      "pagePublicationOrUpdateDate": "September 13, 2024"
+    },
+    {
+      "key": "arccos-normalized",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/19008593261972-What-is-Normalized-Smart-Distances",
+      "title": "What is Normalized Smart Distances? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "68964f1a6296bb08ce438c9eb6717a586b7f217d072de8c6afae99a5e6637319",
+      "htmlBytes": 40449,
+      "claim": "Distance figures are normalized for environment; users can view/edit included shots.",
+      "limitations": "Modeled adjusted values are not raw measured flight; no reconstruction algorithm disclosed.",
+      "pagePublicationOrUpdateDate": "February 27, 2025"
+    },
+    {
+      "key": "arccos-filter",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/4407629857556-How-do-I-included-or-excluded-shots-in-my-Smart-Distance",
+      "title": "How do I included or excluded shots in my Smart Distance? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "145ac2b760bd11a1ca7ed8fdedb511c59647dc340716b0a1f45757fe235ba043",
+      "htmlBytes": 37849,
+      "claim": "Users may manually include/exclude shots such as duffs and recoveries.",
+      "limitations": "Inclusion rules can vary by user; selected good-shot results cannot represent every attempted full shot.",
+      "pagePublicationOrUpdateDate": "February 27, 2025"
+    },
+    {
+      "key": "arccos-overview",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/50225781366164-Understanding-Your-Club-Overview-Stats",
+      "title": "Understanding Your Club Overview Stats \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "d6b2e5cb3f32e59b8c5a5903bd23066249478b6f0f1242ffa12e58f88db06f62",
+      "htmlBytes": 37806,
+      "claim": "Smart Distance described as a club-dependent percentile of good-contact carry, drivers lower and wedges higher.",
+      "limitations": "Exact club percentiles and carry measurement/reconstruction method absent; provider claim, not raw data.",
+      "pagePublicationOrUpdateDate": "June 12, 2026"
+    },
+    {
+      "key": "arccos-distribution",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/50225607598612-What-Is-Distance-Distribution",
+      "title": "What Is Distance Distribution? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "2e1ae98b9c1ea24078c4f384a43da72551d836dc2225d2fdb846112fe7db5210",
+      "htmlBytes": 36182,
+      "claim": "Histogram by club and lie; recommends majority outcome rather than best shot.",
+      "limitations": "Calls Smart Distance most common carry, unlike percentile description elsewhere; do not equate mode and quantile.",
+      "pagePublicationOrUpdateDate": "June 12, 2026"
+    },
+    {
+      "key": "arccos-driving70",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/50224911416212-What-Does-the-Driving-Distance-Number-Mean",
+      "title": "What Does the Driving Distance Number Mean? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "299e75897c39204d79fad75e4c36bf72bb3d869a7698c1119241335eefd4e11a",
+      "htmlBytes": 37030,
+      "claim": "Player driving-distance statistic explicitly P70 carry; par4/par5 tee shots only; recommends 10 tracked rounds.",
+      "limitations": "Driving statistic only, not every iron Smart Distance; no raw dataset, measured carry method or tail rates.",
+      "pagePublicationOrUpdateDate": "June 12, 2026"
+    },
+    {
+      "key": "arccos-graph",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/50225866664468-How-Do-I-Read-the-Dispersion-Graph",
+      "title": "How Do I Read the Dispersion Graph? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "64b5c08e3a35650a7dc0169db23529b0ce5da54dffa2bf92b7db2a08152a5f04",
+      "htmlBytes": 37086,
+      "claim": "Ellipse represents approximately 68% of shots; axes use fairway centerline for drives and pin target line for approaches.",
+      "limitations": "Recorded line is not necessarily intended line; no raw sample or ellipse-fit algorithm; not interchangeable with 80% core.",
+      "pagePublicationOrUpdateDate": "June 12, 2026"
+    },
+    {
+      "key": "arccos-bias",
+      "url": "https://support.arccosgolf.com/hc/en-us/articles/50225732640916-What-Is-Directional-Bias",
+      "title": "What Is Directional Bias? \u2013 Arccos Golf",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "ebb9cf49fab509524c805382790e8ffaa653427b11ef46769998afdba832734b",
+      "htmlBytes": 36588,
+      "claim": "Bias is club-specific; extreme mishits filtered; fairway/pin reference axes.",
+      "limitations": "Does not establish universal left-long/right-short correlation or target intent.",
+      "pagePublicationOrUpdateDate": "June 12, 2026"
+    },
+    {
+      "key": "ss-pavg",
+      "url": "https://support.shotscope.com/hc/en-us/articles/360000810145-What-is-the-P-AVG-Performance-Average-Distance",
+      "title": "What is the P-AVG (Performance Average Distance)? \u2013 Shot Scope",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "4c297d86da62cbd18fba4a2572c9b87f469f82d6a488a5ead74b95743251b4c0",
+      "htmlBytes": 23445,
+      "claim": "Performance Average removes long and short outliers; excludes positional shots and shots inside50yd.",
+      "limitations": "Well-struck distance reference; no carry separation or filtering thresholds in article; not unfiltered error shape.",
+      "pagePublicationOrUpdateDate": "December 15, 2020"
+    },
+    {
+      "key": "pg-control",
+      "url": "https://practical-golf.com/golf-ball-control",
+      "title": "You Don't Have as Much Control over the Golf Ball as You Think \u00b7 Practical-Golf.com",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "b2377628d35a94dcf32e8d01e00e42017b473ab464d721d149eccd552f68a9c8",
+      "htmlBytes": 187174,
+      "claim": "One near-scratch golfer hit20 shots per club indoors: SW105 target97\u2013117;8i160 target148\u2013171;5i195 target178\u2013201 yd.",
+      "limitations": "Small good-striking session, perfect mat and no pressure; descriptive min/max, not central intervals or hard bounds; no raw coordinates.",
+      "pagePublicationOrUpdateDate": "Not displayed in extracted article text"
+    },
+    {
+      "key": "pg-driver",
+      "url": "https://practical-golf.com/driver-dispersion",
+      "title": "The Driver Dispersion Test: How To Make Smarter Decisions Off the Tee \u00b7 Practical-Golf.com",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "a5896633c05aca16060ca0afe3bfdfc5cb332a2fc0f8fd5fb2afd115a1cf4079",
+      "htmlBytes": 184467,
+      "claim": "Single-player30-shot driver exercise separates250yd carry from270\u2013275 total and about68yd lateral width.",
+      "limitations": "One-player example; width is not SD or universal probability coverage; no shot-level export.",
+      "pagePublicationOrUpdateDate": "Not displayed in extracted article text"
+    },
+    {
+      "key": "pg-irons",
+      "url": "https://practical-golf.com/golf-iron-distances",
+      "title": "How Far Do Golfers Hit Their Irons? Why Approach Play Is so Important \u00b7 Practical-Golf.com",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "34462ae578685cd386dd0e5211a9cda889c4feba503dffb02dd12097cae12891",
+      "htmlBytes": 190766,
+      "claim": "Aggregate iron distances/GIR/proximity contextualize ability differences.",
+      "limitations": "Between-player mean distances and short-of-green results do not identify within-club carry error or execution/selection causes.",
+      "pagePublicationOrUpdateDate": "Not displayed in extracted article text"
+    },
+    {
+      "key": "pg-true",
+      "url": "https://practical-golf.com/knowing-your-true-distances",
+      "title": "Knowing the actual distances of each of your golf clubs is vital information to have. Find out why in our latest article. \u00b7 Practical-Golf.com",
+      "accessedUTC": "2026-11-05",
+      "htmlSHA256": "d2745f1a9bb7de169d3804ddcfa387f3bca487d7aad93e32df3396da2c6ff878",
+      "htmlBytes": 149484,
+      "claim": "Instruction explicitly says average carry not best-strike yardage; wind/lie/slope can cause short misses.",
+      "limitations": "Coaching explanation, not controlled population distribution.",
+      "pagePublicationOrUpdateDate": "Not displayed in extracted article text"
+    }
+  ]
+}

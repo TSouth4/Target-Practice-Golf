@@ -1,0 +1,44 @@
+{
+  "scope": "Mathematical examples only. 16.2587yd is the current owner-example model SD, not empirical calibration. All rows are normal; no mishit mixture or hard limits.",
+  "rows": [
+    {
+      "label": "Symmetric at stated carry",
+      "statedCarry": 170,
+      "mean": 170.0,
+      "sd": 16.2587,
+      "stockPercentile": 0.5,
+      "central80": [
+        149.16363756127998,
+        190.83636243872002
+      ],
+      "over20LongProbability": 0.10932783652612299,
+      "over40LongProbability": 0.006942568470245769
+    },
+    {
+      "label": "Same width; stated carry at P70",
+      "statedCarry": 170,
+      "mean": 161.47392938403377,
+      "sd": 16.2587,
+      "stockPercentile": 0.7000000000000002,
+      "central80": [
+        140.63756694531378,
+        182.31029182275375
+      ],
+      "over20LongProbability": 0.03967147957042316,
+      "over40LongProbability": 0.001419645640632905
+    },
+    {
+      "label": "Hypothetical 150\u2013180 central80",
+      "statedCarry": 170,
+      "mean": 165,
+      "sd": 11.704562191085683,
+      "stockPercentile": 0.6653772901721029,
+      "central80": [
+        150.0,
+        180.0
+      ],
+      "over20LongProbability": 0.016342997071326804,
+      "over40LongProbability": 6.0361154705423914e-05
+    }
+  ]
+}
