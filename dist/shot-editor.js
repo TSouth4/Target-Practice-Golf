@@ -1,3 +1,4 @@
+import {validStockSnapshot} from './profile-snapshot.js';
 import {trainingBag} from './bag.js';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const FLIGHT_PIXEL=2.3,APEX_FLIGHT_PIXEL=FLIGHT_PIXEL*3;
@@ -21,6 +22,7 @@ export function resetFlight(bag,club=null){return bag.map(c=>!club||c.club===clu
 export function validPlayerProfile(p){
  if(p?.difficulty!==undefined&&!['easy','medium','hard'].includes(p.difficulty))return false;
  if(!p||!['0','5','10','20'].includes(p.handicap)||!Number.isFinite(p.limit)||p.limit<180||p.limit>330||p.shotMode&&!['basic','custom'].includes(p.shotMode))return false;
+ if(p.stockSnapshot!==undefined&&!validStockSnapshot(p.stockSnapshot))return false;
  if(p.shotMode!=='custom')return true;
  const names=['Driver','3 wood','Hybrid','5 iron','6 iron','7 iron','8 iron','9 iron','PW','SW'];
  return Array.isArray(p.bag)&&p.bag.length===10&&new Set(p.bag.map(c=>c.club)).size===10&&p.bag.every(c=>names.includes(c.club)&&['both','left','right'].includes(c.bigDirection)&&Object.entries(SHOT_FIELDS).every(([k,[lo,hi]])=>{const v=k==='carry'?c.stock-c.roll:c[k];return Number.isFinite(v)&&v>=lo&&v<=hi;}));

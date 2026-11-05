@@ -366,3 +366,6 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
  .immersive-mode .course-readouts #conditionsBar{grid-column:2;grid-row:1}
  .immersive-mode .course-readouts .dogleg-readout{grid-column:1/-1;grid-row:2;justify-self:center;width:100%;max-width:440px}
 }
+
+/* Club assumption stays readable beside the carry control in both layouts. */
+.modeled-club{display:block;font-size:11px;line-height:1.4;color:var(--muted);text-align:center}.immersive-mode .modeled-club{font-size:9px;overflow-wrap:anywhere}

@@ -1,3 +1,9 @@
+# Saved club assumptions and comparison prototype (17.18.5)
+
+Standard learning rounds, assessments and Par-3 rounds now save their stock club distances, spreads and flight assumptions. Legacy rounds receive a frozen compatibility snapshot when loaded. The modeled club is named beside the player settings. Current scoring and automatic club selection are unchanged.
+
+Open `club-selection-prototype.html` beside the app to compare feasible club-and-target pairs for the two owner examples. It is an isolated diagnostic, not a new scoring mode. See [scope, assumptions and checks](docs/CLUB-SELECTION-IMPLEMENTATION.md).
+
 # Two owner model-review examples (17.18.4)
 
 An isolated read-only page compares fixed long Par-3 and sharp-dogleg targets. Open `model-owner-review.html` on the preview/host, without changing normal game modes or saved progress. See [findings and questions](docs/TWO-MODEL-EXAMPLES.md). No scoring changes were made.

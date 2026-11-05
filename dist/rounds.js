@@ -1,3 +1,4 @@
+import {snapshotProfile,pinLegacyProfile} from './profile-snapshot.js';
 import {validAssessmentNote} from './assessment-review.js';
 import {MODEL_VERSION} from './progress.js';
 import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule} from './conditions.js';
@@ -10,7 +11,7 @@ export const ROUND_KEY='target-practice-round-v1';
 export const ROUND_VERSION='rounds-v4-model-v6';
 const groups=[['drivable'],['cedar'],['narrow','squeeze-par4','creek-tee'],['bend','sharp-dogleg'],['creek-tee','drivable']];
 export function createRound(kind,seed,profile){
- profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
+ profile={...snapshotProfile(profile),...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
  const rng=random(seed),count=kind==='assessment'?10:5,approaches=['water','tucked','bowl','split','creek-par3','par5-open','par5-carry'],schedule=[];
  for(let i=0;i<count;i++){
   const pool=i===1?['shore-green']:i%2?approaches:groups[Math.floor(i/2)%groups.length],id=pool[Math.floor(rng()*pool.length)];
@@ -36,6 +37,7 @@ export function readRound(raw){
   if(r.schedule.some(s=>!SCENARIOS.some(b=>b.id===s.id)||!Number.isInteger(s.holeSeed)||s.holeSeed<=0||!Number.isInteger(s.drawSeed)||s.drawSeed<=0))return null;
   if(r.answers.some((a,i)=>!a||a.index!==i||!['balanced','aggressive','conservative','refine'].includes(a.kind)||!Number.isFinite(a.score)||a.score<0||a.score>100||!(a.regret===null||Number.isFinite(a.regret)&&a.regret>=0)||!Number.isFinite(a.dx)||!Number.isFinite(a.dy)||!validAssessmentNote(a.review)))return null;
   if(r.answers.length<r.index||r.answers.length>r.index+1||r.status==='complete'&&r.answers.length!==count)return null;
+  r.profile=pinLegacyProfile(r.profile);
   return r;
  }catch{return null;}
 }

@@ -2,6 +2,7 @@
 export const DRIVER_LIMITS={0:280,5:265,10:250,20:225};
 const CLUBS=[['Driver',1,15,1],['3 wood',.89,10,.82],['Hybrid',.78,7,.66],['5 iron',.71,4,null],['6 iron',.66,3,null],['7 iron',.585,3,null],['8 iron',.53,2,null],['9 iron',.475,2,null],['PW',.415,1,null],['SW',.30,0,null]];
 export function trainingBag(p){
+ if(p.stockBag&&!p.customBag)return p.stockBag.map(c=>({...c}));
  if(p.customBag)return p.customBag.filter(c=>p.shotType==='tee'||c.club!=='Driver').map(c=>({...c,stock:p.shotType==='approach'?c.stock-c.roll:c.stock,roll:p.shotType==='approach'?0:c.roll})).sort((a,b)=>b.stock-a.stock);
  const maximum=p.driverLimit||DRIVER_LIMITS[p.handicap];
  return CLUBS.filter(c=>p.shotType==='tee'||c[0]!=='Driver').map(([club,fraction,roll,spread])=>{

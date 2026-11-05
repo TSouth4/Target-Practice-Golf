@@ -1,3 +1,4 @@
+import {snapshotProfile,savedBasicPattern,pinLegacyProfile} from './profile-snapshot.js';
 import {MODEL_VERSION} from './progress.js';
 import {CONDITIONS_VERSION,conditionsFor,validConditionSchedule,windEffect} from './conditions.js';
 import {validPlayerProfile} from './shot-editor.js';
@@ -33,7 +34,7 @@ export function simulateFinish(kind,yards,seed,reference=null){
 // Pick longer existing layouts rather than enlarging greens or changing hazard geometry.
 // A separate seeded stream controls the mix without changing draw/finish randomness.
 export function courseDistanceRange(profile,id,conditions=null,long=false){
- const template=SCENARIOS.find(s=>s.id==='tucked'),p={...basicPattern(profile.handicap,template,profile.limit),aimMode:'carry',...(profile.shotMode==='custom'?{customBag:profile.bag}:{}),conditions};
+ const template=SCENARIOS.find(s=>s.id==='tucked'),p={...savedBasicPattern(profile,template),aimMode:'carry',...(profile.shotMode==='custom'?{customBag:profile.bag}:{}),conditions};
  const carry=Math.min(330,reachLimit(p)),aim={x:0,y:carry},flight=patternAtTarget(aim,p),available=carry+windEffect(aim,flight,carry).y;
  if(!long)return{min:0,max:Math.min(175,available),available};
  // Front pins in the water family have a shorter authored range than back pins.
@@ -51,7 +52,7 @@ function courseHoleSeed(id,initial,range){
  return{seed:best,matched:false};
 }
 export function createCourse(seed,profile,landscape='woodland'){
- profile={...profile,...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
+ profile={...snapshotProfile(profile),...(profile.difficulty&&profile.difficulty!=='easy'?{conditionsVersion:CONDITIONS_VERSION}:{})};
  const rng=random(seed),mix=random(seed^0x37ab91),longCount=4+Math.floor(mix()*2),longSlots=new Set();
  for(let i=0;i<longCount;i++){const first=Math.floor(i*COURSE_HOLES/longCount),last=Math.floor((i+1)*COURSE_HOLES/longCount);longSlots.add(first+Math.floor(mix()*(last-first)));}
  const families=['tucked','water','split'],schedule=[];
@@ -84,7 +85,7 @@ export function recordCourseShot(c,points,s,decision,aim,pattern){
 export function advanceCourse(c){if(!c.review)return false;if(c.review.retee){c.review=null;return true;}if(c.status==='complete')return false;c.index++;c.current={strokes:0,attempts:[]};c.review=null;return true;}
 export function readCourse(raw){
  try{
-  const c=typeof raw==='string'?JSON.parse(raw):raw;
+  const c=typeof raw==='string'?JSON.parse(raw):structuredClone(raw);
   const integer=(n,min=0,max=2147483646)=>Number.isInteger(n)&&n>=min&&n<=max;
   const point=p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y);
   const shot=p=>point(p)&&point(p.landing)&&['fairway','green','rough','bunker','trees','water','ob'].includes(p.kind);
@@ -105,7 +106,7 @@ export function readCourse(raw){
    if(r.retee){if(r.finish!==null||c.current.strokes!==c.current.attempts.length*2)return null;}
    else if(!finish(r.finish)||c.current.strokes!==c.current.attempts.length+c.current.attempts.reduce((n,a)=>n+a.penalty,0)+r.finish.strokes||c.answers.at(-1)?.holeScore!==c.current.strokes)return null;
   }else if(c.current.attempts.some(a=>a.selected.kind!=='ob')||c.current.strokes!==c.current.attempts.length*2)return null;
-  return c;
+  c.profile=pinLegacyProfile(c.profile);return c;
  }catch{return null;}
 }
 
