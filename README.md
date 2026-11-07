@@ -1,3 +1,7 @@
+# Purpose-first visual introduction (17.18.9)
+
+The Introduction now starts with one hoped-for shot, one miss, 100 possible finishes, and an interactive move of the whole shot pattern. It then teaches direction/carry/commit and leads to assessment setup. These are ungraded authored illustrations; game scoring and saved rounds are unchanged. Returning users can replay Introduction from Home/Menu. See [flow and verification](docs/INTRO-SHOT-PATTERN-STORY.md).
+
 # Clearer expanded feedback (17.18.8)
 
 See details now explains Your decision → Why the comparison scores better → The difference. It shows one comparison table; technical metrics and limitations are under Calculation notes and limits. Repeated scores and paragraphs are removed from view. Initial feedback and scoring are unchanged. See [scope and verification](docs/THREE-PART-FEEDBACK.md).
