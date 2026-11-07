@@ -101,3 +101,28 @@ export function retryStory(first,now){
  const changes=Object.entries(COSTS).map(([key,name])=>({name,value:(first.breakdown?.[key]??NaN)-(now.breakdown?.[key]??NaN)})).filter(v=>Number.isFinite(v.value)&&(helped?v.value>.005:v.value<-.005)).sort((a,b)=>Math.abs(b.value)-Math.abs(a.value));
  return {verdict:helped?'This adjustment helped.':'This adjustment cost more.',reason:changes.length?`The largest modeled ${helped?'saving':'added cost'} came from ${changes[0].name}. The result also includes the other parts of the tradeoff.`:'The overall modeled result changed. Compare both patterns; the available results do not isolate one reason.'};
 }
+
+// Plain explanation of observed cost differences; no new target evaluation.
+export function comparisonDetails(r,q,kind){
+ if(!Number.isFinite(r.expected)||!Number.isFinite(q.expected))return {
+  heading:'How the targets compare',
+  comparison:!Number.isFinite(q.expected)?'There isn’t a usable blue comparison for this shot. Check the shot settings before comparing targets.':'Your target sent every shot out of bounds. The blue target keeps some shots in play.',
+  difference:'A reliable strokes-saved figure is not available for this comparison.'
+ };
+ const gain=r.expected-q.expected,amount=Math.abs(gain),blue=gain>=0;
+ const difference=amount<1e-10?'These targets have the same estimated score.':`The ${blue?'blue target':'original target'} saves an estimated ${amount<.005?'less than 0.01':amount.toFixed(2)} strokes per shot—about ${(amount*100).toFixed(1)} strokes over 100 attempts.${kind==='balanced'&&blue?' Your original target is still a good choice.':''}`;
+ if(amount<.005)return {heading:'How the targets compare',comparison:'These targets score about the same. You don’t need to match the blue point exactly.',difference};
+ const winner=blue?q:r,other=blue?r:q,subject=blue?'The blue target':'Your target';
+ const keys=['nextShot','rough','bunker','trees','water','ob'];
+ const changes=keys.map(key=>({key,saving:(other.breakdown?.[key]??NaN)-(winner.breakdown?.[key]??NaN)})).filter(x=>Number.isFinite(x.saving));
+ const good=changes.filter(x=>x.saving>.005).sort((a,b)=>b.saving-a.saving)[0],bad=changes.filter(x=>x.saving<-.005).sort((a,b)=>a.saving-b.saving)[0];
+ const names={rough:'the rough',bunker:'bunkers',trees:'the trees',water:'water',ob:'out of bounds'};
+ function describe(change,improves){
+  if(change.key==='nextShot')return improves?`${subject} leaves ${change.saving<.1?'a slightly easier':'an easier'} next shot on average.`:'It leaves a harder next shot on average.';
+  const k=change.key,delta=rate(winner,k)-rate(other,k);
+  if(improves&&delta<-.005)return `${subject} sends fewer shots ${k==='ob'?'out of bounds':'into '+names[k]}.`;
+  if(!improves&&delta>.005)return `It does send more shots ${k==='ob'?'out of bounds':'into '+names[k]}.`;
+  return improves?`${subject} loses fewer strokes to ${k==='ob'?'out-of-bounds penalties':names[k]} overall.`:`Its shots ${k==='ob'?'out of bounds':'in '+names[k]} cost more strokes overall.`;
+ }
+ return {heading:blue?'Why the comparison scores better':'Why your target scores better',comparison:good?describe(good,true)+(bad?' '+describe(bad,false):''):'The two patterns finish in different places, but these results don’t identify one clear reason for the score difference.',difference};
+}

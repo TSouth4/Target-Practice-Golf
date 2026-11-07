@@ -369,3 +369,5 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 
 /* Club assumption stays readable beside the carry control in both layouts. */
 .modeled-club{display:block;font-size:11px;line-height:1.4;color:var(--muted);text-align:center}.immersive-mode .modeled-club{font-size:9px;overflow-wrap:anywhere}
+/* Expanded feedback: one readable explanation, followed by supporting numbers. */
+.decision-explanation h3{font-size:16px;margin:18px 0 6px}.decision-explanation p{font-size:14px;line-height:1.65;max-width:72ch}.decision-explanation .per100-evidence{max-width:none}.calculation-notes{margin-top:18px;border-top:1px solid var(--line);padding-top:8px}.calculation-notes>summary{cursor:pointer;min-height:44px;padding:12px 0;font-size:13px;font-weight:600}.calculation-notes>p{font-size:12px;line-height:1.65}

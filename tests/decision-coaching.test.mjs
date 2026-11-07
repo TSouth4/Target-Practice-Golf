@@ -41,3 +41,11 @@ test('depth comments require a carry-only comparison and measured short or long 
  x.b.aim.x=0;delete x.r.points;assert.doesNotMatch(story(x).summary,/beyond the green/);
  x.s.type='tee';x.s.par=4;assert.doesNotMatch(story(x).summary,/green/);
 });
+test('expanded comparison explains benefits, tradeoffs and unrounded per-100 cost plainly',async()=>{
+ const {comparisonDetails}=await import('../dist/decision-coaching.js');
+ const own=result({expected:2.837,breakdown:{nextShot:1.8,rough:.037,water:0,ob:0,bunker:0,trees:0}}),blue=result({expected:2.79,counts:{...counts,rough:25},breakdown:{nextShot:1.74,rough:.05,water:0,ob:0,bunker:0,trees:0}}),before=structuredClone({own,blue});
+ const d=comparisonDetails(own,blue,'balanced');assert.match(d.heading,/comparison scores better/);assert.match(d.comparison,/slightly easier next shot/);assert.match(d.comparison,/more shots into the rough/);assert.match(d.difference,/0.05 strokes per shot/);assert.match(d.difference,/4.7 strokes over 100/);assert.match(d.difference,/still a good choice/);assert.deepEqual({own,blue},before);
+ const inverse=comparisonDetails(blue,own,'refine');assert.match(inverse.heading,/your target scores better/);assert.match(inverse.difference,/original target saves/);
+ assert.match(comparisonDetails(own,own,'balanced').comparison,/about the same/);assert.match(comparisonDetails(own,{...blue,expected:Infinity},'refine').difference,/not available/);assert.match(comparisonDetails({...own,expected:Infinity},blue,'aggressive').comparison,/out of bounds/);
+ const missing=comparisonDetails({...own,breakdown:null},{...blue,breakdown:null},'refine');assert.match(missing.comparison,/don’t identify one clear reason/);
+});

@@ -1,3 +1,7 @@
+# Clearer expanded feedback (17.18.8)
+
+See details now explains Your decision → Why the comparison scores better → The difference. It shows one comparison table; technical metrics and limitations are under Calculation notes and limits. Repeated scores and paragraphs are removed from view. Initial feedback and scoring are unchanged. See [scope and verification](docs/THREE-PART-FEEDBACK.md).
+
 # Plain-language feedback (17.18.7)
 
 Practice, learning rounds, completed assessment shot reviews and Par-3 results now lead with short beginner-friendly comments. Existing scores and verdicts stay; analytical explanations and statistics are expandable under See details. The assessment setup explains that feedback arrives after shot 10. Scoring/model assumptions, private access and saved outcomes are unchanged. See [scope and checks](docs/BEGINNER-FEEDBACK.md).
