@@ -11,6 +11,40 @@ export function comparisonAdjustment(aim,p,b){
  const axis=direction&&depth?'both':direction?'direction':depth?'carry':'small';
  return {axis,side,carry,label:{both:'Direction and carry',direction:'Direction',carry:'Carry distance',small:'Small target adjustment'}[axis]};
 }
+
+export function generalDecisionComment(kind,approach=true){
+ const useful=approach?'finish close':'leave an easier next shot';
+ return {
+  balanced:`You picked a good target. It gives your good shots a chance to ${useful} and leaves room for your misses.`,
+  aggressive:`This target is a little too aggressive. Your good shots may ${useful}, but aiming this close to trouble makes your misses costly.`,
+  conservative:approach?'You’ve given the trouble plenty of room, but played a little too safely. You could aim closer without taking on much more risk.':'You’ve given the trouble plenty of room, but played a little too safely. You could gain more useful distance without taking on much more risk.',
+  refine:'A target adjustment could help more of your shots finish in a better position.'
+ }[kind]||'Check your shot settings, then try again.';
+}
+export function initialDecisionFeedback(aim,p,r,b,s,assessment){
+ const a=comparisonAdjustment(aim,p,b),approach=s.type==='approach'||s.par===3;
+ if(!Number.isFinite(b.result.expected))return {summary:'We couldn’t find a useful target to compare. Check your shot settings, then try again.',adjustment:''};
+ if(!Number.isFinite(r.expected))return {summary:'All of these shots finished out of bounds. Your target needs more room inside the course.',adjustment:'Choose a target farther inside the boundary and try again.'};
+ if(assessment.kind==='balanced')return {summary:generalDecisionComment('balanced',approach),adjustment:''};
+ let summary=generalDecisionComment(assessment.kind,approach),adjustment='';
+ if(assessment.kind==='refine'&&a.axis==='small')summary='You’re close to a good target. A small adjustment could help more of your shots finish in a better position.';
+ const risk=result=>HAZARDS.reduce((sum,[key])=>sum+rate(result,key),0);
+ if(assessment.kind==='conservative'&&risk(b.result)-risk(r)>.02)summary='You’ve given the trouble plenty of room, but played a little too safely. Compare a target that leaves an easier next shot.';
+ const depthRate=(result,long)=>Array.isArray(result.points)&&s.green?result.points.filter(q=>{const y=q.landing?.y??q.y;return long?y>s.green.y+s.green.ry:y<s.green.y-s.green.ry;}).length/Math.max(1,result.points.length):null;
+ const short=depthRate(r,false),otherShort=depthRate(b.result,false),long=depthRate(r,true),otherLong=depthRate(b.result,true);
+ // Depth advice requires observed depth misses and a carry-only comparison.
+ // Do not infer contact quality or blame carry when both axes changed.
+ if(approach&&a.axis==='carry'&&rate(r,'green')>0&&a.carry>3&&short!==null&&otherShort!==null&&short-otherShort>.02){
+  summary='Your good shots may reach the green, but you haven’t left enough room for shorter shots.';adjustment='Try a little more carry.';
+ }else if(approach&&a.axis==='carry'&&a.carry< -3&&long!==null&&otherLong!==null&&long-otherLong>.02){
+  summary='Your target leaves too little room behind it. Too many of your longer shots finish beyond the green.';adjustment='Try a little less carry.';
+ }else if(a.axis==='direction'||a.axis==='both'){
+  adjustment=`Try aiming a little farther ${a.side<0?'left':'right'} with the same carry, then compare.`;
+ }else if(a.axis==='carry'&&Math.abs(a.carry)>3){
+  adjustment=`Try a little ${a.carry>0?'more':'less'} carry, then compare.`;
+ }else if(assessment.kind!=='refine')adjustment='Try a small target adjustment and compare.';
+ return {summary,adjustment};
+}
 function experiment(a){
  const turn=a.side<0?'left':'right',distance=a.carry<0?'shorter':'longer';
  if(a.axis==='both')return `Try aiming ${turn} with carry held steady, then test a ${distance} carry separately. Predict the effect on your misses before comparing.`;
@@ -52,7 +86,7 @@ export function decisionStory(aim,p,r,b,s,assessment){
   principle='Compare where the whole pattern finishes. A change of club or position can help without meaning you should always play more safely or more aggressively.';
   courseReason='A direction or carry adjustment improved the overall tradeoff; this was not clearly a simple risk-versus-safety mistake.';
  }
- return {what:assessment.label,axis:assessment.kind==='balanced'?'Sound choice':a.label,why,principle,experiment:trial,courseReason};
+ return {...initialDecisionFeedback(aim,p,r,b,s,assessment),what:assessment.label,axis:assessment.kind==='balanced'?'Sound choice':a.label,why,principle,experiment:trial,courseReason};
 }
 const COSTS={nextShot:'next-shot and putting cost',rough:'rough recovery cost',bunker:'bunker recovery cost',trees:'tree recovery cost',water:'water penalty and recovery cost',ob:'out-of-bounds penalty and repeat cost'};
 export function retryStory(first,now){

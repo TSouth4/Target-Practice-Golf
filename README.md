@@ -1,3 +1,7 @@
+# Plain-language feedback (17.18.7)
+
+Practice, learning rounds, completed assessment shot reviews and Par-3 results now lead with short beginner-friendly comments. Existing scores and verdicts stay; analytical explanations and statistics are expandable under See details. The assessment setup explains that feedback arrives after shot 10. Scoring/model assumptions, private access and saved outcomes are unchanged. See [scope and checks](docs/BEGINNER-FEEDBACK.md).
+
 # Experimental dispersion comparison (17.18.6)
 
 Open `dispersion-prototype.html` to compare the current symmetric carry pattern, a shifted reference, and an illustrative good-contact/short-mishit mixture. Six hole/profile combinations hold club choice and random samples fixed. Switch between the same target and each pattern's best sampled target. Links are on the existing model-review and club-comparison pages. Normal gameplay/scoring is unchanged. See [review instructions](docs/DISPERSION-PROTOTYPE.md).

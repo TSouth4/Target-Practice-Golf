@@ -89,7 +89,7 @@ export function readCourse(raw){
   const integer=(n,min=0,max=2147483646)=>Number.isInteger(n)&&n>=min&&n<=max;
   const point=p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y);
   const shot=p=>point(p)&&point(p.landing)&&['fairway','green','rough','bunker','trees','water','ob'].includes(p.kind);
-  const decision=d=>d&&['balanced','aggressive','conservative','refine'].includes(d.kind)&&['label','reason','action'].every(k=>typeof d[k]==='string'&&d[k].length<12000)&&Number.isFinite(d.score)&&d.score>=0&&d.score<=100&&(d.regret===null||Number.isFinite(d.regret)&&d.regret>=0);
+  const decision=d=>d&&(d.plainFeedback===undefined||typeof d.plainFeedback==='boolean')&&(d.adjustment===undefined||typeof d.adjustment==='string'&&d.adjustment.length<=3000)&&['balanced','aggressive','conservative','refine'].includes(d.kind)&&['label','reason','action'].every(k=>typeof d[k]==='string'&&d[k].length<12000)&&Number.isFinite(d.score)&&d.score>=0&&d.score<=100&&(d.regret===null||Number.isFinite(d.regret)&&d.regret>=0);
   const attempt=a=>a&&shot(a.selected)&&point(a.aim)&&a.pattern&&['carry','roll','sdSide','sdLong','height','start','curve','bias','rho'].every(k=>Number.isFinite(a.pattern[k]))&&a.pattern.carry>0&&decision(a.decision)&&a.penalty===(['water','ob'].includes(a.selected.kind)?1:0);
   const finish=f=>f&&integer(f.strokes,0,8)&&integer(f.putts,0,4)&&integer(f.offGreen,0,8)&&f.putts+f.offGreen===f.strokes&&Number.isFinite(f.distance)&&f.distance>=0&&Number.isFinite(f.reference)&&f.reference>=0&&['green','fairway','rough','bunker','trees'].includes(f.kind);
   const validAttempts=arr=>Array.isArray(arr)&&arr.length>0&&arr.length<1000&&arr.every(attempt)&&arr.slice(0,-1).every(a=>a.selected.kind==='ob');

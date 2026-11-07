@@ -27,3 +27,17 @@ test('strong, ambiguous and unusable decisions have distinct honest lessons',()=
 test('retry headlines separate direction of improvement from its observed accounting, and handle ties and Infinity',()=>{
  const first=result({expected:3.5,breakdown:{nextShot:2.2,water:.3}}),now=result({expected:3.2,breakdown:{nextShot:2.2,water:0}});assert.match(retryStory(first,now).verdict,/helped/);assert.match(retryStory(first,now).reason,/water penalty/);assert.match(retryStory(now,first).verdict,/cost more/);assert.match(retryStory(now,first).reason,/added cost/);assert.match(retryStory(first,{...first,expected:3.497}).verdict,/similarly/);assert.match(retryStory(first,{expected:Infinity}).verdict,/out of bounds/);assert.match(retryStory({expected:Infinity},now).verdict,/created playable outcomes/);assert.match(retryStory({expected:Infinity},{expected:Infinity}).verdict,/unavailable/);
 });
+test('beginner comments are separate from detailed analysis and preserve input results',()=>{
+ const x=input(),before=structuredClone(x),v=story(x);assert.match(v.summary,/little too aggressive/);assert.doesNotMatch(v.summary,/model|sampled|simulation|tradeoff/);assert.match(v.adjustment,/left.*same carry/);assert.deepEqual(x,before);
+ x.assessment.kind='balanced';assert.match(story(x).summary,/good target/);assert.doesNotMatch(story(x).summary,/blue point/);assert.equal(story(x).adjustment,'');
+ x.s={type:'tee',par:4};assert.match(story(x).summary,/easier next shot/);assert.doesNotMatch(story(x).summary,/green|flag|finish close/);
+ x.assessment.kind='refine';assert.match(story(x).summary,/target adjustment/);x.b.aim={...x.aim};x.b.pattern.carry=x.p.carry;assert.match(story(x).summary,/close to a good target/);
+});
+test('depth comments require a carry-only comparison and measured short or long misses',()=>{
+ const x=input();x.s.green={y:150,ry:10};x.aim={x:0,y:150};x.p.carry=150;x.b.aim={x:0,y:160};x.b.pattern.carry=160;x.r.points=[{landing:{y:120}},{landing:{y:150}}];x.b.result.points=[{landing:{y:150}},{landing:{y:150}}];
+ assert.match(story(x).summary,/shorter shots/);assert.equal(story(x).adjustment,'Try a little more carry.');
+ x.r.points=[{landing:{y:180}},{landing:{y:150}}];x.b.aim.y=140;x.b.pattern.carry=140;assert.match(story(x).summary,/beyond the green/);assert.equal(story(x).adjustment,'Try a little less carry.');
+ x.b.aim.x=20;assert.doesNotMatch(story(x).summary,/beyond the green/);
+ x.b.aim.x=0;delete x.r.points;assert.doesNotMatch(story(x).summary,/beyond the green/);
+ x.s.type='tee';x.s.par=4;assert.doesNotMatch(story(x).summary,/green/);
+});
