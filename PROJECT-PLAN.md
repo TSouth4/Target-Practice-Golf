@@ -238,3 +238,7 @@ Reorganized live Practice/learning result details into Your decision, Why the co
 ### Purpose-first visual Introduction implemented — 17.18.9
 
 Built the owner's one ideal shot → miss →100 possible finishes → move the whole pattern sequence with original authored SVG illustrations and plain wording. Ten short steps establish the purpose before direction/carry/commit practice, then explain the ten-shot starting assessment and delayed feedback. No existing game distribution or scoring change. Skip, replay, completion persistence, keyboard/pointer controls and saved-round/profile preservation retained. Relevant native tests and Chromium 1440/390/320 layouts passed, including reduced/normal motion; phone graphics inspected. See [flow and verification](docs/INTRO-SHOT-PATTERN-STORY.md). Site deployment remains separate.
+
+### Game-style POV Introduction implemented — 17.18.10
+
+Replaced the flat illustration with the game's standing-camera projection, illustrated terrain/trees and tracer trajectories/colors, using an isolated fixed example. Shows one ideal flight, one miss, then24 representative flights fading to100 finish dots. Same miss offsets translate with the target; finish colors follow actual illustrated terrain. Updated controls marker mapping for the same POV. Five relevant test files and Chromium desktop/phone, reduced/normal motion, navigation and no-score-preservation checks passed. Shared gameplay/scoring/rendering modules remain unchanged. See [implementation notes](docs/INTRO-GAME-POV.md). No live deployment performed.

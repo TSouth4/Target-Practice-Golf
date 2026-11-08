@@ -1,3 +1,7 @@
+# Game-style introduction visuals (17.18.10)
+
+Introduction now uses the game's ground-level perspective, course artwork and tracer trajectories. One ideal shot → one miss →24 example flights →100 finishing dots, with the same misses moving when the target changes. The hole stays fixed and illustrations remain ungraded. See [scope and checks](docs/INTRO-GAME-POV.md).
+
 # Purpose-first visual introduction (17.18.9)
 
 The Introduction now starts with one hoped-for shot, one miss, 100 possible finishes, and an interactive move of the whole shot pattern. It then teaches direction/carry/commit and leads to assessment setup. These are ungraded authored illustrations; game scoring and saved rounds are unchanged. Returning users can replay Introduction from Home/Menu. See [flow and verification](docs/INTRO-SHOT-PATTERN-STORY.md).

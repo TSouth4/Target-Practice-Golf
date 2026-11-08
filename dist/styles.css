@@ -374,3 +374,7 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 #controlsStory{max-height:360px;margin:16px auto 6px}#controlsStoryCaption{margin:0 0 12px;line-height:1.5}#controlsMoveTarget{margin:6px 0 10px;min-height:44px}.intro-finish{animation:intro-finish .25s both;opacity:.9}.intro-trace{opacity:.1}@keyframes intro-finish{from{opacity:0}to{opacity:.9}}@media(prefers-reduced-motion:reduce){.intro-finish{animation:none}}@media(max-width:600px){#controlsStory{max-height:280px}.controls-dialog .course-setup-card{padding:18px}}
 
 #controlsTitle:focus{outline:2px solid #178d8b;outline-offset:4px;border-radius:3px}
+
+.intro-game-trace{fill:none}.intro-game-finish{animation:intro-finish .3s both;opacity:.9}#controlsStory .intro-finish{animation-fill-mode:both}@media(prefers-reduced-motion:reduce){.intro-game-finish{animation:none}}
+
+.intro-group-flights{animation:intro-flights-away .35s 1.7s forwards}@keyframes intro-flights-away{to{opacity:0}}@media(prefers-reduced-motion:reduce){.intro-group-flights{display:none}}

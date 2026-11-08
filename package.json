@@ -1,6 +1,6 @@
 {
   "name": "target-practice",
-  "version": "17.18.9",
+  "version": "17.18.10",
   "private": true,
   "type": "module",
   "scripts": {

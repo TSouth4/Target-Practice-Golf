@@ -1,10 +1,10 @@
-import {introStoryGraphic,introCourse} from './intro-story.js';
+import {introStoryGraphic,introCourse,introProject} from './intro-story.js';
 // Introduction only: independent of gameplay, probability defaults and scoring.
 export function createControlsTutorial({get,onComplete,onAssessment,onStrategy}){
  const DIRECTION=5,CARRY=6,COMMIT=7,COMPLETE=9;
  let opened=false,completed=false,step=0,side=0,carry=140,aimed=false,moved=false,patternMoved=false,focusTarget=null,drag=null;
  const $=get;
- $('controlsBackground').innerHTML=introCourse();
+ let backgroundReady=false;
  const slides=[
   ['The shot we picture','It’s easy to choose a target based on the shot you hope to hit. Picture one perfect shot finishing close to the flag.'],
   ['The shots we also hit','But we won’t hit that shot every time. The ball might finish shorter, longer, left, or right—even when we aim at the same target.'],
@@ -25,7 +25,7 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
   if(!controls){$('controlsStory').innerHTML=introStoryGraphic(step,patternMoved);if(globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches){$('controlsStory').pauseAnimations?.();$('controlsStory').setCurrentTime?.(5);}else{$('controlsStory').setCurrentTime?.(0);$('controlsStory').unpauseAnimations?.();}}
   $('controlsStoryCaption').hidden=controls;$('controlsStoryCaption').textContent=step===0?'One illustrated shot toward the flag.':step===1?'Same target. A different finish.':'100 illustrated possible finishes. White cross: your target.';
   $('controlsMoveTarget').hidden=step!==3;$('controlsMoveTarget').disabled=patternMoved;$('controlsMoveTarget').textContent=patternMoved?'Target moved':'Move the target away from water';
-  $('controlsMarker').setAttribute('transform',`translate(${300+side*2},${220-(carry-50)/180*150})`);
+  const marker=introProject({x:side,y:carry});$('controlsMarker').setAttribute('transform',`translate(${marker.x.toFixed(2)},${marker.y.toFixed(2)})`);
   $('controlsRange').setAttribute('tabindex',step===DIRECTION?'0':'-1');$('controlsCarry').value=String(carry);$('controlsCarryOut').textContent=`${carry} yd`;$('controlsCarry').disabled=step!==CARRY;
   $('controlsNext').hidden=step===COMMIT||step===COMPLETE;$('controlsNext').disabled=step===DIRECTION?!aimed:step===CARRY?!moved:step===3?!patternMoved:false;
   $('controlsRange').style.display=controls?'':'none';$('controlsCarry').hidden=!controls;$('controlsCarryOut').parentElement?.toggleAttribute('hidden',!controls);
@@ -35,7 +35,7 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
   for(const [id,on]of [['controlsRange',step===DIRECTION],['controlsCarry',step===CARRY],['controlsCommit',step===COMMIT]])$(id).classList.toggle('control-highlight',on);
  }
  function close(restore=true){if(!opened)return;opened=false;drag=null;$('controlsDialog').hidden=true;$('mainContent').inert=false;$('appHeader').inert=false;if(restore)focusTarget?.focus?.();}
- function choose(e){if(!opened||step!==DIRECTION)return;const point=$('controlsRange').createSVGPoint();point.x=e.clientX;point.y=e.clientY;const ct=$('controlsRange').getScreenCTM();if(!ct)return;const local=point.matrixTransform(ct.inverse());side=Math.max(-60,Math.min(60,(local.x-300)/2));aimed=true;render();}
+ function choose(e){if(!opened||step!==DIRECTION)return;const point=$('controlsRange').createSVGPoint();point.x=e.clientX;point.y=e.clientY;const ct=$('controlsRange').getScreenCTM();if(!ct)return;const local=point.matrixTransform(ct.inverse());side=Math.max(-60,Math.min(60,(local.x-480)*(carry+6)/1000));aimed=true;render();}
  $('controlsMoveTarget').addEventListener('click',()=>{if(opened&&step===3){patternMoved=true;render();$('controlsNext').focus?.();}});
  $('controlsRange').addEventListener('pointerdown',e=>{if(step!==DIRECTION||e.isPrimary===false||e.button!==undefined&&e.button!==0)return;drag=e.pointerId;choose(e);$('controlsRange').setPointerCapture?.(e.pointerId);});
  $('controlsRange').addEventListener('pointermove',e=>{if(drag!==null&&drag===e.pointerId)choose(e);});
@@ -52,5 +52,5 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
   if(e.key==='Escape'){e.preventDefault();close();}
   if(e.key==='Tab'){const items=['controlsClose','controlsRange','controlsMoveTarget','controlsCarry','controlsBack','controlsNext','controlsCommit','controlsAssessment','controlsStrategy'].map($).filter(el=>!el.hidden&&!el.disabled&&(el!==$('controlsRange')||step===DIRECTION));if(e.shiftKey&&e.target===items[0]){e.preventDefault();items.at(-1).focus?.();}else if(!e.shiftKey&&e.target===items.at(-1)){e.preventDefault();items[0].focus?.();}}
  });
- return {open(target){focusTarget=target;completed=false;step=0;side=0;carry=140;aimed=false;moved=false;patternMoved=false;opened=true;$('controlsDialog').hidden=false;$('mainContent').inert=true;$('appHeader').inert=true;render();$('controlsTitle').focus?.();},close};
+ return {open(target){if(!backgroundReady){$('controlsBackground').innerHTML=introCourse();backgroundReady=true;}focusTarget=target;completed=false;step=0;side=0;carry=140;aimed=false;moved=false;patternMoved=false;opened=true;$('controlsDialog').hidden=false;$('mainContent').inert=true;$('appHeader').inert=true;render();$('controlsTitle').focus?.();},close};
 }
