@@ -1,3 +1,7 @@
+# Introduction refinements (17.18.11)
+
+Intro example flights now remain visible instead of fading into dots. The move-target button disappears after use, and the final slide introduces the assessment as a baseline of current decisions and tendencies. Scoring, model assumptions and saved rounds are unchanged.
+
 # Game-style introduction visuals (17.18.10)
 
 Introduction now uses the game's ground-level perspective, course artwork and tracer trajectories. One ideal shot → one miss →24 example flights →100 finishing dots, with the same misses moving when the target changes. The hole stays fixed and illustrations remain ungraded. See [scope and checks](docs/INTRO-GAME-POV.md).

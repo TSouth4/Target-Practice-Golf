@@ -377,4 +377,4 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 
 .intro-game-trace{fill:none}.intro-game-finish{animation:intro-finish .3s both;opacity:.9}#controlsStory .intro-finish{animation-fill-mode:both}@media(prefers-reduced-motion:reduce){.intro-game-finish{animation:none}}
 
-.intro-group-flights{animation:intro-flights-away .35s 1.7s forwards}@keyframes intro-flights-away{to{opacity:0}}@media(prefers-reduced-motion:reduce){.intro-group-flights{display:none}}
+.intro-group-flights{opacity:1}

@@ -28,3 +28,11 @@ Reduced-motion users receive the finished visual without the moving ball or flig
 - Syntax and prepared asset checks passed. The shared game renderer, trajectory, camera, grading and simulation modules themselves are unchanged.
 
 Rebuild with `npm run prepare:assets`. Merge into the latest Work-hosted source while preserving its changes; this source branch does not publish the live app.
+
+## Update —17.18.11
+
+At the owner's request, intro group slides now retain the24 example flight trails and do not render finishing dots. The100 authored offsets still supply the fixed representative flights; normal gameplay is unchanged. Reduced-motion mode shows completed trails immediately. The move-target button hides after use rather than becoming a disabled “Target moved” button. The last slide now reads:
+
+> Before you start the lessons, let’s see what your current decisions and tendencies look like. Choose targets for 10 shots to get your baseline—a starting point to compare with after practicing. We’ll save the feedback until the end.
+
+Controller/beginner-setup tests and syntax checks passed. Chromium1440/390/320 checks passed, including hidden completed-action button, persistent trails, no dots, replay/completion/assessment handoff, no changed round/progress storage, and normal/reduced motion.

@@ -28,7 +28,7 @@ export function introStoryGraphic(step,moved=false){
  if(!group){const landing=step===0?{...INTRO_SCENE.pin}:{x:36,y:147},shot={...landing,landing,kind:step===0?'green':'water'};out+=flight(shot,INTRO_SCENE.pin,0,true);}
  else for(let i=0;i<24;i++)out+=flight(shots[Math.floor((i+.5)*shots.length/24)],aim,i*12);
  out+='</g>';
- if(group)out+=`<g data-intro-finishes="100">${shots.map((shot,i)=>{const p=introProject(shot);return `<circle class="intro-finish intro-game-finish" style="animation-delay:${1.65+i*.003}s" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="3.5" fill="${TRACER_COLORS[shot.kind]}" stroke="#344d31" stroke-width=".6"/>`;}).join('')}</g>`;
+
  const target=introProject(group?aim:INTRO_SCENE.pin);out+=`<g transform="translate(${target.x},${target.y})"><circle r="12" fill="#173f3544" stroke="white" stroke-width="2"/><path d="M-20 0h10M10 0h10M0-20v10M0 10v10" stroke="#fff5cb" stroke-width="2"/></g>`;
  return out;
 }

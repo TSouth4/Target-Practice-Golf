@@ -242,3 +242,7 @@ Built the owner's one ideal shot → miss →100 possible finishes → move the 
 ### Game-style POV Introduction implemented — 17.18.10
 
 Replaced the flat illustration with the game's standing-camera projection, illustrated terrain/trees and tracer trajectories/colors, using an isolated fixed example. Shows one ideal flight, one miss, then24 representative flights fading to100 finish dots. Same miss offsets translate with the target; finish colors follow actual illustrated terrain. Updated controls marker mapping for the same POV. Five relevant test files and Chromium desktop/phone, reduced/normal motion, navigation and no-score-preservation checks passed. Shared gameplay/scoring/rendering modules remain unchanged. See [implementation notes](docs/INTRO-GAME-POV.md). No live deployment performed.
+
+### Introduction refinements —17.18.11
+
+Kept intro flight trails visible instead of switching to dots, hid the move-target action after use, and rewrote the last slide around the player's current decision/tendency baseline. Live game flights/scoring and saved rounds are unchanged. Controller/setup and syntax tests plus desktop/phone browser checks passed. This is a source update for Work integration; no deployment performed.

@@ -15,16 +15,16 @@ export function createControlsTutorial({get,onComplete,onAssessment,onStrategy})
   ['Set intended carry','Move the carry bar to choose how far the ball travels before landing. Direction and distance are two separate decisions, so we ask you to think through both. Rollout changes with the ground; carry is our starting point.'],
   ['Commit your choice','Choose Try Commit & shoot. In the game, this reveals the possible shots after you choose your target. Here, you’re just practicing the controls—your choice is not graded.'],
   ['Judge the group, not one ball','A target can give you a lucky result or an unlucky one. We score how the whole group of possible shots performs. You can then adjust your target and compare. This illustration shows the idea; it does not grade the target you just selected.'],
-  ['Find your starting point','Now choose targets for 10 shots on your own. We’ll score your decisions, but save the feedback until the end. This gives you a starting point to compare with after practicing. Afterward, practice with feedback after each shot or explore the lessons.']
+  ['Find your starting point','Before you start the lessons, let’s see what your current decisions and tendencies look like. Choose targets for 10 shots to get your baseline—a starting point to compare with after practicing. We’ll save the feedback until the end.']
  ];
  function render(){
   const controls=step>=DIRECTION&&step<=COMMIT;
   $('controlsStep').textContent=step===COMPLETE?'INTRODUCTION COMPLETE':`INTRODUCTION · ${step+1} / ${slides.length}`;
   $('controlsTitle').textContent=slides[step][0];$('controlsText').textContent=slides[step][1];
-  $('controlsStory').hidden=controls;$('controlsStory').style.display=controls?'none':'';$('controlsStory').setAttribute('aria-hidden',String(controls));$('controlsStory').setAttribute('aria-label',slides[step][0]+(step>=2?' —100 illustrated possible finishes.':' —one illustrated ball flight.'));
+  $('controlsStory').hidden=controls;$('controlsStory').style.display=controls?'none':'';$('controlsStory').setAttribute('aria-hidden',String(controls));$('controlsStory').setAttribute('aria-label',slides[step][0]+(step>=2?' —illustrated example ball flights.':' —one illustrated ball flight.'));
   if(!controls){$('controlsStory').innerHTML=introStoryGraphic(step,patternMoved);if(globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches){$('controlsStory').pauseAnimations?.();$('controlsStory').setCurrentTime?.(5);}else{$('controlsStory').setCurrentTime?.(0);$('controlsStory').unpauseAnimations?.();}}
-  $('controlsStoryCaption').hidden=controls;$('controlsStoryCaption').textContent=step===0?'One illustrated shot toward the flag.':step===1?'Same target. A different finish.':'100 illustrated possible finishes. White cross: your target.';
-  $('controlsMoveTarget').hidden=step!==3;$('controlsMoveTarget').disabled=patternMoved;$('controlsMoveTarget').textContent=patternMoved?'Target moved':'Move the target away from water';
+  $('controlsStoryCaption').hidden=controls;$('controlsStoryCaption').textContent=step===0?'One illustrated shot toward the flag.':step===1?'Same target. A different finish.':'Example flights from a group of possible shots. White cross: your target.';
+  $('controlsMoveTarget').hidden=step!==3||patternMoved;$('controlsMoveTarget').disabled=patternMoved;$('controlsMoveTarget').textContent=patternMoved?'Target moved':'Move the target away from water';
   const marker=introProject({x:side,y:carry});$('controlsMarker').setAttribute('transform',`translate(${marker.x.toFixed(2)},${marker.y.toFixed(2)})`);
   $('controlsRange').setAttribute('tabindex',step===DIRECTION?'0':'-1');$('controlsCarry').value=String(carry);$('controlsCarryOut').textContent=`${carry} yd`;$('controlsCarry').disabled=step!==CARRY;
   $('controlsNext').hidden=step===COMMIT||step===COMPLETE;$('controlsNext').disabled=step===DIRECTION?!aimed:step===CARRY?!moved:step===3?!patternMoved:false;
