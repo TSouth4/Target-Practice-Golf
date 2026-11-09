@@ -246,3 +246,8 @@ Replaced the flat illustration with the game's standing-camera projection, illus
 ### Introduction refinements —17.18.11
 
 Kept intro flight trails visible instead of switching to dots, hid the move-target action after use, and rewrote the last slide around the player's current decision/tendency baseline. Live game flights/scoring and saved rounds are unchanged. Controller/setup and syntax tests plus desktop/phone browser checks passed. This is a source update for Work integration; no deployment performed.
+
+
+### Completed: beginner lesson language review — v17.18.12
+
+Reviewed all four lessons and the fuller course-management tutorial in Lessons for elementary/middle-school understanding, without talking down to the reader. Defined useful golf terms, shortened explanations, and simplified guided result wording. Rules, reference calculations, fixtures, completion versions, scoring and saved progress are unchanged. The newer Home Introduction was left alone. See [review and validation](docs/LESSON-LANGUAGE-REVIEW.md). Next: obtain uncoached beginner feedback and review the isolated dispersion prototype before changing model assumptions.

@@ -14,7 +14,7 @@ function comparisonGraphic(s,target){
  for(const h of s.hazards.filter(h=>['water','bunker'].includes(h.kind)))art+=`<polygon points="${poly(h.poly)}" fill="${h.kind==='water'?'#53b6ce':'#eddaa4'}" stroke="${h.kind==='water'?'#0789ae':'#b8791d'}" stroke-width="4"/>`;
  for(const [i,c] of comparisons.entries()){const [cx,cy]=xy(c.center.x,c.center.y);art+=`<polygon data-pattern="${i?'recommended':'flag'}" data-center-x="${c.center.x}" data-center-y="${c.center.y}" points="${poly(c.contour)}" fill="${c.color}22" stroke="${c.color}" stroke-width="4" stroke-dasharray="${i?'8 5':'none'}"/><path d="M${cx-7} ${cy}h14M${cx} ${cy-7}v14" stroke="${c.color}" stroke-width="3"/>`;}
  const [px,py]=xy(s.pin.x,s.pin.y);art+=`<path d="M${px} ${py}v-22l18 6-18 6" fill="#dd594a" stroke="#294832" stroke-width="2"/></g>`;
- art+=label(320,310,`Gold: flag target · water ${(comparisons[0].water*100).toFixed(1)}%`)+label(320,342,`Blue: recommended · water ${(comparisons[1].water*100).toFixed(1)}%`)+label(320,375,'80% core spreads · water rates use all shots');return art;
+ art+=label(320,310,`Gold: flag target · water ${(comparisons[0].water*100).toFixed(1)}%`)+label(320,342,`Blue: recommended · water ${(comparisons[1].water*100).toFixed(1)}%`)+label(320,375,'Outlines: main patterns · water rates: all shots');return art;
 }
 function clubTargetsGraphic(shortSide=false){
  let art='';
@@ -24,19 +24,19 @@ function clubTargetsGraphic(shortSide=false){
   else art+=`<ellipse cx="${x+shift}" cy="170" rx="${r}" ry="${r*1.1}" fill="#367fc033" stroke="#367fc0" stroke-width="4" stroke-dasharray="7 5"/><path d="M${x+shift-7} 170h14M${x+shift} 163v14" stroke="#367fc0" stroke-width="3"/>`;
   art+=label(x,325,title);
  }
- return art+label(320,370,shortSide?'Same flag, different recovery room':'Same green · illustrative spreads and aims');
+ return art+label(320,370,shortSide?'Same flag, different recovery room':'Same green · example patterns and targets');
 }
 export function tutorialGraphic(topic,current,target){
  let art='';
  if(topic==='pattern')art=comparisonGraphic(current,target);
  else if(topic==='dartboard'){
   for(const r of [125,96,66,32])art+=`<circle cx="300" cy="168" r="${r}" fill="${r===32?'#de7460':r===96?'#b8d29a':'#e8ebd9'}" stroke="#294832" stroke-width="3"/>`;
-  art+=`<path d="M405 105q-24-26-32-14q-3 8 15 30l-9-5q-24-7-27 8q-2 9 20 20l-12-2q-24 0-21 16q1 10 23 15l-10 4q-20 10-7 24q18 21 67 15l35-3v-69Z" fill="#ecc3a2" stroke="#976d50" stroke-width="3"/><circle cx="257" cy="168" r="10" fill="#367fc0"/><path d="M290 168h-22" stroke="#367fc0" stroke-width="4"/>${label(320,325,'Move the target away from costly trouble')}`;
+  art+=`<path d="M405 105q-24-26-32-14q-3 8 15 30l-9-5q-24-7-27 8q-2 9 20 20l-12-2q-24 0-21 16q1 10 23 15l-10 4q-20 10-7 24q18 21 67 15l35-3v-69Z" fill="#ecc3a2" stroke="#976d50" stroke-width="3"/><circle cx="257" cy="168" r="10" fill="#367fc0"/><path d="M290 168h-22" stroke="#367fc0" stroke-width="4"/>${label(320,325,'Move your target away from trouble')}`;
  }
  else if(topic==='distance-cost'||topic==='distance-increments'){
   const selected=topic==='distance-cost'?DISTANCE_EXAMPLES.filter(d=>[100,150].includes(d.yards)):DISTANCE_EXAMPLES;
   selected.forEach((d,i)=>{const x=selected.length===2?180+i*280:85+i*155;art+=`<rect x="${x-60}" y="108" width="120" height="135" fill="#83b358" rx="8"/>${label(x,160,d.strokes.toFixed(2))}${label(x,194,'strokes')}${label(x,278,d.yards+' yd')}`;});
-  art+=label(320,330,'Expected strokes to finish from fairway')+label(320,370,'Historical PGA TOUR reference · 2003–2010');
+  art+=label(320,330,'Average strokes to finish from fairway')+label(320,370,'Historical PGA TOUR reference · 2003–2010');
  }
  else if(topic==='club-targets'||topic==='short-side')art=clubTargetsGraphic(topic==='short-side');
  else if(topic==='dispersion'){
@@ -56,5 +56,5 @@ export function tutorialGraphic(topic,current,target){
 
   else art+=label(320,365,{water:'Blue outline: penalty area',bunker:'Gold outline: sand, no automatic penalty',trees:'Dark outline: difficult recovery'}[topic]||'Make room for your misses');
  }
- return `<svg viewBox="0 0 640 390" role="img" aria-label="${topic} teaching illustration" data-lesson-topic="${topic}" xmlns="http://www.w3.org/2000/svg">${art}</svg><p class="micro">Read-only illustration · ${topic==='pattern'?'equal yard scales · calculated core spreads': 'not to scale'} · use Next to continue</p>${topic.startsWith('distance-')?'<p class="micro"><a href="https://business.columbia.edu/sites/default/files-efs/pubfiles/4996/assessing_golfer_performance.full.pdf" target="_blank" rel="noopener noreferrer">Source: Broadie, Assessing Golfer Performance (2012), Table B.1</a><br>150 yd uses interpolation; displayed values are rounded.</p>':''}`;
+ return `<svg viewBox="0 0 640 390" role="img" aria-label="${topic} teaching illustration" data-lesson-topic="${topic}" xmlns="http://www.w3.org/2000/svg">${art}</svg><p class="micro">Look at the picture, then choose Next. You’ll try a shot after these slides. ${topic==='pattern'?'The two patterns use the same scale.':'Picture not to scale.'}</p>${topic.startsWith('distance-')?'<p class="micro"><a href="https://business.columbia.edu/sites/default/files-efs/pubfiles/4996/assessing_golfer_performance.full.pdf" target="_blank" rel="noopener noreferrer">Source: Broadie, Assessing Golfer Performance (2012), Table B.1</a><br>150 yd uses interpolation; displayed values are rounded.</p>':''}`;
 }

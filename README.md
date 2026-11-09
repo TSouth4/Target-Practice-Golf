@@ -1,3 +1,7 @@
+# Clearer lesson language (17.18.12)
+
+Lessons now use shorter explanations and define golf terms before using them. Penalty rules, reference numbers, fixed examples and scoring stay unchanged. See [scope and checks](docs/LESSON-LANGUAGE-REVIEW.md).
+
 # Introduction refinements (17.18.11)
 
 Intro example flights now remain visible instead of fading into dots. The move-target button disappears after use, and the final slide introduces the assessment as a baseline of current decisions and tendencies. Scoring, model assumptions and saved rounds are unchanged.
