@@ -1,3 +1,7 @@
+# Mobile hazard labels (17.18.13)
+
+Phone hazard labels use two lines so full distances fit. OB labels include left/right context, with stronger background contrast and spacing between labels. Terrain distances, scoring and shot behavior are unchanged. See [review](docs/MOBILE-HAZARD-READABILITY-REVIEW.md).
+
 # Clearer lesson language (17.18.12)
 
 Lessons now use shorter explanations and define golf terms before using them. Penalty rules, reference numbers, fixed examples and scoring stay unchanged. See [scope and checks](docs/LESSON-LANGUAGE-REVIEW.md).

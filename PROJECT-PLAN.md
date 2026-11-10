@@ -251,3 +251,13 @@ Kept intro flight trails visible instead of switching to dots, hid the move-targ
 ### Completed: beginner lesson language review — v17.18.12
 
 Reviewed all four lessons and the fuller course-management tutorial in Lessons for elementary/middle-school understanding, without talking down to the reader. Defined useful golf terms, shortened explanations, and simplified guided result wording. Rules, reference calculations, fixtures, completion versions, scoring and saved progress are unchanged. The newer Home Introduction was left alone. See [review and validation](docs/LESSON-LANGUAGE-REVIEW.md). Next: obtain uncoached beginner feedback and review the isolated dispersion prototype before changing model assumptions.
+
+
+### Mobile hazard readability: initial review — 2026-11-10
+
+Dispersion calibration paused by owner. Reproduced clipped long mobile hazard labels on a fixed woodland dogleg in regular/fullscreen phone layouts (390 and 320 px). Next: contain label text, clarify lateral OB distances, then review additional layouts before global terrain-art changes. See [review](docs/MOBILE-HAZARD-READABILITY-REVIEW.md). No gameplay changes or deployment.
+
+
+### Mobile hazard label fix — v17.18.13
+
+Two-line hazard labels keep names and distances separate; OB labels now identify left/right. Increased label background contrast and vertical spacing. No terrain, camera, scoring or storage changes. Browser verification and limitations are recorded in the mobile hazard readability review.
