@@ -41,10 +41,10 @@ export function courseDistanceRange(profile,id,conditions=null,long=false){
  const authoredMax=id==='water'?200:['tucked','split'].includes(id)?217:225,max=Math.min(authoredMax,available*.97);
  return{min:Math.min(max-8,Math.max(176,available*.85)),max,available};
 }
-function courseHoleSeed(id,initial,range){
+function courseHoleSeed(id,initial,range,layoutVersion){
  const base=SCENARIOS.find(s=>s.id===id);let best=initial,penalty=Infinity;
  for(let n=0;n<256;n++){
-  const seed=initial+n,s=generateScenario(base,seed),distance=Math.hypot(s.pin.x,s.pin.y),front=Math.hypot(s.green.x,s.green.y-s.green.ry+3),miss=Math.max(0,range.min-distance,distance-range.max)+Math.max(0,front-range.available)*2;
+  const seed=initial+n,s=generateScenario(base,seed,layoutVersion),distance=Math.hypot(s.pin.x,s.pin.y),front=Math.hypot(s.green.x,s.green.y-s.green.ry+3),miss=Math.max(0,range.min-distance,distance-range.max)+Math.max(0,front-range.available)*2;
   if(miss<penalty){best=seed;penalty=miss;}if(miss===0)return{seed,matched:true};
  }
  // Very short/unusual custom bags can fall outside the authored layout range.
@@ -59,7 +59,7 @@ export function createCourse(seed,profile,landscape='woodland'){
  for(let i=0;i<COURSE_HOLES;i++){
   if(i>=families.length){const bag=[...COURSE_FAMILIES];for(let n=bag.length-1;n>0;n--){const j=Math.floor(rng()*(n+1));[bag[n],bag[j]]=[bag[j],bag[n]];}if(bag[0]===families.at(-1))[bag[0],bag[1]]=[bag[1],bag[0]];families.push(...bag);}
   const id=families[i],initial=Math.floor(rng()*2147483000)+1,drawSeed=Math.floor(rng()*2147483000)+1,finishSeed=Math.floor(rng()*2147483000)+1,conditions=profile.difficulty&&profile.difficulty!=='easy'?conditionsFor(profile.difficulty,drawSeed^0x6137):null;
-  const range=courseDistanceRange(profile,id,conditions,longSlots.has(i)),choice=courseHoleSeed(id,initial,range);
+  const range=courseDistanceRange(profile,id,conditions,longSlots.has(i)),choice=courseHoleSeed(id,initial,range,profile.layoutVersion);
   schedule.push({id,holeSeed:choice.seed,drawSeed,finishSeed,landscape,distanceBand:longSlots.has(i)&&choice.matched?'long':'standard',...(conditions?{conditions}:{} )});
  }
  return{id:`course-${seed}`,kind:'course',decisionModel:MODEL_VERSION,version:COURSE_VERSION,seed,profile,schedule,index:0,answers:[],status:'active',current:{strokes:0,attempts:[]},review:null};

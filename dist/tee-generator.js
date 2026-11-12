@@ -1,3 +1,4 @@
+import {varyGreen,addBackTrouble} from './hole-variety.js';
 import {random,inPoly,inGreen,lie} from './model.js';
 import {decorateScenario} from './landscape.js';
 
@@ -43,17 +44,18 @@ export function validateTeeScenario(s,{minimumReach=180}={}){
  return failures;
 }
 
-function buildTee(base,seed,attempt){
+function buildTee(base,seed,attempt,variety=false){
  const rng=random((seed+attempt*104729)>>>0),between=(a,b)=>a+(b-a)*rng();
  const squeeze=base.id==='squeeze-par4',creek=base.id==='creek-tee',sharp=base.id==='sharp-dogleg';
  const short=base.id==='drivable'||squeeze,tight=base.id==='narrow',dogleg=base.id==='bend'||sharp;
  const side=rng()<.5?-1:1,greenY=short?between(235,305):between(335,425);
- const bendStart=between(125,205),bend=side*(sharp?between(65,100):dogleg?between(35,58):tight?between(0,7):between(4,18));
+ const bendStart=between(125,205),bend=side*(sharp?between(65,100):dogleg?(variety&&seed%2===0?between(18,32):between(35,58)):tight?between(0,7):between(4,18));
  const betweenTurn=between(38,70),sway=between(-12,12),center=y=>bend*smooth((y-bendStart)/(sharp?betweenTurn:greenY-bendStart))+sway*Math.sin(Math.PI*clamp(y/greenY,0,1));
  const openLanding=base.id==='cedar'&&seed%3===0;
  const earlyWidth=openLanding?between(38,48):tight?between(14,19):between(24,34),lateWidth=openLanding?between(24,34):tight?between(9,14):squeeze?between(8,12):between(12,22),neckY=between(205,280),neckDepth=openLanding?between(2,5):between(3,tight?5:12);
  const width=y=>y<65?10+(earlyWidth-10)*y/65:Math.max(8,earlyWidth+(lateWidth-earlyWidth)*smooth((y-100)/(greenY-100))-neckDepth*Math.exp(-(((y-neckY)/45)**2)));
  const green={x:center(greenY),y:greenY,rx:short?between(12,18):tight?between(12,16):between(15,22),ry:between(16,22)};
+ if(variety)varyGreen(green,seed);
  const fairwayEnd=short?greenY-green.ry-15:greenY-green.ry*.45;
  const ys=[0,65,110,150,190,230,270,310,350,390].filter(y=>y<fairwayEnd);ys.push(fairwayEnd);
  const right=ys.map(y=>[center(y)+width(y),y]),left=ys.map(y=>[center(y)-width(y),y]);
@@ -104,14 +106,15 @@ function buildTee(base,seed,attempt){
  // Pin placement is within the central ellipse, away from all generated hazards.
  const angle=between(0,Math.PI*2),radius=between(0,.6);s.pin={x:green.x+Math.cos(angle)*green.rx*radius,y:green.y+Math.sin(angle)*green.ry*radius};
  s.length=Math.round(Math.hypot(s.pin.x,s.pin.y));s.aimRange=[short?110:125,short?Math.ceil(greenY+green.ry+5):320];s.aimY=short?Math.round(greenY):250;
- s.name=dogleg?`The ${sharp?'sharp ':''}${side<0?'left':'right'}-hand bend`:base.name;s.tag=openLanding?'Wide landing area · long par 4':strategicTag;if(openLanding)s.brief='A wider landing area gives the longer club more room. Compare that distance advantage with the side hazards and the recovery room beyond the fairway.';
+ s.name=dogleg?`The ${sharp?'sharp ':variety&&seed%2===0?'gentle ':''}${side<0?'left':'right'}-hand bend`:base.name;s.tag=openLanding?'Wide landing area · long par 4':strategicTag;if(openLanding)s.brief='A wider landing area gives the longer club more room. Compare that distance advantage with the side hazards and the recovery room beyond the fairway.';
  s.generation={openLanding,attempt,bendStart,bend,earlyWidth,lateWidth,neckY,neckDepth,hazardSide:side};
+ if(variety){s.layoutVersion='variety-v1';addBackTrouble(s,seed);}
  return s;
 }
 
-export function generateTeeScenario(base,seed){
+export function generateTeeScenario(base,seed,variety=false){
  for(let attempt=0;attempt<8;attempt++){
-  const s=decorateScenario(buildTee(base,seed,attempt));if(!validateTeeScenario(s).length)return s;
+  const s=decorateScenario(buildTee(base,seed,attempt,variety));if(!validateTeeScenario(s).length)return s;
  }
  // Preserve the known-good authored family if a candidate cannot be validated.
  const fallback=decorateScenario({...structuredClone(base),variantSeed:seed,generatorVersion:TEE_GENERATOR_VERSION,elevationM:9,generation:{fallback:true}});

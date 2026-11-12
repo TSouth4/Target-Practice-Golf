@@ -10,4 +10,4 @@ export function readPractice(raw){
  return {...s,hasAim:s.hasAim===true&&Number.isFinite(s.aim?.x)&&Number.isFinite(s.aim?.y),practiceFilter:['tee','approach','mixed'].includes(s.practiceFilter)?s.practiceFilter:'mixed',recent:Array.isArray(s.recent)?s.recent.filter(id=>SCENARIOS.some(h=>h.id===id)).slice(-6):[]};
  }catch{return null;}
 }
-export function practiceSnapshot(state,hasAim){return {version:1,scenario:state.scenario,holeSeed:state.holeSeed,seed:state.seed,landscape:state.landscape,aim:{...state.aim},hasAim,practiceFilter:state.practiceFilter,recent:[...state.recent],encounter:state.encounter};}
+export function practiceSnapshot(state,hasAim){return {version:1,scenario:state.scenario,layoutVersion:state.layoutVersion||null,holeSeed:state.holeSeed,seed:state.seed,landscape:state.landscape,aim:{...state.aim},hasAim,practiceFilter:state.practiceFilter,recent:[...state.recent],encounter:state.encounter};}

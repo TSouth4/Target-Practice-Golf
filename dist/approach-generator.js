@@ -1,13 +1,15 @@
+import {varyGreen,addBackTrouble} from './hole-variety.js';
 import {random} from './model.js';
 import {decorateScenario} from './landscape.js';
 import {validateTeeScenario,validPolygon} from './tee-generator.js';
 
 export const APPROACH_GENERATOR_VERSION='approach-v3';
-function build(base,seed,attempt){
+function build(base,seed,attempt,variety=false){
  const rng=random((seed+attempt*104729)>>>0),between=(a,b)=>a+(b-a)*rng(),side=rng()<.5?-1:1;
  const par5=!!base.secondShot,creek=base.id==='creek-par3'||base.id==='par5-carry';
  const y=par5?between(190,275):between(110,215),x=between(-28,28);
  const green={x,y,rx:between(11,21),ry:between(13,23)},sway=between(-9,9),center=d=>x*d/y+sway*Math.sin(Math.PI*d/y);
+ if(variety)varyGreen(green,seed);
  const early=between(20,30),late=between(11,19),width=d=>d<50?10+(early-10)*d/50:early+(late-early)*Math.min(1,d/y);
  const end=y-green.ry*.4,ys=[0,50,80,110,150,190,230].filter(d=>d<end);ys.push(end);
  const right=ys.map(d=>[center(d)+width(d),d]),left=ys.map(d=>[center(d)-width(d),d]);
@@ -54,11 +56,12 @@ function build(base,seed,attempt){
 s.length=Math.round(Math.hypot(s.pin.x,s.pin.y));
  s.tag=`${s.length} yards · ${par5?'par 5 second shot':s.par===3?'par 3':'approach'} · ${creek?'crossing creek':base.id==='bowl'?'sand short / water long':'guarded green'}`;
  s.brief=problem;s.generation={attempt,greenWidth:green.rx*2,greenDepth:green.ry*2,hazardSide:side,creek};
+ if(variety){s.layoutVersion='variety-v1';addBackTrouble(s,seed);}
  return s;
 }
-export function generateApproachScenario(base,seed){
+export function generateApproachScenario(base,seed,variety=false){
  for(let attempt=0;attempt<8;attempt++){
-  const s=decorateScenario(build(base,seed,attempt));if(!validateTeeScenario(s,{minimumReach:160}).length)return s;
+  const s=decorateScenario(build(base,seed,attempt,variety));if(!validateTeeScenario(s,{minimumReach:160}).length)return s;
  }
  const s=decorateScenario({...structuredClone(base),variantSeed:seed,generatorVersion:APPROACH_GENERATOR_VERSION,elevationM:8,generation:{fallback:true}});
  s.hazards=s.hazards.filter(h=>!h.forest||validPolygon(h.poly));return s;

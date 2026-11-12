@@ -20,7 +20,7 @@ export function createRound(kind,seed,profile){
   // A wide tee slot complements the short and tight tee slots in each learning round.
   if(id==='cedar'||id==='creek-tee'&&i===4)while(holeSeed%3!==0)holeSeed++;
   if(id==='drivable'&&profile.limit>=225){
-   let closest=Infinity,bestSeed=holeSeed;for(let attempt=0;attempt<128;attempt++){const candidate=holeSeed+attempt,front=greenYardages(generateScenario(SCENARIOS.find(s=>s.id===id),candidate))[0].distance;if(front<closest){closest=front;bestSeed=candidate;}if(front<=profile.limit-3)break;}holeSeed=bestSeed;
+   let closest=Infinity,bestSeed=holeSeed;for(let attempt=0;attempt<128;attempt++){const candidate=holeSeed+attempt,front=greenYardages(generateScenario(SCENARIOS.find(s=>s.id===id),candidate,profile.layoutVersion))[0].distance;if(front<closest){closest=front;bestSeed=candidate;}if(front<=profile.limit-3)break;}holeSeed=bestSeed;
   }
   schedule.push({id,holeSeed,drawSeed:Math.floor(rng()*2147483645)+1});
  }

@@ -1,3 +1,7 @@
+# More varied hole layouts (17.18.14)
+
+New games mix gentle/moderate bends, balanced/wide/deep oval greens, and occasional back bunkers or recovery areas. Saved rounds retain their original geometry; fixed teaching and research examples stay unchanged. See [scope and verification](docs/HOLE-VARIETY.md).
+
 # Mobile hazard labels (17.18.13)
 
 Phone hazard labels use two lines so full distances fit. OB labels include left/right context, with stronger background contrast and spacing between labels. Terrain distances, scoring and shot behavior are unchanged. See [review](docs/MOBILE-HAZARD-READABILITY-REVIEW.md).

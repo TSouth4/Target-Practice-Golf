@@ -261,3 +261,8 @@ Dispersion calibration paused by owner. Reproduced clipped long mobile hazard la
 ### Mobile hazard label fix — v17.18.13
 
 Two-line hazard labels keep names and distances separate; OB labels now identify left/right. Increased label background contrast and vertical spacing. No terrain, camera, scoring or storage changes. Browser verification and limitations are recorded in the mobile hazard readability review.
+
+
+### Completed: first hole-variety expansion — v17.18.14
+
+Added gentle bends alongside moderate/sharp layouts, distinct wide/shallow and narrow/deep oval greens, and occasional back bunkers/recovery patches in new games. Preserved old seeded layouts with an explicit saved layout policy. See [scope and verification](docs/HOLE-VARIETY.md). Next: owner tests of new rounds and uncoached beginner feedback. Angled/irregular green shapes, peninsula/island families and broader course compositions remain planned; dispersion changes remain paused.

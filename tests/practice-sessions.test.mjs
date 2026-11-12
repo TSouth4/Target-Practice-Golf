@@ -11,9 +11,9 @@ test('corrupt saved practice does not become a continue session; seeds are in su
 test('new practice changes layout; continue restores target and seed across rounds and reload',async()=>{
  let dom=setupDOM(),$=dom.$;await import('../dist/app.js?practice-sessions');
  assert.equal($('homeContinuePractice').hidden,true);
- await $('homePractice').fire('click');const initial=readPractice(dom.storage.get(PRACTICE_KEY));assert.ok(initial.holeSeed>0);
+ await $('homePractice').fire('click');const initial=readPractice(dom.storage.get(PRACTICE_KEY));assert.ok(initial.holeSeed>0);assert.equal(initial.layoutVersion,'variety-v1');
  $('aimX').value='12';await $('aimX').fire('input');const selected=readPractice(dom.storage.get(PRACTICE_KEY));assert.ok(selected.hasAim);
- await $('homeLogo').fire('click',{preventDefault(){}});await $('homeLearning').fire('click');const round=dom.storage.get(ROUND_KEY);
+ await $('homeLogo').fire('click',{preventDefault(){}});await $('homeLearning').fire('click');const round=dom.storage.get(ROUND_KEY);assert.equal(JSON.parse(round).profile.layoutVersion,'variety-v1');
  await $('homeLogo').fire('click',{preventDefault(){}});await $('homeContinuePractice').fire('click');const continued=readPractice(dom.storage.get(PRACTICE_KEY));assert.equal(continued.holeSeed,selected.holeSeed);assert.equal(continued.seed,selected.seed);assert.ok(Math.hypot(continued.aim.x-selected.aim.x,continued.aim.y-selected.aim.y)<1e-9,'Restored target is unchanged within floating-point roundoff');assert.deepEqual(continued.recent,selected.recent);assert.equal(dom.storage.get(PAUSED_ROUND_KEY),round);
  await $('homeLogo').fire('click',{preventDefault(){}});assert.equal($('homeContinue').hidden,false);await $('homeContinue').fire('click');assert.equal(dom.storage.get(ROUND_KEY),round);
  await $('homeLogo').fire('click',{preventDefault(){}});await $('homePractice').fire('click');const fresh=readPractice(dom.storage.get(PRACTICE_KEY));assert.notEqual(fresh.holeSeed,selected.holeSeed);assert.notEqual(fresh.scenario,selected.scenario);assert.equal(fresh.hasAim,false);

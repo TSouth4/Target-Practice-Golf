@@ -20,3 +20,5 @@ test('new Practice and paused-round slots round-trip while older backups remain 
  const storage=memory();restoreBackup(storage,copy);assert.deepEqual(JSON.parse(storage.getItem(PRACTICE_KEY)),b.data[PRACTICE_KEY]);
  delete b.data[PRACTICE_KEY];delete b.data[PAUSED_ROUND_KEY];const legacy=parseBackup(JSON.stringify(b));assert.equal(legacy.data[PRACTICE_KEY],null);assert.equal(legacy.data[PAUSED_ROUND_KEY],null);
 });
+
+test('layout version survives backup and restore without changing older unversioned settings',()=>{const b=makeBackup({state:{...state(),layoutVersion:'variety-v1'}}),copy=parseBackup(JSON.stringify(b)),storage=memory();restoreBackup(storage,copy);assert.equal(JSON.parse(storage.getItem(SETTINGS_KEY)).layoutVersion,'variety-v1');const invalid=structuredClone(b);invalid.data[SETTINGS_KEY].layoutVersion='unknown';assert.throws(()=>parseBackup(JSON.stringify(invalid)));});
