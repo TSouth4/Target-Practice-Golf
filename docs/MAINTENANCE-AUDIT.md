@@ -1,5 +1,7 @@
 # Maintenance audit — 14 November 2026
 
+Follow-up: save-failure visibility/retry is implemented in v17.18.15; see [verification](SAVE-FAILURE-RECOVERY.md). The findings below describe the pinned v17.18.14 audit. Bootstrap-file recovery remains pending.
+
 Audited source: app **17.18.14**, commit `dd172fd6e6738a800df06975c7d0556ba3b97750`, branch `feature/hole-variety`. This is a local source audit, not verification of Work's hosted deployment or a completed launch/security audit. No golf-model, page-design or application behavior changes were made.
 
 ## Prioritized findings

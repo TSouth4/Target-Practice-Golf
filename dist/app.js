@@ -32,6 +32,18 @@ import {illustratedTheme,illustratedDefinitions,drawIllustratedPlant} from './co
 import {LANDSCAPES,vegetation,drawPlant,drawBackdrop} from './landscape.js';
 import {projectSurface,unprojectSurface,drawRelief} from './surfaces.js';
 const $=id=>document.getElementById(id);
+// Retain failed writes in memory until they can be saved; never clear user data.
+const pendingSaves=new Map();
+function updateSaveWarning(){
+ $('saveWarning').hidden=pendingSaves.size===0;
+ if(!pendingSaves.size)$('saveWarningDetail').textContent='';
+}
+function writeSaved(key,value){
+ try{localStorage.setItem(key,value);pendingSaves.delete(key);}
+ catch(error){pendingSaves.set(key,value);updateSaveWarning();throw error;}
+ updateSaveWarning();
+}
+function trySave(key,value){try{writeSaved(key,value);return true;}catch{return false;}}
 const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bigPct','bigDirection','bigShift','bigShort','rho'];
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
@@ -62,7 +74,7 @@ state.encounter=makeId();
 let progressHistory=[],progressOpen=false,progressStored=true,progressMessage='';
 try{progressHistory=readProgress(localStorage.getItem(PROGRESS_KEY));}catch{progressStored=false;}
 let completedRounds=[],roundHistoryStored=true,progressDifficulty='all';try{completedRounds=readRoundHistory(localStorage.getItem(ROUND_HISTORY_KEY));}catch{roundHistoryStored=false;}
-function rememberCompletedRound(candidate){const next=archiveRound(completedRounds,candidate);if(next===completedRounds&&roundHistoryStored)return;completedRounds=next;try{localStorage.setItem(ROUND_HISTORY_KEY,JSON.stringify(completedRounds));roundHistoryStored=true;}catch{roundHistoryStored=false;}}
+function rememberCompletedRound(candidate){const next=archiveRound(completedRounds,candidate);if(next===completedRounds&&roundHistoryStored)return;completedRounds=next;try{writeSaved(ROUND_HISTORY_KEY,JSON.stringify(completedRounds));roundHistoryStored=true;}catch{roundHistoryStored=false;}}
 const escapeHTML=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const RATING_LABELS={balanced:'Strong decision',aggressive:'Too aggressive',conservative:'Too conservative',refine:'Target needs refining'};
 function effectiveBag(){return round?.profile.shotMode==='custom'?round.profile.bag:state.memberBag;}
@@ -76,7 +88,7 @@ function recordDecision(){
  const assessed=decisionFeedback(state.aim,state.pattern,result,best,scene());
  const entry={id:makeId(),encounter:state.encounter,at:new Date().toISOString(),model:MODEL_VERSION,profile:currentProfile(),profileLabel:state.mode==='basic'?`Free · ${state.basicHandicap==='0'?'scratch':state.basicHandicap+' handicap'} · ${Math.round(state.pattern.driverLimit)} yd limit · ${state.pattern.conditions?.difficulty||'easy'}`:`My clubs · ${state.pattern.conditions?.difficulty||'easy'}`,type:scene().type,kind:assessed.kind,score:decisionScore(result.expected,best.result.expected,state.aim,best.aim),regret:Number.isFinite(result.expected)?Math.max(0,result.expected-best.result.expected):null,penalty:result.penalty,conditions:structuredClone(state.pattern.conditions||CALM),handicap:state.basicHandicap,shotMode:state.mode==='advanced'?'custom':'handicap'};
  const recorded=recordAttempt(progressHistory,entry);progressHistory=recorded.history;
- try{localStorage.setItem(PROGRESS_KEY,JSON.stringify(progressHistory));progressStored=true;}catch{progressStored=false;}
+ try{writeSaved(PROGRESS_KEY,JSON.stringify(progressHistory));progressStored=true;}catch{progressStored=false;}
  progressMessage=progressStored?(recorded.entry.retry?'Retry saved separately; it does not enter your improvement trend.':'First attempt saved to My progress.'):'Progress is available for this visit, but could not be saved on this device.';
 }
 function renderProgress(){
@@ -100,7 +112,7 @@ function renderProgress(){
  $('progressStorage').textContent=progressStored&&roundHistoryStored?`Saved in this browser: up to 1,000 practice attempts and ${ROUND_HISTORY_LIMIT} completed rounds. Older rounds that were replaced before this update cannot be recovered. Clearing browser data removes history.`:'Local saving is unavailable for some history. Results from this visit may be lost when you close the page.';
 }
 let backupCandidate=null,backupSafety=null,backupReadId=0;
-function currentBackup(){return makeBackup({state:tutorialReturn?.state||state,progress:progressHistory,completedRounds,round:tutorialReturn?.round||round,course:storedCourse(),freeSession,pausedRound,lessons:lessonCompleted,introductionSeen});}
+function currentBackup(){return makeBackup({state:tutorialReturn?.state||state,progress:progressHistory,completedRounds,round:tutorialReturn?.round||round,course:pendingSaves.has(COURSE_KEY)?readCourse(pendingSaves.get(COURSE_KEY)):storedCourse(),freeSession,pausedRound,lessons:lessonCompleted,introductionSeen});}
 function downloadBackupFile(backup){const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`target-practice-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('backupExport').addEventListener('click',()=>{try{downloadBackupFile(backupSafety||currentBackup());$('backupStatus').textContent=backupSafety?'Safety backup downloaded. Keep it before closing this page.':'Backup downloaded. Keep the file somewhere safe; it contains your progress and shot settings.';}catch{$('backupStatus').textContent='Could not create a backup. Your saved data has not been changed. Try again in this browser.';}});
 $('backupFile').addEventListener('change',async()=>{const readId=++backupReadId;backupCandidate=null;$('backupPreview').hidden=true;$('backupRestore').disabled=true;const file=$('backupFile').files?.[0];if(!file)return;$('backupStatus').textContent='Checking backup…';try{if(file.size>BACKUP_MAX_BYTES)throw Error('Choose a backup file smaller than 5 MB.');const candidate=parseBackup(await file.text());if(readId!==backupReadId)return;backupCandidate=candidate;const summary=backupSummary(candidate);$('backupPreviewText').textContent=`Backup from ${new Date(candidate.createdAt).toLocaleString()}: ${summary.decisions} practice ${summary.decisions===1?'attempt':'attempts'}, ${summary.rounds} completed ${summary.rounds===1?'round':'rounds'}, ${summary.lessons} completed ${summary.lessons===1?'lesson':'lessons'}.${summary.customShot?' Includes custom shot settings.':''}${summary.activeRound?' Saved round: '+summary.activeRound+'.':''}`;$('backupPreview').hidden=false;$('backupRestore').disabled=false;$('backupStatus').textContent='File checked. Nothing has been restored yet.';}catch(error){if(readId===backupReadId)$('backupStatus').textContent=error.message;}});
@@ -128,7 +140,28 @@ if(state.mode==='advanced'){state.pattern=member();state.costs=memberCosts();sta
 state.recent=state.recent.length?state.recent:[state.scenario];
 function member(){return{...basic(),customBag:effectiveBag(),shotType:scene().type};}
 function memberCosts(){const out={...DEFAULT_COSTS};for(const el of document.querySelectorAll('[data-cost]'))out[el.dataset.cost]=num(state.memberCosts?.[el.dataset.cost],Number(el.min),Number(el.max),DEFAULT_COSTS[el.dataset.cost]);return out;}
-function save(){if(tutorialReturn){try{localStorage.setItem(storeKey,JSON.stringify(tutorialReturn.state));localStorage.setItem(ROUND_KEY,JSON.stringify(tutorialReturn.round));}catch{}return;}rememberCompletedRound(round);if(round&&pausedRound?.id===round.id){pausedRound=structuredClone(round);try{localStorage.setItem(PAUSED_ROUND_KEY,JSON.stringify(pausedRound));}catch{}}if(!round&&freeSessionActive){freeSession=practiceSnapshot(state,hasAim);try{localStorage.setItem(PRACTICE_KEY,JSON.stringify(freeSession));}catch{}}try{localStorage.setItem(storeKey,JSON.stringify(state));localStorage.setItem(ROUND_KEY,JSON.stringify(round));if(isCourse()){localStorage.setItem(COURSE_KEY,JSON.stringify(round));courseStorageOK=true;}}catch{if(isCourse())courseStorageOK=false;}}
+function save(){
+ if(tutorialReturn){trySave(storeKey,JSON.stringify(tutorialReturn.state));trySave(ROUND_KEY,JSON.stringify(tutorialReturn.round));return;}
+ rememberCompletedRound(round);
+ if(round&&pausedRound?.id===round.id){pausedRound=structuredClone(round);trySave(PAUSED_ROUND_KEY,JSON.stringify(pausedRound));}
+ if(!round&&freeSessionActive){freeSession=practiceSnapshot(state,hasAim);trySave(PRACTICE_KEY,JSON.stringify(freeSession));}
+ trySave(storeKey,JSON.stringify(state));trySave(ROUND_KEY,JSON.stringify(round));
+ if(isCourse())courseStorageOK=trySave(COURSE_KEY,JSON.stringify(round));
+}
+$('saveWarningRetry').addEventListener('click',()=>{
+ for(const [key,value] of [...pendingSaves])if(trySave(key,value)){
+  if(key===PROGRESS_KEY)progressStored=true;if(key===ROUND_HISTORY_KEY)roundHistoryStored=true;
+  if(key===LESSON_KEY)lessonStorageOK=true;if(key===INTRO_KEY)introductionSaved=true;if(key===COURSE_KEY)courseStorageOK=true;
+ }
+ if(pendingSaves.size)$('saveWarningDetail').textContent='Still unable to save. Keep this page open and download a backup.';
+ else toast('Saved in this browser.');
+ if(progressOpen)renderProgress();updateLabels();
+});
+$('saveWarningBackup').addEventListener('click',()=>{
+ try{downloadBackupFile(backupSafety||currentBackup());$('saveWarningDetail').textContent='Backup downloaded. Keep the file somewhere safe before closing this page.';}
+ catch{$('saveWarningDetail').textContent='Could not download a backup. Keep this page open and try again.';}
+});
+
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function setSideTarget(x){
  const range=state.pattern.aimXRange||[-60,60],distance=state.pattern.carry;
@@ -221,7 +254,7 @@ async function openIntroduction(){
  finally{working=false;updateIntroductionControls();}
 }
 function closeIntroduction(status='skipped'){
- if(working||!introduction)return;if(status==='completed'){introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status}));introductionSaved=true;}catch{introductionSaved=false;}}
+ if(working||!introduction)return;if(status==='completed'){introductionSeen=true;try{writeSaved(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status}));introductionSaved=true;}catch{introductionSaved=false;}}
  introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
@@ -247,7 +280,7 @@ $('introductionSelect').addEventListener('click',selectIntroductionTarget);
 $('introductionDiagram').addEventListener('click',e=>{if(e.target.closest?.('[data-intro-target]'))selectIntroductionTarget();});
 $('introductionDiagram').addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.closest?.('[data-intro-target]')){e.preventDefault();selectIntroductionTarget();}});
 $('introductionReveal').addEventListener('click',()=>{if(working||!introduction?.selected)return;introduction.revealed=true;updateIntroductionControls();});
-function changeIntroductionStep(delta){if(working||!introduction||delta>0&&introduction.step>=0&&introduction.step<3&&!introduction.revealed)return;introduction.step=Math.max(-1,Math.min(INTRO_STEPS.length-1,introduction.step+delta));introduction.selected=false;introduction.revealed=false;if(introduction.step===INTRO_STEPS.length-1){introductionSeen=true;try{localStorage.setItem(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status:'completed'}));introductionSaved=true;}catch{introductionSaved=false;}}updateIntroductionControls();$('introductionScreen').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();}
+function changeIntroductionStep(delta){if(working||!introduction||delta>0&&introduction.step>=0&&introduction.step<3&&!introduction.revealed)return;introduction.step=Math.max(-1,Math.min(INTRO_STEPS.length-1,introduction.step+delta));introduction.selected=false;introduction.revealed=false;if(introduction.step===INTRO_STEPS.length-1){introductionSeen=true;try{writeSaved(INTRO_KEY,JSON.stringify({version:INTRO_VERSION,status:'completed'}));introductionSaved=true;}catch{introductionSaved=false;}}updateIntroductionControls();$('introductionScreen').scrollIntoView({behavior:'auto'});$('introductionTitle').focus?.();}
 $('introductionNext').addEventListener('click',()=>changeIntroductionStep(1));
 $('introductionBack').addEventListener('click',()=>changeIntroductionStep(-1));
 $('introductionSkip').addEventListener('click',()=>closeIntroduction('skipped'));
@@ -296,7 +329,7 @@ async function backTutorial(){
 }
 function finishTutorial(){
  leaveFullscreen();const definition=lessonById(tutorial.id);lessonCompleted=[...new Set([...lessonCompleted,tutorial.id])];
- try{localStorage.setItem(LESSON_KEY,JSON.stringify({version:CURRICULUM_VERSION,completed:lessonCompleted}));lessonStorageOK=true;}catch{lessonStorageOK=false;}
+ try{writeSaved(LESSON_KEY,JSON.stringify({version:CURRICULUM_VERSION,completed:lessonCompleted}));lessonStorageOK=true;}catch{lessonStorageOK=false;}
  $('lessonStorage').textContent=lessonStorageOK?'Completion is saved in this browser.':'Completed for this visit, but browser saving is unavailable.';
  lessonScreenOpen=true;$('practiceScreen').hidden=true;$('lessonsScreen').hidden=false;$('lessonCatalog').hidden=true;$('tutorialRecap').hidden=false;
  $('tutorialRecapTitle').textContent='Lesson complete: '+definition.title;
@@ -361,7 +394,7 @@ function showCourseReport(){$('assessmentShotReview').hidden=true;$('roundNextSt
  $('courseDecisionRows').innerHTML=round.answers.map(a=>`<li>Hole ${a.index+1}: ${a.score} / 100 · ${RATING_LABELS[a.kind]}</li>`).join('');$('courseReplay').hidden=false;$('courseReplay').textContent='Restart round';$('closeRound').textContent=round.status==='complete'?'Back to practice':'Back to hole';updateLabels();save();$('roundScreen').scrollIntoView({behavior:'auto'});}
 $('courseNext').addEventListener('click',()=>{if(working||!isCourse()||!round.review)return;if(round.status==='complete'){showCourseReport();return;}advanceCourse(round);hasAim=false;dirty();loadRoundSlot();});
 function quitCourse(){
- if(working||!isCourse())return;let cleared=true;try{localStorage.setItem(COURSE_KEY,'null');}catch{cleared=false;}
+ if(working||!isCourse())return;let cleared=true;try{writeSaved(COURSE_KEY,'null');}catch{cleared=false;}
  leaveFullscreen();round=null;sceneKey=null;setMode(state.mode,true);toast(cleared?'Round ended. You are back in practice.':'Round ended for this visit. Browser saving is unavailable.');
 }
 for(const id of ['courseQuit','courseQuitReport'])$(id).addEventListener('click',quitCourse);
@@ -462,7 +495,7 @@ $('closeRound').addEventListener('click',()=>{if(isCourse()&&round.status==='com
 $('roundContinue').addEventListener('click',nextRoundSlot);
 function enterFreePractice(resume=false){
  if(!prepareNavigation())return;
- if(round?.status==='active'){pausedRound=structuredClone(round);try{localStorage.setItem(PAUSED_ROUND_KEY,JSON.stringify(pausedRound));}catch{toast('Round backup could not be saved. Stay in this visit to resume it.');}}
+ if(round?.status==='active'){pausedRound=structuredClone(round);try{writeSaved(PAUSED_ROUND_KEY,JSON.stringify(pausedRound));}catch{toast('Round backup could not be saved. Stay in this visit to resume it.');}}
  round=null;state.practiceMode='free';roundView=false;freeSessionActive=true;
  $('roundScreen').hidden=true;$('practiceScreen').hidden=false;closeMenu();
  if(resume&&freeSession){const saved=freeSession;state.seed=saved.seed;state.practiceFilter=saved.practiceFilter;state.recent=saved.recent;setScenario(saved.scenario,saved.holeSeed,saved.landscape,saved.layoutVersion||null);state.recent=[...saved.recent];if(typeof saved.encounter==='string')state.encounter=saved.encounter;if(saved.hasAim){state.aim=fitTarget(saved.aim,state.pattern);hasAim=true;}updateControls();dirty();}
@@ -525,7 +558,7 @@ function renderEditor(keepInput=null){
  $('editorStatus').textContent=editorInvalid.size?'Check your entries before saving. Carry: 50–330 yd; roll: 0–40 yd. Other settings must be within their control limits.':'Save uses this shot profile in new games. Cancel or switch pages to discard unsaved changes.';
 }
 function closeEditor(){editorDraft=null;editorDrag=null;editorInvalid.clear();$('shotEditor').hidden=true;$('practiceScreen').hidden=false;updateControls();$('practiceScreen').scrollIntoView({behavior:'auto'});}
-function saveEditor(){if(!editorDraft||editorInvalid.size)return;state.memberBag=cleanMemberBag(editorDraft,basic());closeEditor();setMode('advanced',true);toast('My shot saved. Choose a target to see how it plays.');}
+function saveEditor(){if(!editorDraft||editorInvalid.size)return;state.memberBag=cleanMemberBag(editorDraft,basic());closeEditor();setMode('advanced',true);toast(pendingSaves.size?'Shot settings applied for this visit. They could not be saved.':'My shot saved. Choose a target to see how it plays.');}
 function editorPoint(svg,e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const ct=svg.getScreenCTM();return ct?p.matrixTransform(ct.inverse()):null;}
 function dragEditor(id,e){if(!editorDraft||!editorDrag||editorInvalid.size)return;const at=editorPoint($(id),e);if(!at)return;let p=editorPattern();p=editorDrag==='mid'&&id==='flightEditor'?moveApex(p,(at.x-APEX_X)/APEX_FLIGHT_PIXEL,at.y):editorDrag==='height'?{...p,height:Math.round(clamp((166-at.y)/2.4,5,50))}:moveFlightHandle(p,editorDrag,(at.x-(editorDrag==='end'?FINISH_X:APEX_X))/FLIGHT_PIXEL);changeDraft(p,true);renderEditor();}
 function practiceFilter(filter){if(working)return;state.practiceFilter=filter;if(filter!=='mixed'&&scene().type!==filter){state.seed=(state.seed+7919)%2147483646||1;setScenario(nextScenario(state.scenario,filter,state.seed,state.recent),state.seed);}else{save();updateLabels();}}

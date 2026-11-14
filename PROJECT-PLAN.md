@@ -271,3 +271,8 @@ Added gentle bends alongside moderate/sharp layouts, distinct wide/shallow and n
 ### Completed: maintenance audit — 14 November 2026
 
 Audited 17.18.14 without changing gameplay. Backup, packaged-asset and worker tests passed; six local Chromium timing samples completed. Confirmed silent learning-round save failures under rejected browser writes, and missing recovery when the bootstrap module itself cannot load. Clarified historical source/version instructions. See [audit and priorities](docs/MAINTENANCE-AUDIT.md). Next maintenance round: visible save-failure/recovery status, then bootstrap-independent failure recovery; preserve data and model behavior. Hosted-source reconciliation, real-device tests and launch gates remain pending.
+
+
+### Completed: visible save failures and recovery — v17.18.15
+
+Persistent warning, retry and backup actions now cover failed settings/round/practice/progress writes, including partial failures. Latest pending values are retained in memory; recovery preserves the active round and avoids duplicate progress. Existing storage is not cleared. See [scope and checks](docs/SAVE-FAILURE-RECOVERY.md). Next maintenance fix: recovery when the bootstrap module itself cannot load. Real-device checks and hosted-source reconciliation remain pending.

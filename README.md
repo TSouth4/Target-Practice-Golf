@@ -1,4 +1,8 @@
-> **Current source:** this branch contains app **17.18.14**. See the [maintenance audit](docs/MAINTENANCE-AUDIT.md) for verified source, recovery findings and remaining checks. Older version sections below are historical. The latest hosted version has not been independently confirmed; merge into Work’s latest source while preserving hosted changes. Do not assume a default `main` download is current.
+# Visible save failures (17.18.15)
+
+A persistent warning now explains when browser saving fails, offers retry and backup, and clears after all pending writes succeed. Play can continue without restarting or duplicating results. See [behavior and verification](docs/SAVE-FAILURE-RECOVERY.md).
+
+> **Current source:** this branch contains app **17.18.15**. See the [maintenance audit](docs/MAINTENANCE-AUDIT.md) for verified source, recovery findings and remaining checks. Older version sections below are historical. The latest hosted version has not been independently confirmed; merge into Work’s latest source while preserving hosted changes. Do not assume a default `main` download is current.
 
 # More varied hole layouts (17.18.14)
 

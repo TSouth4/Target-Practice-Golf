@@ -378,3 +378,5 @@ body:not(.immersive-mode) .course-with-depth .course-viewport{width:100%}.course
 .intro-game-trace{fill:none}.intro-game-finish{animation:intro-finish .3s both;opacity:.9}#controlsStory .intro-finish{animation-fill-mode:both}@media(prefers-reduced-motion:reduce){.intro-game-finish{animation:none}}
 
 .intro-group-flights{opacity:1}
+
+.save-warning{position:sticky;top:8px;z-index:450;margin:12px auto;padding:14px 18px;max-width:1200px;background:#fff4dc;color:#4c3920;border:1px solid #bfa270;border-radius:8px;font-size:14px;line-height:1.5}.save-warning p{margin-top:6px}.save-warning-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.save-warning-actions button{min-height:44px;background:#fffdf7}.save-warning [role=status]:empty{display:none}.immersive-mode .save-warning{position:fixed;top:8px;left:8px;right:8px;z-index:450;margin:0;max-height:35dvh;overflow:auto}@media(max-width:760px){.save-warning{margin:8px;padding:12px;font-size:13px}.save-warning-actions button{flex:1 1 130px}}
