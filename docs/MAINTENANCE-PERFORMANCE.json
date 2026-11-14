@@ -1,0 +1,69 @@
+{
+  "scope": "Local Chromium, reduced motion, no CPU/network throttling; timings include automation polling. Not real-phone or production capacity evidence.",
+  "runs": [
+    {
+      "width": 1440,
+      "sample": 1,
+      "courseReadyMs": 282.4000000022352,
+      "commitToReviewMs": 2892,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 61,
+      "resourceBytes": 849923,
+      "fcpMs": 60
+    },
+    {
+      "width": 1440,
+      "sample": 2,
+      "courseReadyMs": 274.69999999925494,
+      "commitToReviewMs": 3272,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 0,
+      "resourceBytes": 849923,
+      "fcpMs": 64
+    },
+    {
+      "width": 1440,
+      "sample": 3,
+      "courseReadyMs": 430.80000000074506,
+      "commitToReviewMs": 3118.800000000745,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 53,
+      "resourceBytes": 849923,
+      "fcpMs": 64
+    },
+    {
+      "width": 390,
+      "sample": 1,
+      "courseReadyMs": 375.3999999985099,
+      "commitToReviewMs": 3141.5,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 0,
+      "resourceBytes": 849923,
+      "fcpMs": 64
+    },
+    {
+      "width": 390,
+      "sample": 2,
+      "courseReadyMs": 334.20000000298023,
+      "commitToReviewMs": 2935.199999999255,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 0,
+      "resourceBytes": 849923,
+      "fcpMs": 40
+    },
+    {
+      "width": 390,
+      "sample": 3,
+      "courseReadyMs": 292.19999999925494,
+      "commitToReviewMs": 3019.7000000029802,
+      "execution": "worker",
+      "worstMainThreadTaskMs": 51,
+      "resourceBytes": 849923,
+      "fcpMs": 52
+    }
+  ],
+  "blockedBootstrap": {
+    "errorPanelHidden": true,
+    "courseRendered": false
+  }
+}

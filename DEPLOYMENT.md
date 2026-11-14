@@ -1,3 +1,5 @@
+> **Current-source notice (14 November 2026):** this checkout is **17.18.14**. The older headings/checks below are historical. Build with `npm run prepare:assets`, retain the existing private Site identity, and merge into Work’s latest hosted source while preserving its changes. The latest hosted version has not been verified in this audit. See [maintenance findings](docs/MAINTENANCE-AUDIT.md), including the outstanding bootstrap-file recovery gap.
+
 # Deployment and asset preparation — v17.18.4
 
 Download the complete development branch from GitHub using **Code → Download ZIP**, and upload it to the original Work conversation.

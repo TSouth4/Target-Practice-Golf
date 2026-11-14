@@ -1,3 +1,5 @@
+> **Current source:** this branch contains app **17.18.14**. See the [maintenance audit](docs/MAINTENANCE-AUDIT.md) for verified source, recovery findings and remaining checks. Older version sections below are historical. The latest hosted version has not been independently confirmed; merge into Work’s latest source while preserving hosted changes. Do not assume a default `main` download is current.
+
 # More varied hole layouts (17.18.14)
 
 New games mix gentle/moderate bends, balanced/wide/deep oval greens, and occasional back bunkers or recovery areas. Saved rounds retain their original geometry; fixed teaching and research examples stay unchanged. See [scope and verification](docs/HOLE-VARIETY.md).

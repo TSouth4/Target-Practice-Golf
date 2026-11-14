@@ -266,3 +266,8 @@ Two-line hazard labels keep names and distances separate; OB labels now identify
 ### Completed: first hole-variety expansion — v17.18.14
 
 Added gentle bends alongside moderate/sharp layouts, distinct wide/shallow and narrow/deep oval greens, and occasional back bunkers/recovery patches in new games. Preserved old seeded layouts with an explicit saved layout policy. See [scope and verification](docs/HOLE-VARIETY.md). Next: owner tests of new rounds and uncoached beginner feedback. Angled/irregular green shapes, peninsula/island families and broader course compositions remain planned; dispersion changes remain paused.
+
+
+### Completed: maintenance audit — 14 November 2026
+
+Audited 17.18.14 without changing gameplay. Backup, packaged-asset and worker tests passed; six local Chromium timing samples completed. Confirmed silent learning-round save failures under rejected browser writes, and missing recovery when the bootstrap module itself cannot load. Clarified historical source/version instructions. See [audit and priorities](docs/MAINTENANCE-AUDIT.md). Next maintenance round: visible save-failure/recovery status, then bootstrap-independent failure recovery; preserve data and model behavior. Hosted-source reconciliation, real-device tests and launch gates remain pending.
