@@ -1,3 +1,4 @@
+import {greenLevel} from './green-geometry.js';
 import {windEffect,rolloutDistance,usesSurfaceRollout,LEGACY_ROLLOUT} from './conditions.js';
 import {DRIVER_LIMITS,clubPattern,reachLimit} from './bag.js';
 import {EXTRA_HOLES} from './holes.js';
@@ -60,7 +61,7 @@ export function segmentPolyEntry(a,b,poly){
  return Number.isFinite(earliest)?{x:a.x+earliest*rx,y:a.y+earliest*ry}:inPoly(b,poly)?{x:b.x,y:b.y}:null;
 }
 export function segmentHitsPoly(a,b,poly){return segmentPolyEntry(a,b,poly)!==null;}
-export function inGreen(p,s){return ((p.x-s.green.x)/s.green.rx)**2+((p.y-s.green.y)/s.green.ry)**2<=1;}
+export function inGreen(p,s){return s.green.rotation?greenLevel(p,s.green)<=1:((p.x-s.green.x)/s.green.rx)**2+((p.y-s.green.y)/s.green.ry)**2<=1;}
 export function lie(p,s){if(p.x<s.bounds[0]||p.x>s.bounds[1]||p.y<0||p.y>s.maxY+100)return 'ob';for(const h of s.hazards)if(inPoly(p,h.poly))return h.kind;if(inGreen(p,s))return 'green';return inPoly(p,s.fairway)?'fairway':'rough';}
 export function remaining(p,s,c,kind=lie(p,s)){
  const d=Math.hypot(p.x-s.pin.x,p.y-s.pin.y);

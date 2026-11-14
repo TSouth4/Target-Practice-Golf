@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {greenLocal,greenLevel,greenPoint,greenOutline,greenBounds} from '../dist/green-geometry.js';
+import {GREEN_SHAPE_EXAMPLES,greenShapeScene} from '../dist/green-shape-fixtures.js';
+import {inGreen,lie,SCENARIOS} from '../dist/model.js';import {greenYardages} from '../dist/guidance.js';
+import {surfaceHeight,projectSurface,unprojectSurface,RELIEF} from '../dist/surfaces.js';import {validateTeeScenario,touchesGreen} from '../dist/tee-generator.js';
+const close=(a,b,t=1e-8)=>assert.ok(Math.abs(a-b)<t,`${a} differs from ${b}`);
+test('missing and zero rotation keep the original ellipse arithmetic',()=>{for(const g of [{x:8,y:155,rx:12,ry:27},{x:-4,y:130,rx:26,ry:11,rotation:0}])for(let x=-45;x<45;x+=3)for(let y=80;y<210;y+=7){const expected=((x-g.x)/g.rx)**2+((y-g.y)/g.ry)**2;assert.equal(greenLevel({x,y},g),expected);assert.equal(inGreen({x,y},{green:g}),expected<=1);}const s=SCENARIOS[2];assert.deepEqual(greenYardages(s).map(x=>x.kind),['front','flag','back']);});
+test('rotated boundaries, lies, relief, pin and front/back measurements use one ellipse',()=>{for(const f of GREEN_SHAPE_EXAMPLES){const s=greenShapeScene(f.id),g=s.green;assert.deepEqual(validateTeeScenario(s,{minimumReach:160}),[]);assert.equal(lie(s.pin,s),'green');const bounds=greenBounds(g);for(let i=0;i<96;i++){const a=i/96*Math.PI*2,p=greenPoint(g,a),inner=greenPoint(g,a,.999),outer=greenPoint(g,a,1.001),local=greenLocal(p,g);close(greenLevel(p,g),1);close(local.x,Math.cos(a)*g.rx);close(local.y,Math.sin(a)*g.ry);assert.equal(inGreen(inner,s),true);assert.equal(inGreen(outer,s),false);assert.ok(p.x>=bounds.minX-1e-8&&p.x<=bounds.maxX+1e-8&&p.y>=bounds.minY-1e-8&&p.y<=bounds.maxY+1e-8);close(surfaceHeight(s,p),0);}
+ for(const edge of greenYardages(s).filter(e=>e.kind!=='flag')){close(greenLevel(edge,g),1);close(Math.hypot(edge.x,edge.y),edge.distance);}
+ close(surfaceHeight(s,g),RELIEF.green);assert.equal(touchesGreen([[g.x-1,g.y-1],[g.x+1,g.y-1],[g.x+1,g.y+1],[g.x-1,g.y+1]],s),true);
+ const point=greenPoint(g,.7,.4),screen=projectSurface(s,point,8),picked=unprojectSurface(s,screen.x,screen.y,8);close(picked.x,point.x,1);const centerScreen=projectSurface(s,g,8),centerPick=unprojectSurface(s,centerScreen.x,centerScreen.y,8);close(centerPick.x,g.x);close(centerPick.y,g.y);assert.equal(inGreen(centerPick,s),true);
+ assert.equal(greenOutline(g).length,72);
+ }});
+test('rotation changes genuine lies, and mirroring the fixed long examples mirrors their geometry',()=>{const a=greenShapeScene('left'),b=greenShapeScene('right'),axis={...a,green:{...a.green,rotation:0}};const tip=greenPoint(a.green,Math.PI/2,.95);assert.equal(lie(tip,a),'green');assert.notEqual(lie(tip,axis),'green');close(a.pin.x,-b.pin.x);close(a.pin.y,b.pin.y);close(greenYardages(a)[0].distance,greenYardages(b)[0].distance);});

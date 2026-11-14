@@ -276,3 +276,8 @@ Audited 17.18.14 without changing gameplay. Backup, packaged-asset and worker te
 ### Completed: visible save failures and recovery — v17.18.15
 
 Persistent warning, retry and backup actions now cover failed settings/round/practice/progress writes, including partial failures. Latest pending values are retained in memory; recovery preserves the active round and avoids duplicate progress. Existing storage is not cleared. See [scope and checks](docs/SAVE-FAILURE-RECOVERY.md). Next maintenance fix: recovery when the bootstrap module itself cannot load. Real-device checks and hosted-source reconciliation remain pending.
+
+
+### Ready for owner review: fixed angled-green prototype — v17.18.16
+
+Menu preview offers left/right tilted long greens and a wide angled green, with shared boundaries for drawing, lies, yardages and simulated outcomes. No normal-round rotation or stored-data changes. See [review instructions](docs/ANGLED-GREEN-PREVIEW.md). Next: owner checks the fixed examples, then integrate rotated shapes throughout normal views and versioned generation; kidney/irregular shapes follow separately.

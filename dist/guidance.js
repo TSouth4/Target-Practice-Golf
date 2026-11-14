@@ -1,3 +1,4 @@
+import {greenRadiusAlong} from './green-geometry.js';
 import {inPoly} from './model.js';
 // Distances along the selected straight aim ray, in yards. Terrain only;
 // this describes geometry, not the probability that a curved shot clears it.
@@ -25,7 +26,7 @@ export function retryRows(first,now){const f=x=>Number.isFinite(x)?x.toFixed(2):
 // Front/back are intersections of the ball-to-green-center line with the green ellipse.
 export function greenYardages(s){
  const g=s.green,length=Math.hypot(g.x,g.y),dx=g.x/length,dy=g.y/length;
- const radius=1/Math.sqrt((dx/g.rx)**2+(dy/g.ry)**2);
+ const radius=g.rotation?greenRadiusAlong(g,dx,dy):1/Math.sqrt((dx/g.rx)**2+(dy/g.ry)**2);
  return [{label:'GREEN FRONT',kind:'front',x:g.x-dx*radius,y:g.y-dy*radius,distance:length-radius},{label:'FLAG',kind:'flag',...s.pin,distance:Math.hypot(s.pin.x,s.pin.y)},{label:'GREEN BACK',kind:'back',x:g.x+dx*radius,y:g.y+dy*radius,distance:length+radius}];
 }
 

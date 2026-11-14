@@ -1,3 +1,4 @@
+import {greenLocal,greenBounds} from './green-geometry.js';
 import {varyGreen,addBackTrouble} from './hole-variety.js';
 import {random,inPoly,inGreen,lie} from './model.js';
 import {decorateScenario} from './landscape.js';
@@ -20,7 +21,7 @@ export function validPolygon(poly){
 }
 export function touchesGreen(poly,s){
  if(inPoly(s.green,poly))return true;
- const g=s.green,at=([x,y])=>[(x-g.x)/g.rx,(y-g.y)/g.ry];
+ const g=s.green,at=([x,y])=>{const p=greenLocal({x,y},g);return[p.x/g.rx,p.y/g.ry];};
  for(let i=0;i<poly.length;i++){const a=at(poly[i]),b=at(poly[(i+1)%poly.length]),dx=b[0]-a[0],dy=b[1]-a[1],t=clamp(-(a[0]*dx+a[1]*dy)/(dx*dx+dy*dy||1),0,1);if((a[0]+t*dx)**2+(a[1]+t*dy)**2<=1)return true;}
  return false;
 }
@@ -30,7 +31,9 @@ export function validateTeeScenario(s,{minimumReach=180}={}){
  if(!s.bounds.every(Number.isFinite)||s.bounds[0]>=s.bounds[1])failures.push('boundaries');
  if(![s.green.x,s.green.y,s.green.rx,s.green.ry,s.pin.x,s.pin.y,s.maxY,...s.aimRange,s.aimY].every(Number.isFinite)||s.green.rx<=0||s.green.ry<=0)failures.push('coordinates');
  if(!inGreen(s.pin,s)||lie(s.pin,s)!=='green')failures.push('pin');
- if(s.green.x-s.green.rx<=s.bounds[0]||s.green.x+s.green.rx>=s.bounds[1]||s.green.y+s.green.ry>=s.maxY)failures.push('green bounds');
+ const greenBox=greenBounds(s.green);
+ if(s.green.rotation!==undefined&&!Number.isFinite(s.green.rotation))failures.push('green rotation');
+ if(greenBox.minX<=s.bounds[0]||greenBox.maxX>=s.bounds[1]||greenBox.maxY>=s.maxY)failures.push('green bounds');
  if(!(s.aimRange[0]<s.aimY&&s.aimY<s.aimRange[1]))failures.push('target range');
  for(const h of s.hazards){
   if(!validPolygon(h.poly))failures.push(`${h.label} polygon`);
