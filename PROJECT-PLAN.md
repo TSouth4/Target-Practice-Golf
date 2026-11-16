@@ -281,3 +281,8 @@ Persistent warning, retry and backup actions now cover failed settings/round/pra
 ### Ready for owner review: fixed angled-green prototype — v17.18.16
 
 Menu preview offers left/right tilted long greens and a wide angled green, with shared boundaries for drawing, lies, yardages and simulated outcomes. No normal-round rotation or stored-data changes. See [review instructions](docs/ANGLED-GREEN-PREVIEW.md). Next: owner checks the fixed examples, then integrate rotated shapes throughout normal views and versioned generation; kidney/irregular shapes follow separately.
+
+
+### Ready for owner review: angled-green fringe trial — v17.18.17
+
+Improved fringe contrast and exact green-edge visibility in the isolated preview. Original collar width, camera, playable shape, yardages and scoring remain unchanged. Owner should judge whether POV readability is sufficient before normal-game integration. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).

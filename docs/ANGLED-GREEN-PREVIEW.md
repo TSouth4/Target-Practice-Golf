@@ -26,3 +26,12 @@ No production generator emits rotation. No rotation is added to any saved layout
 - Syntax and complete asset preparation passed (50 runtime asset files).
 
 No deployment or physical-device/Safari test performed. Work must merge into its latest hosted source, preserve its changes and private access, rebuild assets and deploy to the existing private site. Owner review comes before randomizing or integrating angled greens into normal rounds.
+
+
+## Edge/fringe trial — v17.18.17
+
+Owner found the angle difficult to read from eye level. This preview-only trial changes the grass collar contrast and adds a clearer inner putting-surface edge. The outer collar stays at the original three-yard illustrative width. A lighter inner band softens the transition; the exact playable boundary has a restrained stroke that stays legible across screen sizes. Fringe outside that boundary is not scored as putting surface.
+
+No mowing lines, camera changes, raised terrain, larger playable green or gameplay integration were added. Fixtures, yardages, scoring and saved data are unchanged. Geometry and syntax checks passed. The browser sweep checked all three examples in both views at desktop/phone widths, with simulations and preserved storage; a final phone screenshot check followed a reduction of fringe width back to its original value. The angle remains subtle at ground level, so owner review is still needed. This is a readability trial, not proof that a first-time player can judge the angle correctly.
+
+Merge `feature/angled-green-fringe` into Work’s latest hosted source, preserving its changes and private access; rebuild assets. Then review Menu → Angled green preview.
