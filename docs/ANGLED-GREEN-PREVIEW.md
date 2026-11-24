@@ -35,3 +35,14 @@ Owner found the angle difficult to read from eye level. This preview-only trial 
 No mowing lines, camera changes, raised terrain, larger playable green or gameplay integration were added. Fixtures, yardages, scoring and saved data are unchanged. Geometry and syntax checks passed. The browser sweep checked all three examples in both views at desktop/phone widths, with simulations and preserved storage; a final phone screenshot check followed a reduction of fringe width back to its original value. The angle remains subtle at ground level, so owner review is still needed. This is a readability trial, not proof that a first-time player can judge the angle correctly.
 
 Merge `feature/angled-green-fringe` into Work’s latest hosted source, preserving its changes and private access; rebuild assets. Then review Menu → Angled green preview.
+
+
+## Mowing-band trial — v17.18.18
+
+Subtle alternating bands now follow each green's long local axis, so the wide example uses the opposite local direction from the long examples. They follow the existing projected relief and are clipped to the exact putting-surface outline. The preview-only Show mowing bands checkbox permits an immediate on/off comparison without changing aim or results.
+
+This adds artwork, not a change to grass lies, slope, elevation, camera, playable green boundary or scoring. No bands were added to normal gameplay. The low eye-level perspective still compresses the green; this is a visual trial rather than a claim that the angle is now obvious.
+
+Verification: syntax and geometry checks passed. All 840 projected vertices per example (including the clipping outline) lie inside/on the same ellipse, with fixtures unchanged. Chromium checked all three examples and both views at 1440/390/320 px, including the toggle, unchanged edge/yardages, three simulations, unchanged results after toggling, no overflow/invalid SVG and preserved storage. Phone eye-level and overhead screenshots were visually reviewed. Complete asset release contains 51 files.
+
+Merge `feature/angled-green-mowing` into Work's latest hosted source, preserving its changes/private access, then rebuild assets. Review Menu → Angled green preview and toggle Show mowing bands. No deployment was performed here.

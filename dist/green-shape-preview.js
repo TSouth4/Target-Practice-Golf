@@ -1,3 +1,4 @@
+import {drawGreenMowing} from './green-mowing.js';
 import {greenShapeScene} from './green-shape-fixtures.js';
 import {greenOutline} from './green-geometry.js';
 import {greenYardages} from './guidance.js';
@@ -17,6 +18,7 @@ function render(){
  const map=$('studyView').value==='map',pin=project(scene.pin),target=project(aim),camera=project({x:0,y:0});
  let svg=`<defs>${illustratedDefinitions(theme,scene,project)}</defs>`+(map?'<rect width="960" height="580" fill="#8da66d"/>':'<rect width="960" height="580" fill="#9bbdce"/><path d="M0 234Q95 212 195 225T390 221T650 224T960 234V250H0Z" fill="#708d5f"/><rect y="235" width="960" height="345" fill="#8da66d"/>'+drawBackdrop('woodland',scene));
  svg+=`<polygon points="${polygon(scene.fairway)}" fill="#83b653"/><g id="studyGreenFringe"><polygon points="${polygon(greenOutline(scene.green,72,3))}" fill="#56793b"/><polygon points="${polygon(greenOutline(scene.green,72,1.2))}" fill="#96ad65"/></g>`+drawRelief(scene,project,theme,map,true);
+ if($('studyMowing').checked)svg+=drawGreenMowing(scene.green,project);
  svg+=`<polygon id="studyGreenEdge" points="${polygon(greenOutline(scene.green))}" fill="none" stroke="#43632e" stroke-width="1.25" vector-effect="non-scaling-stroke"/>`;
  if(answer){for(const p of answer.result.points.filter((_,i)=>i%8===0)){const q=project(p);svg+=`<circle cx="${q.x}" cy="${q.y}" r="2.5" fill="${colors[p.kind]}" stroke="#344b36" stroke-width=".4"/>`;}const best=project(answer.comparison.aim);svg+=`<path d="M${best.x} ${best.y-7}l7 7-7 7-7-7Z" fill="#3487b6" stroke="white"/>`;}
  svg+=`<path d="M${pin.x} ${pin.y}v-25l18 6-18 7" fill="#ed6551" stroke="white" stroke-width="2"/><line x1="${camera.x}" y1="${camera.y}" x2="${target.x}" y2="${target.y}" stroke="white" stroke-width="1.4" stroke-dasharray="6 5"/><circle cx="${target.x}" cy="${target.y}" r="6" fill="none" stroke="white" stroke-width="2"/>`;
@@ -26,7 +28,7 @@ function render(){
  $('studyCommit').disabled=busy||!!answer;$('studyCommit').textContent=busy?'Calculating…':'Commit & reveal';
 }
 function change(x,carry){if(busy)return;aim=aimAtDistance({x,y:Math.sqrt(Math.max(1,carry*carry-x*x))},carry,[-50,50]);answer=null;$('studyResult').hidden=true;$('studyStatus').textContent='Target updated. Commit to reveal the possible finishes.';render();}
-$('studyExample').onchange=initialize;$('studyProfile').onchange=initialize;$('studyView').onchange=render;
+$('studyExample').onchange=initialize;$('studyProfile').onchange=initialize;$('studyView').onchange=render;$('studyMowing').onchange=render;
 $('studySide').oninput=()=>change(Number($('studySide').value),Math.hypot(aim.x,aim.y));$('studyCarry').oninput=()=>change(aim.x,Number($('studyCarry').value));
 $('studyFlag').onclick=()=>change(scene.pin.x,Math.hypot(scene.pin.x,scene.pin.y));$('studyCenter').onclick=()=>change(0,155);$('studyReset').onclick=initialize;
 $('studyCourse').onclick=e=>{if(busy)return;const p=$('studyCourse').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform($('studyCourse').getScreenCTM().inverse()),at=$('studyView').value==='map'?{x:(q.x-480)/6,y:95+(530-q.y)/4.5}:unprojectSurface(scene,q.x,q.y,8);change(Math.max(-50,Math.min(50,at.x)),Math.hypot(aim.x,aim.y));};

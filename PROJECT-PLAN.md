@@ -286,3 +286,8 @@ Menu preview offers left/right tilted long greens and a wide angled green, with 
 ### Ready for owner review: angled-green fringe trial — v17.18.17
 
 Improved fringe contrast and exact green-edge visibility in the isolated preview. Original collar width, camera, playable shape, yardages and scoring remain unchanged. Owner should judge whether POV readability is sufficient before normal-game integration. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).
+
+
+### Ready for owner review: angled-green mowing bands — v17.18.18
+
+Preview-only mowing bands follow the long axis of each fixed green. A checkbox allows comparison with the plain surface. Camera, terrain, playable geometry and scoring are unchanged. Owner should judge whether this helps eye-level visibility; an optional raised inspection view remains a possible next experiment if needed. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).
