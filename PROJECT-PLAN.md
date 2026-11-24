@@ -291,3 +291,8 @@ Improved fringe contrast and exact green-edge visibility in the isolated preview
 ### Ready for owner review: angled-green mowing bands — v17.18.18
 
 Preview-only mowing bands follow the long axis of each fixed green. A checkbox allows comparison with the plain surface. Camera, terrain, playable geometry and scoring are unchanged. Owner should judge whether this helps eye-level visibility; an optional raised inspection view remains a possible next experiment if needed. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).
+
+
+### Ready for owner review: narrower bands and scenery — v17.18.19
+
+Preview mowing bands are half as wide; optional background/side trees and masked rough texture add visual context without changing playable hazards, geometry or scoring. Two toggles support comparison. See [notes](docs/ANGLED-GREEN-PREVIEW.md). Owner checks POV readability before further integration or an elevated inspection-view trial.

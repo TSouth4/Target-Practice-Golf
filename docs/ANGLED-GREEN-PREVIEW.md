@@ -46,3 +46,14 @@ This adds artwork, not a change to grass lies, slope, elevation, camera, playabl
 Verification: syntax and geometry checks passed. All 840 projected vertices per example (including the clipping outline) lie inside/on the same ellipse, with fixtures unchanged. Chromium checked all three examples and both views at 1440/390/320 px, including the toggle, unchanged edge/yardages, three simulations, unchanged results after toggling, no overflow/invalid SVG and preserved storage. Phone eye-level and overhead screenshots were visually reviewed. Complete asset release contains 51 files.
 
 Merge `feature/angled-green-mowing` into Work's latest hosted source, preserving its changes/private access, then rebuild assets. Review Menu → Angled green preview and toggle Show mowing bands. No deployment was performed here.
+
+
+## Narrower bands and scenery — v17.18.19
+
+Band width is reduced from four to two yards, giving about six darker bands rather than three across these examples. Sampling density per yard stays consistent. A separate Show scenery checkbox adds distant/side trees and subtle rough texture near/far from the green. The original mowing-band toggle remains available.
+
+Trees are placed beyond the existing lateral/far OB boundaries; they do not create unscored obstacles on playable turf. Rough textures are masked out of the fairway, green/fringe and existing hazards. Trees use the game's existing illustrated artwork and appear in eye-level view; the overhead view keeps its terrain-focused presentation. Camera, terrain relief, green boundary, pin, hazards and scoring are unchanged. No scenery or striping changes are enabled in normal play.
+
+Checks: geometry/scenery tests and syntax passed. Tree bases classify as OB in all three examples and rendering leaves fixtures unchanged. The existing browser sweep passed all examples/both views at desktop and phone sizes, including toggles, unchanged edges/yardages/results, valid SVG and preserved storage. Stripe vertices remain inside the scored green. Phone eye-level/overhead screenshots were visually reviewed. Asset preparation includes 52 files. The visual depth effect remains limited by eye-level perspective and needs owner review.
+
+Merge `feature/angled-green-context` into Work's latest hosted source while preserving its changes/private access, then rebuild assets and deploy to the existing private site. Review Menu → Angled green preview, using Show mowing bands and Show scenery for comparison. Not deployed here.

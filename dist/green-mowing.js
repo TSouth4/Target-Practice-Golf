@@ -1,8 +1,8 @@
 import {greenPoint,greenOutline} from './green-geometry.js';
-// Preview-only artwork: alternate four-yard bands parallel to the long axis.
+// Preview-only artwork: alternate two-yard bands parallel to the long axis.
 // Vertices stay inside the same ellipse and are projected on its existing relief.
 export function drawGreenMowing(g,project){
- const longY=g.ry>=g.rx,shortRadius=longY?g.rx:g.ry,width=4,sections=4,rows=16;
+ const longY=g.ry>=g.rx,shortRadius=longY?g.rx:g.ry,width=2,sections=2,rows=16;
  const screen=(across,along)=>{const limit=Math.sqrt(Math.max(0,1-across*across)),u=longY?across:along*limit,v=longY?along*limit:across,p=greenPoint(g,Math.atan2(v,u),Math.hypot(u,v)),q=project(p);return`${q.x.toFixed(2)},${q.y.toFixed(2)}`;};
  let path='';
  for(let start=-shortRadius,band=0;start<shortRadius;start+=width,band++){

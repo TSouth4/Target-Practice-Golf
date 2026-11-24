@@ -1,3 +1,7 @@
+# Narrower bands and green scenery trial (17.18.19)
+
+The isolated angled-green preview has twice as many mowing bands plus optional background trees/rough texture. Use the two checkboxes to compare. Geometry, camera and scoring stay unchanged. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).
+
 # Angled-green mowing-band trial (17.18.18)
 
 The isolated preview adds subtle mowing bands aligned with each green and a checkbox for on/off comparison. Camera, terrain, yardages, scoring and normal games are unchanged. See [trial notes](docs/ANGLED-GREEN-PREVIEW.md).
@@ -14,7 +18,7 @@ Menu → Angled green preview opens three fixed, ungraded examples with eye-leve
 
 A persistent warning now explains when browser saving fails, offers retry and backup, and clears after all pending writes succeed. Play can continue without restarting or duplicating results. See [behavior and verification](docs/SAVE-FAILURE-RECOVERY.md).
 
-> **Current source:** this branch contains app **17.18.18**. See the [maintenance audit](docs/MAINTENANCE-AUDIT.md) for verified source, recovery findings and remaining checks. Older version sections below are historical. The latest hosted version has not been independently confirmed; merge into Work’s latest source while preserving hosted changes. Do not assume a default `main` download is current.
+> **Current source:** this branch contains app **17.18.19**. See the [maintenance audit](docs/MAINTENANCE-AUDIT.md) for verified source, recovery findings and remaining checks. Older version sections below are historical. The latest hosted version has not been independently confirmed; merge into Work’s latest source while preserving hosted changes. Do not assume a default `main` download is current.
 
 # More varied hole layouts (17.18.14)
 
