@@ -1,4 +1,4 @@
-> **Current-source notice (14 November 2026):** this checkout contains app **17.18.19**, developed through `feature/angled-green-context`. The v12/v12.7 wording below describes earlier checkpoints, not this checkout. Use `package.json`, the current README entry, [deployment instructions](DEPLOYMENT.md), and [maintenance audit](docs/MAINTENANCE-AUDIT.md) to establish the actual version. Work’s latest hosted source must be reconciled before declaring GitHub/hosting synchronized.
+> **Current-source notice (26 November 2026):** this checkout contains app **17.18.20**, developed through `feature/home-refresh`. The v12/v12.7 wording below describes earlier checkpoints, not this checkout. Use `package.json`, the current README entry, [deployment instructions](DEPLOYMENT.md), and [maintenance audit](docs/MAINTENANCE-AUDIT.md) to establish the actual version. Work’s latest hosted source must be reconciled before declaring GitHub/hosting synchronized.
 
 > **Current startup note:** run `npm run prepare:assets` before serving `dist/`. Generated releases are not stored in Git. `npm test` prepares them automatically. See `docs/HOSTED-SOURCE-RECONCILIATION.md`.
 

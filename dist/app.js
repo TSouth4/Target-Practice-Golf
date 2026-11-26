@@ -48,7 +48,7 @@ const KEYS=['carry','roll','sdSide','sdLong','bias','start','curve','height','bi
 const COLORS=TRACER_COLORS;
 const NAMES={fairway:'Fairway',green:'Green',rough:'Rough',bunker:'Bunker',water:'Water',trees:'Recovery',ob:'OB'};
 let state={scenario:'cedar',holeSeed:0,layoutVersion:null,elevated:true,landscape:'woodland',practiceMode:'free',difficulty:'easy',basicLimits:{},mode:'basic',basicHandicap:'5',advanced:null,memberBag:null,memberCosts:null,practiceFilter:'mixed',recent:[],profile:'5',club:'Driver',view:'pov',aim:{x:0,y:270},pattern:basicPattern(5,SCENARIOS[0]),costs:{...DEFAULT_COSTS},seed:7142026};
-let homeOpen=false,freeSessionActive=false,freeSession=null,pausedRound=null;
+let homeOpen=false,homeResumeAvailable=false,freeSessionActive=false,freeSession=null,pausedRound=null;
 try{freeSession=readPractice(localStorage.getItem(PRACTICE_KEY));pausedRound=readRound(localStorage.getItem(PAUSED_ROUND_KEY));}catch{}
 let courseSetupOpen=false,courseSetupFocus=null;
 let introduction=null,introductionSeen=false,introductionSaved=true;try{introductionSeen=hasSeenIntroduction(localStorage.getItem(INTRO_KEY));}catch{introductionSaved=false;}
@@ -258,7 +258,7 @@ function closeIntroduction(status='skipped'){
  introduction=null;$('introductionScreen').hidden=true;closeLessons();if(!introductionSaved)toast('Introduction finished for this visit. Browser saving is unavailable.');
 }
 function updateIntroductionControls(){
- $('homeIntroductionRecommended').hidden=!homeOpen||state.controlsTutorialSeen===true;$('introductionMenu').disabled=working;$('introductionStart').hidden=true;$('introductionScreen').hidden=!introduction;
+ $('homeIntroductionRecommended').hidden=!homeOpen||state.controlsTutorialSeen===true||homeResumeAvailable;$('introductionMenu').disabled=working;$('introductionStart').hidden=true;$('introductionScreen').hidden=!introduction;
  if(!introduction)return;const i=introduction.step,step=i<0?INTRO_PURPOSE:INTRO_STEPS[i];
  $('introductionStep').textContent=`Introduction · ${i+2} / ${INTRO_STEPS.length+1}`;$('introductionTitle').textContent=step.title;$('introductionText').textContent=step.text;
  const t=introduction.prepared?.targets[Math.min(i,2)];
@@ -439,7 +439,7 @@ function applyPlayerSetup(setup){
 }
 for(const prefix of ['course','assessment'])$(prefix+'Profile').addEventListener('change',()=>updatePlayerSetupSummary(prefix));
 const controlsIntroduction=createControlsTutorial({get:$,onComplete(){
- state.controlsTutorialSeen=true;if(tutorialReturn)tutorialReturn.state.controlsTutorialSeen=true;save();updateHomeRecommendation();updateIntroductionControls();
+ state.controlsTutorialSeen=true;if(tutorialReturn)tutorialReturn.state.controlsTutorialSeen=true;save();updateHomeRecommendation();updateIntroductionControls();if(homeOpen)renderHomePresentation(resumableRound());
 },onAssessment:()=>showRoundScreen(true),onStrategy:()=>openLessons()});
 function openControlsIntroduction(target){if(working||courseSetupOpen)return;leaveFullscreen();closeMenu();controlsIntroduction.open(target?.id==='controlsMenu'?$('menuToggle'):target);}
 function openCourseSetup(focusTarget){
@@ -801,19 +801,36 @@ function hideHome(){homeOpen=false;$('homeScreen').hidden=true;}
 function resumableRound(){return round?.status==='active'?round:pausedRound?.status==='active'?pausedRound:storedCourse()?.status==='active'?storedCourse():null;}
 function openReassessment(profile){if(!profile)return;showRoundScreen(true);$('assessmentProfile').value=profile.shotMode==='custom'?'custom':profile.handicap;$('assessmentDifficulty').value=profile.difficulty||'easy';updatePlayerSetupSummary('assessment');reassessmentProfile=structuredClone(profile);$('assessmentProfileSummary').textContent+=' Reassessment will reuse the saved club distances and shot settings unless you change this selection.';}
 function updateHomeRecommendation(){homeRecommendation=nextLearningStep(completedRounds,state.controlsTutorialSeen===true,lessonCompleted);$('homeNextStep').hidden=homeRecommendation.action==='introduction';$('homeNextStep').textContent=homeRecommendation.label;$('homeNextReason').textContent=homeRecommendation.text;}
+function renderHomePresentation(saved){
+ const introduced=state.controlsTutorialSeen===true,data=dashboardData(progressHistory,completedRounds,'all'),recent=data.first.slice(-20),returning=introduced||!!saved||recent.length>0;
+ $('homeScreen').classList.toggle('home-returning',!!returning);
+ $('homeEyebrow').textContent=returning?'YOUR NEXT PRACTICE':'CHOOSE SMARTER TARGETS';
+ $('homeTitle').textContent=returning?'Ready for your next session?':'Better decisions. Better golf.';
+ $('homeSubtitle').textContent=returning?'Pick up where you left off, or try a fresh challenge.':'Learn to aim with your misses in mind.';
+ $('homeSessionsTitle').textContent=returning?'Choose a session':'Explore the app';
+ $('homeResumeCard').hidden=!saved;$('homeResumeTitle').textContent=saved?`Continue ${saved.kind==='course'?'Par-3 round':saved.kind==='assessment'?'assessment':'learning round'}`:'Continue your round';
+ if(saved)$('homeContinueDetails').textContent+=` · ${saved.profile.shotMode==='custom'?'Custom shot':saved.profile.handicap+'-handicap profile'}`;
+ $('homeIntroPrompt').hidden=introduced||!!saved;$('homeJourney').hidden=!introduced||!!saved;
+ $('homeIntroductionLabel').textContent=introduced?'Replay Introduction':'Introduction';
+ $('homeSummary').hidden=!returning;$('homeSummaryData').hidden=!recent.length;$('homeSummaryEmpty').hidden=recent.length>0;
+ $('homeSummaryScore').textContent=recent.length?(recent.reduce((sum,r)=>sum+r.score,0)/recent.length).toFixed(1):'—';
+ $('homeSummaryCount').textContent=`Last ${recent.length} first ${recent.length===1?'choice':'choices'} · all settings`;
+ $('homeSummaryTrend').hidden=recent.length<2;
+ $('homeSummaryTrend').innerHTML=recent.length<2?'':`<polyline points="${recent.map((r,i)=>`${8+i*244/(recent.length-1)},${56-r.score*.48}`).join(' ')}" fill="none" stroke="#789b39" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+}
 function openHome(){
  if(!prepareNavigation())return;leaveFullscreen();save();homeOpen=true;$('homeScreen').hidden=false;
  for(const id of ['practiceScreen','roundScreen','progressScreen','lessonsScreen','shotEditor','assumptions'])$(id).hidden=true;
  $('homeContinuePractice').hidden=!freeSession;$('continuePracticeMenu').hidden=!freeSession;
- const saved=resumableRound();$('homeContinue').hidden=!saved;$('homeContinueDetails').hidden=!saved;
+ const saved=resumableRound();homeResumeAvailable=!!saved;$('homeContinue').hidden=!saved;$('homeContinueDetails').hidden=!saved;
  $('homeContinueDetails').textContent=saved?`${saved.kind==='course'?'Par-3 course':saved.kind==='assessment'?'Assessment':'Learning round'} · ${saved.kind==='course'?'Hole':'Shot'} ${saved.index+1} of ${saved.schedule.length}`:'';
- updateHomeRecommendation();updateIntroductionControls();$('homeScreen').scrollIntoView({behavior:'auto'});$('homeTitle').focus?.();
+ updateHomeRecommendation();updateIntroductionControls();renderHomePresentation(saved);$('homeScreen').scrollIntoView({behavior:'auto'});$('homeTitle').focus?.();
 }
 $('homeNextStep').addEventListener('click',()=>{const next=homeRecommendation;if(!next)return;if(next.action==='introduction')openControlsIntroduction($('homeNextStep'));else if(next.action==='assessment')showRoundScreen(true);else if(next.action==='learning')startRound('practice');else if(next.action==='lesson')startTutorial(next.lesson);else openReassessment(next.profile);});
 $('roundSuggestedLesson').addEventListener('click',()=>{if(roundSuggestedLesson)startTutorial(roundSuggestedLesson);});$('roundReassess').addEventListener('click',()=>openReassessment(roundReassessmentProfile));$('progressReassess').addEventListener('click',()=>openReassessment(reassessmentProfile));
 $('homeLogo').addEventListener('click',e=>{e.preventDefault();openHome();});$('homeMenu').addEventListener('click',openHome);
 for(const id of ['homeIntroduction','homeIntroductionRecommended','controlsMenu','assessmentControls'])$(id).addEventListener('click',()=>openControlsIntroduction($(id)));
-$('homeLessons').addEventListener('click',openLessons);$('homeProgress').addEventListener('click',openProgress);
+$('homeLessons').addEventListener('click',openLessons);$('homeProgress').addEventListener('click',openProgress);$('homeSummaryDetails').addEventListener('click',openProgress);$('homeNavHome').addEventListener('click',openHome);$('homeNavPlay').addEventListener('click',()=>{if(resumableRound())$('homeContinue').dispatchEvent(new Event('click'));else if(freeSession)$('homeContinuePractice').dispatchEvent(new Event('click'));else $('homePractice').dispatchEvent(new Event('click'));});
 for(const [id,target] of [['homePractice','freePracticeMenu'],['homeLearning','practiceRoundMenu'],['homeAssessment','assessmentMenu']])$(id).addEventListener('click',()=>$(target).dispatchEvent(new Event('click')));
 $('homeCourse').addEventListener('click',()=>{const saved=isCourse()?round:storedCourse();if(saved?.status==='active')$('courseMenu').dispatchEvent(new Event('click'));else openCourseSetup($('homeCourse'));});
 $('homeContinue').addEventListener('click',()=>{const saved=resumableRound();if(!saved||!prepareNavigation())return;round=saved;restorePlayerProfile();sceneKey=null;loadRoundSlot();});

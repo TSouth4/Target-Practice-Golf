@@ -296,3 +296,8 @@ Preview-only mowing bands follow the long axis of each fixed green. A checkbox a
 ### Ready for owner review: narrower bands and scenery — v17.18.19
 
 Preview mowing bands are half as wide; optional background/side trees and masked rough texture add visual context without changing playable hazards, geometry or scoring. Two toggles support comparison. See [notes](docs/ANGLED-GREEN-PREVIEW.md). Owner checks POV readability before further integration or an elevated inspection-view trial.
+
+
+### Completed: Home presentation refresh — v17.18.20
+
+Implemented the approved Home concept with the existing logo, clear new/returning states, continue priority, original course banner, simpler session rows/cards and actual recent first-choice statistics/empty state. Preserved navigation, learning sequence, saved rounds and scoring. See [scope and checks](docs/HOME-REFRESH.md). Owner tests Home while angled-green/scenery review remains pending; bootstrap-independent recovery and hosted-source reconciliation are still open.
